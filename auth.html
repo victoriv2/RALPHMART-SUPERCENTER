@@ -1698,6 +1698,9 @@
           return { valid: false, message: 'Please enter your email address.' };
         }
         const clean = email.trim();
+        if (clean.toLowerCase() === 'admin') {
+          return { valid: true, cleanEmail: 'admin@ralphmart.ng' };
+        }
         if (!clean.includes('@')) {
           return { valid: false, message: 'Email address must contain an "@" symbol (e.g. name@example.com).' };
         }
@@ -1744,10 +1747,19 @@
 
         try {
           const res = await signInUser(emailCheck.cleanEmail, pass);
-          await getCurrentProfile();
+          const prof = await getCurrentProfile();
           showAlert('Signed in successfully! Redirecting...', false);
           setTimeout(() => {
-            window.location.href = redirectUrl;
+            if (prof && prof.role === 'admin') {
+              window.location.href = 'admin.html';
+            } else {
+              window.location.href = redirectUrl;
+            }
+          }, 600);
+        } catch (err) {
+          showAlert(err.message || 'Failed to sign in. Please check your credentials.');
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = 'Sign In to Supercenter';
           }, 800);
         } catch (err) {
           showAlert(err.message || 'Failed to sign in. Please check your credentials.');

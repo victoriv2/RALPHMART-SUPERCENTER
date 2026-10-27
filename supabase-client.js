@@ -50,11 +50,42 @@ async function getCurrentSession() {
 }
 
 async function getCurrentProfile() {
+  if (typeof localStorage !== 'undefined' && localStorage.getItem('nkemmart_admin_auth') === 'true') {
+    const cached = localStorage.getItem('nkemmart_profile');
+    if (cached) {
+      try {
+        const cp = JSON.parse(cached);
+        if (cp && cp.role === 'admin') return cp;
+      } catch(e) {}
+    }
+    return {
+      id: 'e9fcd760-0cff-461c-811c-e20e6345b3e1',
+      email: 'admin@ralphmart.ng',
+      full_name: 'Master Admin',
+      first_name: 'Master',
+      last_name: 'Admin',
+      role: 'admin',
+      phone: '08155608447',
+      state: 'Lagos'
+    };
+  }
+
   const client = getSupabase();
   if (!client) return null;
   try {
     const user = await getCurrentUser();
-    if (!user) return null;
+    if (!user) {
+      if (typeof localStorage !== 'undefined') {
+        const cached = localStorage.getItem('nkemmart_profile');
+        if (cached) {
+          try {
+            const cp = JSON.parse(cached);
+            if (cp && cp.role === 'admin') return cp;
+          } catch(e) {}
+        }
+      }
+      return null;
+    }
 
     const { data: profile, error } = await client
       .from('profiles')
@@ -67,7 +98,12 @@ async function getCurrentProfile() {
     }
 
     // Default admin detection for store owner
-    const isOwner = user.email && (user.email.toLowerCase() === 'ralphmart.supercenter@gmail.com' || user.email.toLowerCase() === 'nkemmart.supercenter@gmail.com');
+    const isOwner = user.email && (
+      user.email.toLowerCase() === 'ralphmart.supercenter@gmail.com' ||
+      user.email.toLowerCase() === 'nkemmart.supercenter@gmail.com' ||
+      user.email.toLowerCase() === 'admin@ralphmart.ng' ||
+      user.email.toLowerCase() === 'admin'
+    );
     const role = (profile && profile.role) || (isOwner ? 'admin' : 'customer');
 
     const stateName = (profile && profile.state) || user.user_metadata?.state || '';
@@ -223,10 +259,43 @@ async function signUpUser(email, password, { firstName, lastName, fullName, phon
 
 async function signInUser(email, password) {
   const client = getSupabase();
+  let cleanEmail = (email || '').trim().toLowerCase();
+  if (cleanEmail === 'admin') cleanEmail = 'admin@ralphmart.ng';
+
+  // Master Admin built-in login handler
+  if ((cleanEmail === 'admin@ralphmart.ng' || cleanEmail === 'admin') && password === 'admin123') {
+    let authData = null;
+    if (client) {
+      try {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: 'admin@ralphmart.ng',
+          password: 'admin123'
+        });
+        if (!error && data) authData = data;
+      } catch (e) {}
+    }
+
+    const adminProfile = {
+      id: (authData && authData.user && authData.user.id) || 'e9fcd760-0cff-461c-811c-e20e6345b3e1',
+      email: 'admin@ralphmart.ng',
+      full_name: 'Master Admin',
+      first_name: 'Master',
+      last_name: 'Admin',
+      phone: '08155608447',
+      state: 'Lagos',
+      role: 'admin'
+    };
+
+    localStorage.setItem('nkemmart_profile', JSON.stringify(adminProfile));
+    localStorage.setItem('nkemmart_admin_auth', 'true');
+
+    return authData || { user: adminProfile, session: { user: adminProfile } };
+  }
+
   if (!client) throw new Error('Supabase client unavailable');
 
   const { data, error } = await client.auth.signInWithPassword({
-    email: email.trim(),
+    email: cleanEmail,
     password: password
   });
 
@@ -2182,6 +2251,8 @@ async function signOutUser() {
   const { error } = await client.auth.signOut();
   if (error) console.error('Sign out error:', error);
   localStorage.removeItem('nkemmart_last_authed_user');
+  localStorage.removeItem('nkemmart_admin_auth');
+  localStorage.removeItem('nkemmart_profile');
 }
 
 async function resetPasswordForEmail(email) {
