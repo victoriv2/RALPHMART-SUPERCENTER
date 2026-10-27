@@ -376,7 +376,7 @@
     /* Stats Grid */
     .admin-stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -385,16 +385,18 @@
       background: var(--admin-card);
       border: 1px solid var(--admin-border);
       border-radius: 12px;
-      padding: 20px;
+      padding: 16px 18px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      min-width: 0;
+      overflow: hidden;
     }
 
     .admin-stat-icon {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -410,21 +412,32 @@
     .admin-stat-info {
       display: flex;
       flex-direction: column;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
     }
 
     .admin-stat-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11.5px;
+      font-weight: 700;
       color: var(--admin-text-muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .admin-stat-val {
-      font-size: 22px;
+      font-size: 19px;
       font-weight: 800;
       color: var(--admin-navy);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.3px;
     }
 
     /* Action Bar */
@@ -766,7 +779,7 @@
     /* Sales KPI Strip */
     .sales-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-bottom: 22px;
     }
@@ -774,8 +787,10 @@
       background: #ffffff;
       border: 1px solid var(--admin-border);
       border-radius: 12px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      min-width: 0;
+      overflow: hidden;
     }
     .sales-kpi-title {
       font-size: 11.5px;
@@ -784,17 +799,28 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sales-kpi-val {
-      font-size: 24px;
+      font-size: 21px;
       font-weight: 800;
       color: var(--admin-navy);
       margin-bottom: 4px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.3px;
     }
     .sales-kpi-sub {
       font-size: 12px;
       color: #10b981;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Date Filter Chips */
@@ -2312,7 +2338,19 @@
         if (p.verified !== false) verifiedCount++;
       });
 
-      document.getElementById('statCatalogValue').textContent = formatNaira(totalValuation);
+      const catValEl = document.getElementById('statCatalogValue');
+      if (catValEl) {
+        const formattedVal = formatNaira(totalValuation);
+        catValEl.textContent = formattedVal;
+        catValEl.title = formattedVal;
+        if (formattedVal.length > 13) {
+          catValEl.style.fontSize = '16px';
+        } else if (formattedVal.length > 10) {
+          catValEl.style.fontSize = '17.5px';
+        } else {
+          catValEl.style.fontSize = '19px';
+        }
+      }
       document.getElementById('statLowStock').textContent = lowStockCount;
       document.getElementById('statVerifiedCount').textContent = verifiedCount;
     }
@@ -2761,7 +2799,14 @@
       const unitsEl = document.getElementById('salesKpiUnits');
       const aovEl = document.getElementById('salesKpiAov');
 
-      if (revEl) revEl.textContent = formatNaira(grossRevenue);
+      if (revEl) {
+        const revFormatted = formatNaira(grossRevenue);
+        revEl.textContent = revFormatted;
+        revEl.title = revFormatted;
+        if (revFormatted.length > 13) revEl.style.fontSize = '17px';
+        else if (revFormatted.length > 10) revEl.style.fontSize = '19px';
+        else revEl.style.fontSize = '';
+      }
       if (ordersEl) ordersEl.textContent = formatNumberWithCommas(ordersCount);
       if (unitsEl) unitsEl.textContent = formatNumberWithCommas(totalUnits);
       if (aovEl) aovEl.textContent = formatNaira(aov);
