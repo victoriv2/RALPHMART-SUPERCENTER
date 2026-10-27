@@ -445,12 +445,14 @@
       background: var(--admin-card);
       border: 1px solid var(--admin-border);
       border-radius: 12px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
+      gap: 12px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: thin;
       margin-bottom: 20px;
     }
 
@@ -458,25 +460,13 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      flex: 1;
-      min-width: 260px;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .admin-search-input {
-      flex: 1;
-      max-width: 320px;
-      padding: 9px 12px;
-      border: 1px solid var(--admin-border);
-      border-radius: 7px;
-      font-size: 13.5px;
-      outline: none;
-    }
-
-    .admin-search-input:focus {
-      border-color: var(--admin-green);
-    }
-
-    .admin-select {
+      flex: 1 1 200px;
+      min-width: 170px;
       padding: 9px 12px;
       border: 1px solid var(--admin-border);
       border-radius: 7px;
@@ -484,25 +474,51 @@
       outline: none;
       background: #ffffff;
       color: var(--admin-text-main);
+    }
+
+    .admin-search-input:focus {
+      border-color: var(--admin-green);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .admin-select {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border: 1px solid var(--admin-border);
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      background: #ffffff;
+      color: var(--admin-text-main);
       cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .admin-select:focus {
+      border-color: var(--admin-green);
     }
 
     .admin-btn-group {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
+      margin-left: auto;
     }
 
     .admin-btn {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 9px 16px;
+      padding: 9px 15px;
       border-radius: 7px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       border: none;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: opacity 0.15s;
     }
 
@@ -611,11 +627,13 @@
     }
 
     .stock-chip {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-size: 11px;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 12px;
+      white-space: nowrap;
     }
 
     .stock-in { background: #dcfce7; color: #15803d; }
@@ -770,6 +788,7 @@
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 12px;
+      white-space: nowrap;
     }
     .status-chip.active { background: #dcfce7; color: #15803d; }
     .status-chip.hidden { background: #fef3c7; color: #b45309; }
@@ -828,7 +847,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: thin;
       margin-bottom: 20px;
       background: #ffffff;
       padding: 12px 16px;
@@ -844,6 +865,8 @@
       background: #f1f5f9;
       color: #475569;
       border: 1px solid transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.15s;
     }
     .date-chip-btn:hover {
@@ -1310,12 +1333,12 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Stock &amp; Visibility</th>
-                  <th>Rating</th>
-                  <th style="text-align: right;">Actions</th>
+                  <th style="min-width: 240px;">Product</th>
+                  <th style="min-width: 110px; white-space: nowrap;">Category</th>
+                  <th style="min-width: 120px; white-space: nowrap;">Price</th>
+                  <th style="min-width: 140px; white-space: nowrap;">Stock &amp; Visibility</th>
+                  <th style="min-width: 100px; white-space: nowrap;">Rating</th>
+                  <th style="min-width: 90px; text-align: right; white-space: nowrap;">Actions</th>
                 </tr>
               </thead>
               <tbody id="overviewProductsTbody">
@@ -1442,10 +1465,10 @@
               <option value="services">Services</option>
             </select>
             <select class="admin-select" id="adminStatusFilter">
-              <option value="all">All Visibility (Active &amp; Hidden)</option>
-              <option value="active">Active (Visible to Customers)</option>
-              <option value="hidden">Hidden (Archived / Off-shelf)</option>
-              <option value="lowstock">Low Stock Alerts (&lt; 10)</option>
+              <option value="all">All Visibility</option>
+              <option value="active">Active (Visible)</option>
+              <option value="hidden">Hidden / Off-Shelf</option>
+              <option value="lowstock">Low Stock (&lt; 10)</option>
             </select>
           </div>
 
@@ -1478,12 +1501,12 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price &amp; Discount</th>
-                  <th>Stock &amp; Visibility</th>
-                  <th>Community Rating</th>
-                  <th style="text-align: right;">Actions</th>
+                  <th style="min-width: 250px;">Product</th>
+                  <th style="min-width: 120px; white-space: nowrap;">Category</th>
+                  <th style="min-width: 150px; white-space: nowrap;">Price &amp; Discount</th>
+                  <th style="min-width: 150px; white-space: nowrap;">Stock &amp; Visibility</th>
+                  <th style="min-width: 160px; white-space: nowrap;">Community Rating</th>
+                  <th style="min-width: 130px; text-align: right; white-space: nowrap;">Actions</th>
                 </tr>
               </thead>
               <tbody id="adminProductsTbody">
@@ -2414,7 +2437,14 @@
 
         const priceFormatted = formatNaira(p.price);
         const oldPriceFormatted = p.oldPrice || p.old_price ? formatNaira(p.oldPrice || p.old_price) : '';
-        const discountBadge = p.discount ? `<span style="font-size: 10px; color: #ef4444; font-weight: 700; margin-left: 4px;">-${p.discount}%</span>` : '';
+        
+        let discountBadge = '';
+        if (p.discount) {
+          const cleanDisc = String(p.discount).replace(/[^0-9]/g, '');
+          if (cleanDisc && Number(cleanDisc) > 0) {
+            discountBadge = `<span style="font-size: 10.5px; background: #fee2e2; color: #ef4444; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; display: inline-flex; align-items: center;">-${cleanDisc}%</span>`;
+          }
+        }
 
         const pReviews = adminReviewsByProd[p.id] || [];
         const ratingInfo = (typeof calculateProductRating === 'function')
@@ -2432,34 +2462,40 @@
                 </div>
               </div>
             </td>
-            <td>
+            <td style="white-space: nowrap;">
               <span style="font-weight: 600; text-transform: capitalize; color: #334155;">${escapeHtml(p.category || p.category_id || 'general')}</span>
             </td>
-            <td>
-              <div style="font-weight: 700; color: #091e3a;">${priceFormatted} ${discountBadge}</div>
-              ${oldPriceFormatted ? `<div style="font-size: 11px; text-decoration: line-through; color: #94a3b8;">${oldPriceFormatted}</div>` : ''}
+            <td style="white-space: nowrap;">
+              <div style="font-weight: 700; color: #091e3a; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span>${priceFormatted}</span>
+                ${discountBadge}
+              </div>
+              ${oldPriceFormatted ? `<div style="font-size: 11px; text-decoration: line-through; color: #94a3b8; white-space: nowrap; margin-top: 2px;">${oldPriceFormatted}</div>` : ''}
             </td>
-            <td>
-              <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-                <span class="stock-chip ${stockClass}">${stockLabel}</span>
-                <span class="status-chip ${isHidden ? 'hidden' : 'active'}">
+            <td style="white-space: nowrap;">
+              <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; white-space: nowrap;">
+                <span class="stock-chip ${stockClass}" style="white-space: nowrap;">${stockLabel}</span>
+                <span class="status-chip ${isHidden ? 'hidden' : 'active'}" style="white-space: nowrap;">
                   ${isHidden ? 'Off-Shelf / Hidden' : 'Active / Visible'}
                 </span>
               </div>
             </td>
-            <td>
-              <div style="font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px;">
-                ★ ${ratingInfo.formatted}
-                <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; ${ratingInfo.isUserRated ? 'background: #f3e8ff; color: #512175;' : 'background: #f1f5f9; color: #64748b;'}">
+            <td style="white-space: nowrap;">
+              <div style="font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span style="display: inline-flex; align-items: center; gap: 3px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span>${ratingInfo.formatted}</span>
+                </span>
+                <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; ${ratingInfo.isUserRated ? 'background: #f3e8ff; color: #512175;' : 'background: #f1f5f9; color: #64748b;'}">
                   ${ratingInfo.isUserRated ? (ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' vote' : ' votes')) : 'Admin Base'}
                 </span>
               </div>
-              <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 2px; white-space: nowrap;">
                 ${ratingInfo.isUserRated ? (ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : (ratingInfo.ruleApplied === 'highest_distinct' ? 'Highest Rating' : 'User Voted')) : 'Base: ' + (p.rating || 4.8)}
               </div>
             </td>
-            <td style="text-align: right;">
-              <div class="action-btn-row" style="justify-content: flex-end;">
+            <td style="text-align: right; white-space: nowrap;">
+              <div class="action-btn-row" style="justify-content: flex-end; white-space: nowrap;">
                 <!-- Hide / Unhide Toggle Button -->
                 <button type="button" class="table-icon-btn hide-btn ${isHidden ? 'is-hidden' : ''}" onclick="window.toggleProductVisibility('${p.id}')" title="${isHidden ? 'Unhide (Make Visible to Customers)' : 'Hide from Store Catalog'}">
                   ${isHidden ? `
@@ -2508,13 +2544,13 @@
                 </div>
               </div>
             </td>
-            <td><span style="font-weight: 600; text-transform: capitalize;">${escapeHtml(p.category || 'general')}</span></td>
-            <td><strong>${formatNaira(p.price)}</strong></td>
-            <td>
-              <span class="status-chip ${isHidden ? 'hidden' : 'active'}">${isHidden ? 'Hidden' : stock + ' in stock'}</span>
+            <td style="white-space: nowrap;"><span style="font-weight: 600; text-transform: capitalize;">${escapeHtml(p.category || 'general')}</span></td>
+            <td style="white-space: nowrap;"><strong>${formatNaira(p.price)}</strong></td>
+            <td style="white-space: nowrap;">
+              <span class="status-chip ${isHidden ? 'hidden' : 'active'}" style="white-space: nowrap;">${isHidden ? 'Hidden' : stock + ' in stock'}</span>
             </td>
-            <td><span style="color: #f59e0b; font-weight: 700;">★ ${ratingInfo.formatted}</span></td>
-            <td style="text-align: right;">
+            <td style="white-space: nowrap;"><span style="color: #f59e0b; font-weight: 700; white-space: nowrap;">★ ${ratingInfo.formatted}</span></td>
+            <td style="text-align: right; white-space: nowrap;">
               <button type="button" class="table-icon-btn hide-btn ${isHidden ? 'is-hidden' : ''}" onclick="window.toggleProductVisibility('${p.id}')" title="${isHidden ? 'Unhide' : 'Hide'}">
                 ${isHidden ? `
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
@@ -2562,7 +2598,8 @@
       document.getElementById('modalProductPrice').value = p.price || '';
       document.getElementById('modalProductOldPrice').value = p.oldPrice || p.old_price || '';
       document.getElementById('modalProductStock').value = p.stock !== undefined ? p.stock : 25;
-      document.getElementById('modalProductDiscount').value = p.discount || 0;
+      const cleanDiscVal = p.discount ? Number(String(p.discount).replace(/[^0-9]/g, '')) : 0;
+      document.getElementById('modalProductDiscount').value = cleanDiscVal || 0;
       
       const ratingInp = document.getElementById('modalProductRating');
       if (ratingInp) ratingInp.value = p.rating || 4.8;
