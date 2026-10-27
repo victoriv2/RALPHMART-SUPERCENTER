@@ -402,6 +402,259 @@ async function getUserOrders() {
   }
 }
 
+// ==========================================
+// RALPHMART COMMUNITY VOTING RATING SYSTEM
+// ==========================================
+/**
+ * Computes product rating based on official voting rules:
+ * 1. Admin creates/rates product -> If 0 user reviews, display the admin rating.
+ * 2. 1 user rates -> Ignore admin rating, use that user's rating.
+ * 3. 2 users rate:
+ *    - Different stars -> Pick the highest rating.
+ *    - Same star -> Use that star rating.
+ * 4. 3+ users rate (Voting / Plurality system):
+ *    - Tally votes for each star rating (1 to 5).
+ *    - If all star ratings have equal single votes (e.g. 1, 3, 5 -> 1 vote each): Pick the highest rating.
+ *    - If 2 or more users rate the same star: Ignore isolated single highest ratings, use the star with the most votes.
+ *    - If there is a tie for the most votes (e.g. two 3s and two 5s): Pick the highest rating among the tied winners.
+ *
+ * @param {number|string} adminRating - Base rating assigned by admin
+ * @param {Array<number|Object>} userReviews - Array of review objects or rating numbers
+ * @returns {{ rating: number, formatted: string, totalReviews: number, isUserRated: boolean, voteBreakdown: Object, votePercentages: Object, ruleApplied: string }}
+ */
+function calculateProductRating(adminRating, userReviews) {
+  var baseAdminRating = parseFloat(adminRating);
+  if (isNaN(baseAdminRating) || baseAdminRating <= 0) baseAdminRating = 4.8;
+
+  if (!userReviews || !Array.isArray(userReviews) || userReviews.length === 0) {
+    return {
+      rating: baseAdminRating,
+      formatted: Number(baseAdminRating).toFixed(1),
+      totalReviews: 0,
+      isUserRated: false,
+      voteBreakdown: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      votePercentages: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      ruleApplied: 'admin_base'
+    };
+  }
+
+  // Extract clean integer ratings [1..5]
+  var ratings = [];
+  userReviews.forEach(function(r) {
+    if (typeof r === 'number') {
+      ratings.push(Math.max(1, Math.min(5, Math.round(r))));
+    } else if (r && typeof r === 'object' && r.rating !== undefined) {
+      var val = parseInt(r.rating, 10);
+      if (isNaN(val)) val = 5;
+      ratings.push(Math.max(1, Math.min(5, val)));
+    }
+  });
+
+  var totalReviews = ratings.length;
+  if (totalReviews === 0) {
+    return {
+      rating: baseAdminRating,
+      formatted: Number(baseAdminRating).toFixed(1),
+      totalReviews: 0,
+      isUserRated: false,
+      voteBreakdown: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      votePercentages: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      ruleApplied: 'admin_base'
+    };
+  }
+
+  // Tally votes for each star
+  var votes = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  ratings.forEach(function(v) {
+    if (votes[v] !== undefined) votes[v]++;
+  });
+
+  var percentages = {};
+  for (var s = 1; s <= 5; s++) {
+    percentages[s] = Math.round((votes[s] / totalReviews) * 100);
+  }
+
+  // Rule 2: Exactly 1 user review
+  if (totalReviews === 1) {
+    var singleRating = ratings[0];
+    return {
+      rating: singleRating,
+      formatted: singleRating.toFixed(1),
+      totalReviews: 1,
+      isUserRated: true,
+      voteBreakdown: votes,
+      votePercentages: percentages,
+      ruleApplied: 'single_user'
+    };
+  }
+
+  // Find the highest vote count among any star rating
+  var maxVotes = 0;
+  for (var star = 1; star <= 5; star++) {
+    if (votes[star] > maxVotes) {
+      maxVotes = votes[star];
+    }
+  }
+
+  // If every rated star has only 1 vote (no repeated votes, all distinct):
+  // Rule: Pick the highest rating
+  if (maxVotes === 1) {
+    var highestDistinct = Math.max.apply(null, ratings);
+    return {
+      rating: highestDistinct,
+      formatted: highestDistinct.toFixed(1),
+      totalReviews: totalReviews,
+      isUserRated: true,
+      voteBreakdown: votes,
+      votePercentages: percentages,
+      ruleApplied: 'highest_distinct'
+    };
+  }
+
+  // Mode/Plurality voting: find all stars that received the maximum vote count
+  var tiedStars = [];
+  for (var st = 1; st <= 5; st++) {
+    if (votes[st] === maxVotes) {
+      tiedStars.push(st);
+    }
+  }
+
+  // Between the star(s) with the most votes, pick the highest star rating
+  var winningRating = Math.max.apply(null, tiedStars);
+
+  return {
+    rating: winningRating,
+    formatted: winningRating.toFixed(1),
+    totalReviews: totalReviews,
+    isUserRated: true,
+    voteBreakdown: votes,
+    votePercentages: percentages,
+    ruleApplied: 'plurality_voting'
+  };
+}
+
+function renderRatingStarsHtml(ratingValue, starSize, activeColor, inactiveColor) {
+  var size = starSize || 11;
+  var actCol = activeColor || '#f59e0b';
+  var inactCol = inactiveColor || '#cbd5e1';
+  var rounded = Math.round(Number(ratingValue) || 5);
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    var fill = (i <= rounded) ? actCol : inactCol;
+    html += '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="' + fill + '" style="margin-right: 1px; vertical-align: middle;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+  }
+  return html;
+}
+
+let _allProductReviewsCache = null;
+let _allProductReviewsFetchPromise = null;
+
+async function getAllProductReviews(forceRefresh = false) {
+  if (_allProductReviewsCache && !forceRefresh) {
+    return _allProductReviewsCache;
+  }
+  if (_allProductReviewsFetchPromise && !forceRefresh) {
+    return await _allProductReviewsFetchPromise;
+  }
+
+  _allProductReviewsFetchPromise = (async () => {
+    try {
+      const client = getSupabase();
+      if (client) {
+        const { data, error } = await client
+          .from('product_reviews')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data)) {
+          _allProductReviewsCache = data;
+          try {
+            localStorage.setItem('nkemmart_all_cloud_reviews', JSON.stringify(data));
+          } catch (e) {}
+          return data;
+        }
+      }
+    } catch (err) {
+      console.warn('Error fetching all reviews:', err);
+    }
+
+    try {
+      const cached = localStorage.getItem('nkemmart_all_cloud_reviews');
+      if (cached) {
+        _allProductReviewsCache = JSON.parse(cached);
+        return _allProductReviewsCache;
+      }
+    } catch (e) {}
+
+    return [];
+  })();
+
+  const result = await _allProductReviewsFetchPromise;
+  _allProductReviewsFetchPromise = null;
+  return result;
+}
+
+async function syncAllProductCardsRating() {
+  if (typeof document === 'undefined') return;
+  try {
+    const allReviews = await getAllProductReviews();
+    const reviewsByProd = {};
+    if (Array.isArray(allReviews)) {
+      allReviews.forEach(r => {
+        if (!r || !r.product_id) return;
+        const pid = String(r.product_id);
+        if (!reviewsByProd[pid]) reviewsByProd[pid] = [];
+        reviewsByProd[pid].push(r);
+      });
+    }
+
+    const cards = document.querySelectorAll('.product-card, [data-product-id]');
+    cards.forEach(card => {
+      const prodId = card.getAttribute('data-id') || card.getAttribute('data-product-id');
+      if (!prodId) return;
+
+      const baseRating = parseFloat(card.getAttribute('data-rating')) || 4.8;
+      const prodReviews = reviewsByProd[prodId] || [];
+      const ratingInfo = calculateProductRating(baseRating, prodReviews);
+
+      const starsBox = card.querySelector('.stars-row');
+      if (starsBox) {
+        starsBox.innerHTML = renderRatingStarsHtml(ratingInfo.rating, 11);
+      }
+
+      const countEl = card.querySelector('.rating-count');
+      if (countEl) {
+        if (ratingInfo.isUserRated) {
+          countEl.textContent = '(' + ratingInfo.formatted + ' ★ • ' + ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' vote)' : ' votes)');
+          countEl.style.color = '#512175';
+          countEl.style.fontWeight = '600';
+        } else {
+          countEl.textContent = '(' + ratingInfo.formatted + ' ★)';
+        }
+      }
+    });
+  } catch (err) {
+    console.warn('Error syncing product cards rating:', err);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.calculateProductRating = calculateProductRating;
+  window.renderRatingStarsHtml = renderRatingStarsHtml;
+  window.getAllProductReviews = getAllProductReviews;
+  window.syncAllProductCardsRating = syncAllProductCardsRating;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(syncAllProductCardsRating, 250);
+  });
+  window.addEventListener('nkemmart_review_added', () => {
+    getAllProductReviews(true).then(syncAllProductCardsRating);
+  });
+  window.addEventListener('nkemmart_review_updated', () => {
+    getAllProductReviews(true).then(syncAllProductCardsRating);
+  });
+}
+
 // Fetch Product Reviews from Cloud Supabase
 async function getProductReviews(productId) {
   if (!productId) return [];

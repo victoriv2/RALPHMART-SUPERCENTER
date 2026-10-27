@@ -1075,9 +1075,17 @@
             </div>
           </div>
 
-          <div class="form-field">
-            <label for="modalProductImage">Image URL</label>
-            <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." required>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="modalProductRating">Initial Admin Rating (1.0 - 5.0)</label>
+              <input type="number" id="modalProductRating" placeholder="4.8" value="4.8" min="1.0" max="5.0" step="0.1" required>
+              <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Active until customer reviews are submitted. When users rate, user voting automatically takes over.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="modalProductImage">Image URL</label>
+              <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." required>
+            </div>
           </div>
 
           <div class="form-field">
@@ -1132,6 +1140,27 @@
     // State
     let adminProducts = [];
     let currentEditingId = null;
+    let adminReviewsByProd = {};
+
+    async function loadAdminReviewsForVoting() {
+      try {
+        if (typeof getAllProductReviews === 'function') {
+          const allReviews = await getAllProductReviews();
+          adminReviewsByProd = {};
+          if (Array.isArray(allReviews)) {
+            allReviews.forEach(r => {
+              if (!r || !r.product_id) return;
+              const pid = String(r.product_id);
+              if (!adminReviewsByProd[pid]) adminReviewsByProd[pid] = [];
+              adminReviewsByProd[pid].push(r);
+            });
+          }
+          renderProductsTable();
+        }
+      } catch (e) {
+        console.warn('Error loading admin reviews for voting:', e);
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
       // 1. Auth Verification
@@ -1185,6 +1214,8 @@
         document.getElementById('productModalTitle').textContent = 'Add New Product';
         productForm.reset();
         document.getElementById('modalProductId').value = '';
+        const ratingInput = document.getElementById('modalProductRating');
+        if (ratingInput) ratingInput.value = '4.8';
         productModal.classList.add('open');
       });
 
@@ -1227,6 +1258,7 @@
 
       updateStats();
       renderProductsTable();
+      loadAdminReviewsForVoting();
     }
 
     function formatNumberWithCommas(num) {
@@ -1309,6 +1341,11 @@
         const oldPriceFormatted = p.oldPrice || p.old_price ? formatNaira(p.oldPrice || p.old_price) : '';
         const discountBadge = p.discount ? `<span style="font-size: 10px; color: #ef4444; font-weight: 700; margin-left: 4px;">-${p.discount}%</span>` : '';
 
+        const pReviews = adminReviewsByProd[p.id] || [];
+        const ratingInfo = (typeof calculateProductRating === 'function')
+          ? calculateProductRating(p.rating || 4.8, pReviews)
+          : { formatted: Number(p.rating || 4.8).toFixed(1), totalReviews: 0, isUserRated: false, ruleApplied: 'admin_base' };
+
         return `
           <tr>
             <td>
@@ -1331,8 +1368,15 @@
               <span class="stock-chip ${stockClass}">${stockLabel}</span>
             </td>
             <td>
-              <span style="font-weight: 700; color: #f59e0b;">★ ${p.rating || 4.8}</span>
-              <span style="font-size: 11px; color: #94a3b8;">(${p.reviewsCount || p.reviews_count || 12})</span>
+              <div style="font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px;">
+                ★ ${ratingInfo.formatted}
+                <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; ${ratingInfo.isUserRated ? 'background: #f3e8ff; color: #512175;' : 'background: #f1f5f9; color: #64748b;'}">
+                  ${ratingInfo.isUserRated ? (ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' vote' : ' votes')) : 'Admin Base'}
+                </span>
+              </div>
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+                ${ratingInfo.isUserRated ? (ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : (ratingInfo.ruleApplied === 'highest_distinct' ? 'Highest Rating' : 'User Voted')) : 'Base: ' + (p.rating || 4.8)}
+              </div>
             </td>
             <td>
               <div class="action-btn-row">
@@ -1366,6 +1410,8 @@
       document.getElementById('modalProductOldPrice').value = p.oldPrice || p.old_price || '';
       document.getElementById('modalProductStock').value = p.stock !== undefined ? p.stock : 25;
       document.getElementById('modalProductDiscount').value = p.discount || 0;
+      const ratingInp = document.getElementById('modalProductRating');
+      if (ratingInp) ratingInp.value = p.rating || 4.8;
       document.getElementById('modalProductImage').value = p.image || '';
       document.getElementById('modalProductDesc').value = p.description || '';
 
@@ -1400,6 +1446,7 @@
       const oldPrice = Number(document.getElementById('modalProductOldPrice').value) || null;
       const stock = Number(document.getElementById('modalProductStock').value) || 0;
       const discount = Number(document.getElementById('modalProductDiscount').value) || 0;
+      const rating = Number(document.getElementById('modalProductRating') ? document.getElementById('modalProductRating').value : 4.8) || 4.8;
       const image = document.getElementById('modalProductImage').value.trim();
       const description = document.getElementById('modalProductDesc').value.trim();
 
@@ -1418,6 +1465,7 @@
             old_price: oldPrice,
             stock,
             discount,
+            rating,
             image,
             description,
             updated_at: new Date().toISOString()
@@ -1439,8 +1487,8 @@
           discount,
           image,
           description,
-          rating: 5.0,
-          reviewsCount: 1,
+          rating: rating,
+          reviewsCount: 0,
           verified: true,
           created_at: new Date().toISOString()
         };
@@ -1465,6 +1513,7 @@
           old_price: itemToSave.oldPrice || itemToSave.old_price,
           stock: itemToSave.stock,
           discount: itemToSave.discount,
+          rating: Number(itemToSave.rating) || 4.8,
           image: itemToSave.image,
           description: itemToSave.description,
           verified: true

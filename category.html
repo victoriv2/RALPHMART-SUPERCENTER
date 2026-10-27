@@ -1229,6 +1229,7 @@
             art.setAttribute('data-original', prod.originalPrice);
             art.setAttribute('data-image', prod.image);
             art.setAttribute('data-brand', prod.brand || 'Verified');
+            art.setAttribute('data-rating', prod.rating || 4.8);
 
             art.innerHTML = 
               '<div class="card-media">' +
@@ -1263,6 +1264,9 @@
         }
         if (typeof syncProductCardsUI === 'function') {
           syncProductCardsUI();
+        }
+        if (typeof syncAllProductCardsRating === 'function') {
+          syncAllProductCardsRating();
         }
       }
 

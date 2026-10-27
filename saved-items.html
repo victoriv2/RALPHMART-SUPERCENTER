@@ -1145,6 +1145,8 @@
           }
 
           var discountPercent = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+          var recRatingInfo = typeof calculateProductRating === 'function' ? calculateProductRating(p.rating || 4.8, []) : { formatted: Number(p.rating || 4.8).toFixed(1), rating: (p.rating || 4.8) };
+          var starsHtml = typeof renderRatingStarsHtml === 'function' ? renderRatingStarsHtml(recRatingInfo.rating, 11) : '';
 
           card.innerHTML = 
             '<div class="rec-card-media">' +
@@ -1158,6 +1160,10 @@
             '</div>' +
             '<div class="rec-card-body">' +
               '<a href="product.html?id=' + encodeURIComponent(p.id) + '" class="rec-card-title">' + p.title + '</a>' +
+              '<div class="rating-row" style="display:flex; align-items:center; gap:4px; margin-bottom:4px;">' +
+                '<div class="stars-row">' + starsHtml + '</div>' +
+                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' ★)</span>' +
+              '</div>' +
               '<div class="rec-card-price-row">' +
                 '<span class="rec-card-price">' + formatNaira(p.price) + '</span>' +
                 '<span class="rec-card-discount">-' + discountPercent + '%</span>' +

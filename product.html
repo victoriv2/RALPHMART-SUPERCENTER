@@ -500,7 +500,7 @@
           
           <div class="pdp-rating-overview-card">
             <div class="pdp-rating-big-score" id="pdpBigScore">4.8</div>
-            <div class="pdp-rating-big-stars">
+            <div class="pdp-rating-big-stars" id="pdpBigStars">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -509,30 +509,32 @@
             </div>
             <div class="pdp-rating-total-reviews">Based on 1,240 verified customer purchases</div>
 
-            <div class="pdp-breakdown-row">
-              <span>5 star</span>
-              <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 82%;"></div></div>
-              <span>82%</span>
-            </div>
-            <div class="pdp-breakdown-row">
-              <span>4 star</span>
-              <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 12%;"></div></div>
-              <span>12%</span>
-            </div>
-            <div class="pdp-breakdown-row">
-              <span>3 star</span>
-              <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 4%;"></div></div>
-              <span>4%</span>
-            </div>
-            <div class="pdp-breakdown-row">
-              <span>2 star</span>
-              <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 1%;"></div></div>
-              <span>1%</span>
-            </div>
-            <div class="pdp-breakdown-row">
-              <span>1 star</span>
-              <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 1%;"></div></div>
-              <span>1%</span>
+            <div class="pdp-breakdown-list" id="pdpBreakdownContainer">
+              <div class="pdp-breakdown-row">
+                <span>5 star</span>
+                <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 82%;"></div></div>
+                <span>82%</span>
+              </div>
+              <div class="pdp-breakdown-row">
+                <span>4 star</span>
+                <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 12%;"></div></div>
+                <span>12%</span>
+              </div>
+              <div class="pdp-breakdown-row">
+                <span>3 star</span>
+                <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 4%;"></div></div>
+                <span>4%</span>
+              </div>
+              <div class="pdp-breakdown-row">
+                <span>2 star</span>
+                <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 1%;"></div></div>
+                <span>1%</span>
+              </div>
+              <div class="pdp-breakdown-row">
+                <span>1 star</span>
+                <div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: 1%;"></div></div>
+                <span>1%</span>
+              </div>
             </div>
           </div>
 
@@ -2124,14 +2126,16 @@
       var savePctEl = document.getElementById('pdpSavePercent');
       if (savePctEl) savePctEl.textContent = activeProduct.discount || '-20%';
 
-      var scoreEl = document.getElementById('pdpRatingScore');
-      if (scoreEl) scoreEl.textContent = activeProduct.rating || '4.8';
-
-      var revCountEl = document.getElementById('pdpRatingCountLink');
-      if (revCountEl) revCountEl.textContent = (activeProduct.reviews ? formatNumberWithCommas(activeProduct.reviews) : '1,240') + ' verified ratings';
-
-      var bigScoreEl = document.getElementById('pdpBigScore');
-      if (bigScoreEl) bigScoreEl.textContent = activeProduct.rating || '4.8';
+      if (typeof calculateProductRating === 'function' && typeof updateProductRatingUI === 'function') {
+        updateProductRatingUI(calculateProductRating(activeProduct.rating, []));
+      } else {
+        var scoreEl = document.getElementById('pdpRatingScore');
+        if (scoreEl) scoreEl.textContent = activeProduct.rating || '4.8';
+        var revCountEl = document.getElementById('pdpRatingCountLink');
+        if (revCountEl) revCountEl.textContent = (activeProduct.reviews ? formatNumberWithCommas(activeProduct.reviews) : '1,240') + ' verified ratings';
+        var bigScoreEl = document.getElementById('pdpBigScore');
+        if (bigScoreEl) bigScoreEl.textContent = activeProduct.rating || '4.8';
+      }
 
       // Specifications table
       var specBrand = document.getElementById('specBrand');
@@ -3210,21 +3214,76 @@
         return card;
       }
 
+      function updateProductRatingUI(ratingInfo) {
+        if (!ratingInfo) return;
+        var scoreEl = document.getElementById('pdpRatingScore');
+        var bigScoreEl = document.getElementById('pdpBigScore');
+        var topStarsEl = document.getElementById('pdpRatingStars');
+        var bigStarsEl = document.getElementById('pdpBigStars');
+        var revCountEl = document.getElementById('pdpRatingCountLink');
+        var totalEl = document.querySelector('.pdp-rating-total-reviews');
+        var breakdownContainer = document.getElementById('pdpBreakdownContainer');
+
+        if (scoreEl) scoreEl.textContent = ratingInfo.formatted;
+        if (bigScoreEl) bigScoreEl.textContent = ratingInfo.formatted;
+
+        if (topStarsEl && typeof renderRatingStarsHtml === 'function') {
+          topStarsEl.innerHTML = renderRatingStarsHtml(ratingInfo.rating, 14);
+        }
+        if (bigStarsEl && typeof renderRatingStarsHtml === 'function') {
+          bigStarsEl.innerHTML = renderRatingStarsHtml(ratingInfo.rating, 20);
+        }
+
+        if (revCountEl) {
+          if (ratingInfo.isUserRated) {
+            revCountEl.textContent = ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' verified customer review' : ' verified customer reviews');
+          } else {
+            revCountEl.textContent = (activeProduct.reviews ? formatNumberWithCommas(activeProduct.reviews) : '1,240') + ' verified ratings';
+          }
+        }
+
+        if (totalEl) {
+          if (ratingInfo.isUserRated) {
+            var badgeNote = ratingInfo.ruleApplied === 'plurality_voting' ? ' (Community Voting Majority Winner)' : (ratingInfo.ruleApplied === 'highest_distinct' ? ' (Highest User Rating)' : ' (Customer Voted)');
+            totalEl.innerHTML = 'Based on <strong>' + ratingInfo.totalReviews + '</strong> verified customer ' + (ratingInfo.totalReviews === 1 ? 'vote' : 'votes') + '<span style="display:block; font-size:12px; color:#512175; font-weight:700; margin-top:3px;">' + badgeNote + '</span>';
+          } else {
+            totalEl.textContent = 'Based on ' + (activeProduct.reviews ? formatNumberWithCommas(activeProduct.reviews) : '1,240') + ' verified customer purchases (Initial Store Rating)';
+          }
+        }
+
+        if (breakdownContainer) {
+          var breakdownHtml = '';
+          for (var star = 5; star >= 1; star--) {
+            var pct = ratingInfo.isUserRated ? (ratingInfo.votePercentages[star] || 0) : (star === 5 ? 82 : (star === 4 ? 12 : (star === 3 ? 4 : 1)));
+            var voteCount = ratingInfo.isUserRated ? (ratingInfo.voteBreakdown[star] || 0) : '';
+            var isWinner = ratingInfo.isUserRated && (star === ratingInfo.rating);
+            var barColor = isWinner ? '#512175' : '#f59e0b';
+            breakdownHtml += 
+              '<div class="pdp-breakdown-row" style="' + (isWinner ? 'font-weight: 700; color: #512175;' : '') + '">' +
+                '<span>' + star + ' star</span>' +
+                '<div class="pdp-breakdown-bar-bg"><div class="pdp-breakdown-bar-fill" style="width: ' + pct + '%; background: ' + barColor + ';"></div></div>' +
+                '<span>' + pct + '%' + (voteCount !== '' ? ' (' + voteCount + ')' : '') + '</span>' +
+              '</div>';
+          }
+          breakdownContainer.innerHTML = breakdownHtml;
+        }
+      }
+
       async function loadProductCloudReviews() {
         if (!reviewsContainer || !activeProduct) return;
         try {
           if (typeof getProductReviews === 'function') {
             var cloudReviews = await getProductReviews(activeProduct.id);
+            var ratingInfo = typeof calculateProductRating === 'function' ? calculateProductRating(activeProduct.rating, cloudReviews) : null;
+            if (ratingInfo) {
+              updateProductRatingUI(ratingInfo);
+            }
+
             if (Array.isArray(cloudReviews) && cloudReviews.length > 0) {
               reviewsContainer.innerHTML = '';
               cloudReviews.forEach(function(rev) {
                 reviewsContainer.appendChild(createReviewCardElement(rev));
               });
-              var totalEl = document.querySelector('.pdp-rating-total-reviews');
-              if (totalEl) {
-                var count = Math.max(cloudReviews.length, activeProduct.reviews || 0);
-                totalEl.textContent = 'Based on ' + formatNumberWithCommas(count) + ' verified customer purchases';
-              }
             }
           }
         } catch (e) {
@@ -3297,14 +3356,12 @@
 
             reviewsContainer.insertBefore(card, reviewsContainer.firstChild);
 
-            if (activeProduct.reviews) {
-              activeProduct.reviews += 1;
-              if (revCountEl) revCountEl.textContent = formatNumberWithCommas(activeProduct.reviews) + ' verified ratings';
-            }
-
             reviewForm.reset();
             reviewForm.classList.remove('open');
             showToast('Thank you! Your verified review has been saved to the cloud.', null, null);
+
+            // Immediately re-load cloud reviews to update voting winner and breakdown bars
+            await loadProductCloudReviews();
           } catch (err) {
             console.error('Review submit error:', err);
             showToast('Could not save review right now. Please try again.', null, null);
@@ -3367,6 +3424,9 @@
             actionHtml = '<button type="button" class="rec-card-btn" data-rec-id="' + prod.id + '">Add to cart</button>';
           }
 
+          var recRatingInfo = typeof calculateProductRating === 'function' ? calculateProductRating(prod.rating || 4.8, []) : { formatted: Number(prod.rating || 4.8).toFixed(1), rating: (prod.rating || 4.8) };
+          var starsHtml = typeof renderRatingStarsHtml === 'function' ? renderRatingStarsHtml(recRatingInfo.rating, 11) : '';
+
           card.innerHTML = 
             '<div class="rec-card-media">' +
               '<a href="product.html?id=' + encodeURIComponent(prod.id) + '">' +
@@ -3379,6 +3439,10 @@
             '</div>' +
             '<div class="rec-card-body">' +
               '<a href="product.html?id=' + encodeURIComponent(prod.id) + '" class="rec-card-title">' + prod.title + '</a>' +
+              '<div class="rating-row" style="display:flex; align-items:center; gap:4px; margin-bottom:4px;">' +
+                '<div class="stars-row">' + starsHtml + '</div>' +
+                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' ★)</span>' +
+              '</div>' +
               '<div class="rec-card-price-row">' +
                 '<span class="rec-card-price">' + formatNaira(prod.price) + '</span>' +
                 '<span class="rec-card-orig-price">' + formatNaira(prod.originalPrice) + '</span>' +
