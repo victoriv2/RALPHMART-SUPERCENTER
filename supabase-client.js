@@ -1,12 +1,12 @@
 /**
  * RALPHMART SUPERCENTER - SUPABASE CLIENT & AUTH HELPER
- * Project: nkemmart.supercenter@gmail.com's Project
+ * Project: ralphmart.supercenter@gmail.com's Project
  * Region: eu-west-1
  */
 
 const SUPABASE_CONFIG = {
-  url: 'https://ykwhhgajybhbmkqkmzhm.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrd2hoZ2FqeWJoYm1rcWttemhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MTI5NzksImV4cCI6MjEwNzk4ODk3OX0.d-qkmKCGE1bbMBNZb7ROnMXC1t1RcPweeXD4Hg0atBM'
+  url: 'https://clmzpzgjoxfdtvampvvb.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbXpwemdqb3hmZHR2YW1wdnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjEyOTgsImV4cCI6MjEwODY5NzI5OH0.iwo2tR2Hn-LXFYUOaIBQ7fiko8AtOto60bJGk0WpCYQ'
 };
 
 // Initialize Supabase Client
