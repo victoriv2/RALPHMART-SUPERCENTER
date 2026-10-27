@@ -735,6 +735,299 @@
       gap: 10px;
     }
 
+    /* Tab Panes */
+    .admin-tab-pane {
+      display: none;
+    }
+    .admin-tab-pane.active {
+      display: block;
+      animation: fadeInTab 0.18s ease-in;
+    }
+    @keyframes fadeInTab {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Status Chips */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+    .status-chip.active { background: #dcfce7; color: #15803d; }
+    .status-chip.hidden { background: #fef3c7; color: #b45309; }
+    .status-chip.pending { background: #fef9c3; color: #854d0e; }
+    .status-chip.completed { background: #ecfdf5; color: #047857; }
+
+    /* Sales KPI Strip */
+    .sales-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .sales-kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .sales-kpi-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .sales-kpi-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--admin-navy);
+      margin-bottom: 4px;
+    }
+    .sales-kpi-sub {
+      font-size: 12px;
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    /* Date Filter Chips */
+    .date-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: #ffffff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--admin-border);
+    }
+    .date-chip-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .date-chip-btn:hover {
+      background: #e2e8f0;
+      color: var(--admin-navy);
+    }
+    .date-chip-btn.active {
+      background: #512175;
+      color: #ffffff;
+      border-color: #512175;
+    }
+
+    /* Leaderboard Grid */
+    .admin-leaderboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .leaderboard-card {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .leaderboard-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fbfcfe;
+    }
+    .leaderboard-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-cart { background: #faf5ff; color: #512175; }
+    .icon-saved { background: #fee2e2; color: #dc2626; }
+    .icon-review { background: #fffbeb; color: #d97706; }
+    .icon-rating { background: #ecfdf5; color: #059669; }
+
+    .leaderboard-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--admin-navy);
+      margin: 0;
+    }
+    .leaderboard-list {
+      padding: 12px 16px;
+      list-style: none;
+      margin: 0;
+      flex: 1;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+    .leaderboard-rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rank-1 { background: #fef3c7; color: #b45309; }
+    .rank-2 { background: #e2e8f0; color: #475569; }
+    .rank-3 { background: #ffedd5; color: #c2410c; }
+    .rank-other { background: #f1f5f9; color: #94a3b8; }
+
+    .leaderboard-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0;
+    }
+    .leaderboard-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .leaderboard-prod-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .leaderboard-meta {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .leaderboard-metric-badge {
+      font-size: 12px;
+      font-weight: 800;
+      color: #512175;
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      padding: 3px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    /* User Activity Modal */
+    .user-modal-card {
+      max-width: 720px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .user-nav-tabs {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--admin-border);
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+    .user-tab-btn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .user-tab-btn.active {
+      color: #512175;
+      border-bottom-color: #512175;
+      background: #ffffff;
+    }
+    .user-pane-content {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 55vh;
+    }
+
+    .table-icon-btn.hide-btn:hover {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+    .table-icon-btn.hide-btn.is-hidden {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fcd34d;
+    }
+
+    .modal-img-preview {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1.5px solid var(--admin-border);
+      flex-shrink: 0;
+    }
+
+    .user-item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .user-item-row:last-child {
+      margin-bottom: 0;
+    }
+    .user-item-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      object-fit: contain;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+    }
+
     @media (max-width: 900px) {
       .admin-sidebar {
         position: fixed;
@@ -790,6 +1083,13 @@
         </a>
       </li>
       <li class="admin-nav-item">
+        <a href="#sales" class="admin-nav-link" data-tab="sales">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <span>Daily Sales</span>
+          <span class="admin-nav-badge" id="sidebarSalesBadge">Today</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
         <a href="#products" class="admin-nav-link" data-tab="products">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
           <span>Products Catalog</span>
@@ -797,9 +1097,23 @@
         </a>
       </li>
       <li class="admin-nav-item">
+        <a href="#users" class="admin-nav-link" data-tab="users">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Registered Users</span>
+          <span class="admin-nav-badge" id="sidebarUsersCount">0</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="#analytics" class="admin-nav-link" data-tab="analytics">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+          <span>Insights &amp; Leaderboards</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
         <a href="#orders" class="admin-nav-link" data-tab="orders">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           <span>Orders</span>
+          <span class="admin-nav-badge" id="sidebarOrdersBadge">0</span>
         </a>
       </li>
       <li class="admin-nav-item">
@@ -810,15 +1124,9 @@
         </a>
       </li>
       <li class="admin-nav-item">
-        <a href="#categories" class="admin-nav-link" data-tab="categories">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          <span>Categories</span>
-        </a>
-      </li>
-      <li class="admin-nav-item">
         <a href="#settings" class="admin-nav-link" data-tab="settings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-          <span>Cloud & Database</span>
+          <span>Cloud &amp; Database</span>
         </a>
       </li>
     </ul>
@@ -864,149 +1172,588 @@
     <!-- Content Workspace -->
     <div class="admin-content">
 
-      <!-- Stats Cards -->
-      <section class="admin-stats-grid">
-        <div class="admin-stat-card">
-          <div class="admin-stat-icon stat-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <!-- ================= TAB: OVERVIEW ================= -->
+      <div class="admin-tab-pane active" id="tab-overview">
+        <!-- Stats Cards -->
+        <section class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon stat-blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            </div>
+            <div class="admin-stat-info">
+              <span class="admin-stat-label">Total Products</span>
+              <span class="admin-stat-val" id="statTotalProducts">0</span>
+            </div>
           </div>
-          <div class="admin-stat-info">
-            <span class="admin-stat-label">Total Products</span>
-            <span class="admin-stat-val" id="statTotalProducts">0</span>
-          </div>
-        </div>
 
-        <div class="admin-stat-card">
-          <div class="admin-stat-icon stat-green">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon stat-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <div class="admin-stat-info">
+              <span class="admin-stat-label">Catalog Value</span>
+              <span class="admin-stat-val" id="statCatalogValue">₦0</span>
+            </div>
           </div>
-          <div class="admin-stat-info">
-            <span class="admin-stat-label">Catalog Value</span>
-            <span class="admin-stat-val" id="statCatalogValue">₦0</span>
-          </div>
-        </div>
 
-        <div class="admin-stat-card">
-          <div class="admin-stat-icon stat-gold">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon stat-gold">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div class="admin-stat-info">
+              <span class="admin-stat-label">Low Stock Alerts</span>
+              <span class="admin-stat-val" id="statLowStock">0</span>
+            </div>
           </div>
-          <div class="admin-stat-info">
-            <span class="admin-stat-label">Low Stock Alerts</span>
-            <span class="admin-stat-val" id="statLowStock">0</span>
-          </div>
-        </div>
 
-        <div class="admin-stat-card">
-          <div class="admin-stat-icon stat-purple">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon stat-purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div class="admin-stat-info">
+              <span class="admin-stat-label">Verified Listings</span>
+              <span class="admin-stat-val" id="statVerifiedCount">0</span>
+            </div>
           </div>
-          <div class="admin-stat-info">
-            <span class="admin-stat-label">Verified Listings</span>
-            <span class="admin-stat-val" id="statVerifiedCount">0</span>
+        </section>
+
+        <!-- Quick Sales & Leaderboard Snapshot Banner -->
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 24px;">
+          <div style="background: linear-gradient(135deg, #091e3a 0%, #1e293b 100%); color: #ffffff; padding: 22px 24px; border-radius: 12px; box-shadow: 0 4px 14px rgba(9, 30, 58, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8;">Today's Sales Performance</div>
+              <div style="font-size: 28px; font-weight: 800; color: #22c55e; margin: 8px 0 4px 0;" id="overviewTodaySales">₦0</div>
+              <div style="font-size: 13px; color: #cbd5e1;" id="overviewTodayOrders">0 orders placed today across Nigeria</div>
+            </div>
+            <div style="margin-top: 18px; display: flex; gap: 10px;">
+              <a href="#sales" class="admin-btn btn-green admin-tab-jump" data-target="sales" style="font-size: 12.5px; padding: 7px 14px; text-decoration: none;">View Sales Ledger</a>
+              <a href="#orders" class="admin-btn btn-secondary admin-tab-jump" data-target="orders" style="font-size: 12.5px; padding: 7px 14px; text-decoration: none; background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);">Recent Orders</a>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Action & Filter Bar -->
-      <section class="admin-action-bar">
-        <div class="admin-filters-group">
-          <input type="text" class="admin-search-input" id="adminSearchInput" placeholder="Search products by title or brand...">
-          <select class="admin-select" id="adminCategoryFilter">
-            <option value="all">All Categories</option>
-            <option value="vehicles">Vehicles</option>
-            <option value="appliances">Appliances</option>
-            <option value="phones">Phones & Tablets</option>
-            <option value="electronics">Electronics</option>
-            <option value="fashion">Fashion</option>
-            <option value="beauty">Health & Beauty</option>
-            <option value="home">Home & Office</option>
-            <option value="computing">Computing</option>
-            <option value="supermarket">Groceries & Supermarket</option>
-            <option value="baby">Baby Products</option>
-            <option value="gaming">Gaming</option>
-            <option value="sports">Sports & Fitness</option>
-            <option value="services">Services</option>
-          </select>
-        </div>
+          <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 13.5px; font-weight: 800; color: #091e3a;">Most In-Demand Product</span>
+                <span style="font-size: 11px; font-weight: 700; color: #512175; background: #faf5ff; padding: 2px 8px; border-radius: 10px;">Cart Leader</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;" id="overviewTopCartWrap">
+                <img src="images/product_powerbank.jpg" alt="Top Product" id="overviewTopCartImg" style="width: 48px; height: 48px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="overviewTopCartTitle">Ace Elec 20000 mAh Power Bank</div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 2px;" id="overviewTopCartMeta">48 active customer carts</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 14px;">
+              <a href="#analytics" class="admin-tab-jump" data-target="analytics" style="font-size: 12.5px; font-weight: 700; color: #512175; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <span>View all 4 Leaderboards (Cart, Wishlist, Reviews, Ratings)</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </a>
+            </div>
+          </div>
+        </section>
 
-        <div class="admin-btn-group">
-          <button type="button" class="admin-btn btn-secondary" id="adminSyncSupabaseBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            <span>Sync to Supabase</span>
+        <!-- Quick Inventory Preview -->
+        <section class="admin-table-card">
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h2 class="admin-table-title">Catalog Inventory Snapshot</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);">Quick action controls for store catalog items</span>
+            </div>
+            <a href="#products" class="admin-btn btn-secondary admin-tab-jump" data-target="products" style="font-size: 12px; text-decoration: none; padding: 6px 12px;">Full Products Management &rarr;</a>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock &amp; Visibility</th>
+                  <th>Rating</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="overviewProductsTbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: DAILY SALES ================= -->
+      <div class="admin-tab-pane" id="tab-sales">
+        <!-- Date Filter Bar -->
+        <div class="date-filter-bar">
+          <span style="font-size: 12.5px; font-weight: 700; color: #091e3a; margin-right: 6px;">Filter Sales Period:</span>
+          <button type="button" class="date-chip-btn active" data-period="today">Today</button>
+          <button type="button" class="date-chip-btn" data-period="yesterday">Yesterday</button>
+          <button type="button" class="date-chip-btn" data-period="week">Last 7 Days</button>
+          <button type="button" class="date-chip-btn" data-period="month">This Month</button>
+          <button type="button" class="date-chip-btn" data-period="all">All Time</button>
+          <button type="button" class="admin-btn btn-secondary" id="salesRefreshBtn" style="margin-left: auto; padding: 5px 12px; font-size: 12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Refresh Ledger</span>
           </button>
-          <button type="button" class="admin-btn btn-green" id="adminAddProductBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Add New Product</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Products Catalog Table -->
-      <section class="admin-table-card">
-        <div class="admin-table-header">
-          <h2 class="admin-table-title">Product Catalog Inventory</h2>
-          <span style="font-size: 12px; color: var(--admin-text-muted);" id="tableCountSummary">Showing all items</span>
         </div>
 
-        <div class="admin-table-responsive">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Rating</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="adminProductsTbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <!-- Sales KPI Strip -->
+        <section class="sales-kpi-grid">
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Gross Revenue</div>
+            <div class="sales-kpi-val" id="salesKpiRevenue">₦0</div>
+            <div class="sales-kpi-sub" id="salesKpiRevenueSub">Across selected dates</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Total Orders Count</div>
+            <div class="sales-kpi-val" id="salesKpiOrders">0</div>
+            <div class="sales-kpi-sub" style="color: #6366f1;">Verified checkouts</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Units / Items Sold</div>
+            <div class="sales-kpi-val" id="salesKpiUnits">0</div>
+            <div class="sales-kpi-sub" style="color: #059669;">Delivered &amp; Transit</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Average Order Value (AOV)</div>
+            <div class="sales-kpi-val" id="salesKpiAov">₦0</div>
+            <div class="sales-kpi-sub" style="color: #d97706;">Per transaction</div>
+          </div>
+        </section>
 
-      <!-- Reviews & Official Store Replies Card -->
-      <section class="admin-table-card" id="adminReviewsSection" style="margin-top: 24px;">
-        <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <!-- Daily Ledger Table -->
+        <section class="admin-table-card" style="margin-bottom: 22px;">
+          <div class="admin-table-header">
+            <h2 class="admin-table-title">Daily Sales Breakdown Ledger</h2>
+            <span style="font-size: 12px; color: var(--admin-text-muted);">Aggregated sales, orders, and receipts by date</span>
+          </div>
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Orders Count</th>
+                  <th>Items Sold</th>
+                  <th>Gross Revenue (₦)</th>
+                  <th>Average Basket</th>
+                  <th>Settlement Status</th>
+                </tr>
+              </thead>
+              <tbody id="salesLedgerTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Orders & Transactions Log Under Selected Period -->
+        <section class="admin-table-card">
+          <div class="admin-table-header">
+            <h2 class="admin-table-title">Order Transactions Under Filtered Period</h2>
+            <span style="font-size: 12px; color: var(--admin-text-muted);" id="salesOrdersCountSummary">Showing transactions</span>
+          </div>
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name &amp; Contact</th>
+                  <th>Delivery Destination</th>
+                  <th>Items Count</th>
+                  <th>Payment Method</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Date &amp; Time</th>
+                </tr>
+              </thead>
+              <tbody id="salesTransactionsTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: PRODUCTS CATALOG ================= -->
+      <div class="admin-tab-pane" id="tab-products">
+        <!-- Action & Filter Bar -->
+        <section class="admin-action-bar">
+          <div class="admin-filters-group">
+            <input type="text" class="admin-search-input" id="adminSearchInput" placeholder="Search products by title, brand, or ID...">
+            <select class="admin-select" id="adminCategoryFilter">
+              <option value="all">All Categories</option>
+              <option value="vehicles">Vehicles</option>
+              <option value="appliances">Appliances</option>
+              <option value="phones">Phones &amp; Tablets</option>
+              <option value="electronics">Electronics</option>
+              <option value="fashion">Fashion</option>
+              <option value="beauty">Health &amp; Beauty</option>
+              <option value="home">Home &amp; Office</option>
+              <option value="computing">Computing</option>
+              <option value="supermarket">Groceries &amp; Supermarket</option>
+              <option value="baby">Baby Products</option>
+              <option value="gaming">Gaming</option>
+              <option value="sports">Sports &amp; Fitness</option>
+              <option value="services">Services</option>
+            </select>
+            <select class="admin-select" id="adminStatusFilter">
+              <option value="all">All Visibility (Active &amp; Hidden)</option>
+              <option value="active">Active (Visible to Customers)</option>
+              <option value="hidden">Hidden (Archived / Off-shelf)</option>
+              <option value="lowstock">Low Stock Alerts (&lt; 10)</option>
+            </select>
+          </div>
+
+          <div class="admin-btn-group">
+            <button type="button" class="admin-btn btn-secondary" id="adminSyncSupabaseBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Sync to Supabase</span>
+            </button>
+            <button type="button" class="admin-btn btn-green" id="adminAddProductBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add New Product</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Products Catalog Table -->
+        <section class="admin-table-card">
+          <div class="admin-table-header">
+            <div>
+              <h2 class="admin-table-title">Full Inventory Management</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);" id="tableCountSummary">Showing all items</span>
+            </div>
+            <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+              <span class="status-chip active">Active = Visible</span>
+              <span class="status-chip hidden">Hidden = Hidden from Store</span>
+            </div>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price &amp; Discount</th>
+                  <th>Stock &amp; Visibility</th>
+                  <th>Community Rating</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminProductsTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: REGISTERED USERS ================= -->
+      <div class="admin-tab-pane" id="tab-users">
+        <!-- Users KPI Strip -->
+        <section class="sales-kpi-grid">
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Total Registered Accounts</div>
+            <div class="sales-kpi-val" id="usersKpiTotal">0</div>
+            <div class="sales-kpi-sub" style="color: #6366f1;">Verified Profiles</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Active Shopping Carts</div>
+            <div class="sales-kpi-val" id="usersKpiCarts">0</div>
+            <div class="sales-kpi-sub" style="color: #512175;">Users with items in cart</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Saved Wishlists</div>
+            <div class="sales-kpi-val" id="usersKpiSaved">0</div>
+            <div class="sales-kpi-sub" style="color: #dc2626;">Users bookmarking products</div>
+          </div>
+          <div class="sales-kpi-card">
+            <div class="sales-kpi-title">Community Reviewers</div>
+            <div class="sales-kpi-val" id="usersKpiReviewers">0</div>
+            <div class="sales-kpi-sub" style="color: #d97706;">Submitted product reviews</div>
+          </div>
+        </section>
+
+        <!-- User Search & Filter Bar -->
+        <div class="admin-action-bar" style="margin-bottom: 20px;">
+          <div class="admin-filters-group">
+            <input type="text" class="admin-search-input" id="userSearchInput" placeholder="Search registered users by name, email, phone, city, or state...">
+          </div>
+          <div class="admin-btn-group">
+            <button type="button" class="admin-btn btn-secondary" id="refreshUsersBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh Users</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Registered Users Table -->
+        <section class="admin-table-card">
+          <div class="admin-table-header">
+            <div>
+              <h2 class="admin-table-title">Customer Accounts &amp; Shopping Profiles</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);" id="usersCountSummary">Loading accounts...</span>
+            </div>
+            <span style="font-size: 12px; color: #512175; font-weight: 700;">Click "View Activity" to inspect cart, saved items, reviews &amp; order history</span>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Customer Profile</th>
+                  <th>Contact &amp; Location</th>
+                  <th>Shopping Cart</th>
+                  <th>Saved Items</th>
+                  <th>Reviews &amp; Orders</th>
+                  <th>Joined Date</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: INSIGHTS & LEADERBOARDS ================= -->
+      <div class="admin-tab-pane" id="tab-analytics">
+        <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
           <div>
-            <h2 class="admin-table-title" style="display: flex; align-items: center; gap: 8px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              <span>Customer Product Reviews &amp; Official Store Replies</span>
-            </h2>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Cloud synced reviews from buyers across Nigeria. View ratings, review comments, and send official store replies.</p>
+            <h2 style="font-size: 17px; font-weight: 800; color: #091e3a; margin: 0 0 4px 0;">Product Leaderboards &amp; Community Demand Intelligence</h2>
+            <p style="margin: 0; font-size: 13px; color: #64748b;">Real-time rankings tracking top items placed in customer carts, wishlists, customer reviews, and voting rating champions.</p>
           </div>
-          <button type="button" class="admin-btn btn-secondary" id="adminRefreshReviewsBtn">
+          <button type="button" class="admin-btn btn-secondary" id="refreshLeaderboardsBtn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            <span>Refresh Reviews</span>
+            <span>Recalculate Leaderboards</span>
           </button>
         </div>
 
-        <div class="admin-table-responsive">
-          <table class="admin-table" id="adminReviewsTable">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Reviewer</th>
-                <th>Rating</th>
-                <th>Customer Comment</th>
-                <th>Store Officer Reply</th>
-                <th>Date</th>
-                <th style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="adminReviewsTableBody">
-              <tr>
-                <td colspan="7" style="text-align: center; padding: 28px; color: #64748b;">Loading reviews from Supabase cloud...</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- 4-Card Leaderboard Grid -->
+        <div class="admin-leaderboard-grid">
+          
+          <!-- Card 1: Most Added to Cart -->
+          <div class="leaderboard-card">
+            <div class="leaderboard-header">
+              <div class="leaderboard-icon icon-cart">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              </div>
+              <div>
+                <h3 class="leaderboard-title">Most Added to Cart</h3>
+                <span style="font-size: 11.5px; color: #64748b;">Highest purchase intent in store</span>
+              </div>
+            </div>
+            <ul class="leaderboard-list" id="leaderboardCartList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+
+          <!-- Card 2: Most Saved Items -->
+          <div class="leaderboard-card">
+            <div class="leaderboard-header">
+              <div class="leaderboard-icon icon-saved">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              </div>
+              <div>
+                <h3 class="leaderboard-title">Most Saved Items</h3>
+                <span style="font-size: 11.5px; color: #64748b;">Top customer wishlist favorites</span>
+              </div>
+            </div>
+            <ul class="leaderboard-list" id="leaderboardSavedList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+
+          <!-- Card 3: Most Reviewed Products -->
+          <div class="leaderboard-card">
+            <div class="leaderboard-header">
+              <div class="leaderboard-icon icon-review">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </div>
+              <div>
+                <h3 class="leaderboard-title">Most Reviewed Products</h3>
+                <span style="font-size: 11.5px; color: #64748b;">Highest customer feedback &amp; comments</span>
+              </div>
+            </div>
+            <ul class="leaderboard-list" id="leaderboardReviewsList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+
+          <!-- Card 4: Highest Rated (Voting Champions) -->
+          <div class="leaderboard-card">
+            <div class="leaderboard-header">
+              <div class="leaderboard-icon icon-rating">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </div>
+              <div>
+                <h3 class="leaderboard-title">Highest Rated Products</h3>
+                <span style="font-size: 11.5px; color: #64748b;">Community voting champions</span>
+              </div>
+            </div>
+            <ul class="leaderboard-list" id="leaderboardRatingsList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+
         </div>
-      </section>
+      </div>
+
+      <!-- ================= TAB: ORDERS ================= -->
+      <div class="admin-tab-pane" id="tab-orders">
+        <section class="admin-table-card">
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h2 class="admin-table-title">Customer Store Orders</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);">Realtime order processing and status fulfillment</span>
+            </div>
+            <button type="button" class="admin-btn btn-secondary" id="refreshOrdersTabBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh Orders</span>
+            </button>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name &amp; Contact</th>
+                  <th>Destination</th>
+                  <th>Order Items Summary</th>
+                  <th>Payment Method</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="tabOrdersTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: REVIEWS & REPLIES ================= -->
+      <div class="admin-tab-pane" id="tab-reviews">
+        <section class="admin-table-card">
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 class="admin-table-title" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>Customer Product Reviews &amp; Official Store Replies</span>
+              </h2>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Cloud synced reviews from buyers across Nigeria. View ratings, review comments, and send official store replies.</p>
+            </div>
+            <button type="button" class="admin-btn btn-secondary" id="adminRefreshReviewsBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh Reviews</span>
+            </button>
+          </div>
+
+          <div class="admin-table-responsive">
+            <table class="admin-table" id="adminReviewsTable">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Reviewer</th>
+                  <th>Rating</th>
+                  <th>Customer Comment</th>
+                  <th>Store Officer Reply</th>
+                  <th>Date</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminReviewsTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 28px; color: #64748b;">Loading reviews from Supabase cloud...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ================= TAB: SETTINGS & DATABASE ================= -->
+      <div class="admin-tab-pane" id="tab-settings">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+          
+          <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Supabase Cloud Database Status</h3>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+              <span class="cloud-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #15803d;">Active &amp; Connected</span>
+            </div>
+            
+            <div style="font-size: 12.5px; color: #475569; line-height: 1.6;">
+              <div><strong>Project ID:</strong> clmzpzgjoxfdtvampvvb</div>
+              <div><strong>Project Name:</strong> ralphmart.supercenter@gmail.com's Project</div>
+              <div><strong>Region:</strong> AWS (eu-west-1)</div>
+              <div><strong>Tables Active:</strong> products, orders, profiles, product_reviews, user_activities</div>
+              <div><strong>RLS &amp; Security:</strong> Configured &amp; Verified</div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button type="button" class="admin-btn btn-secondary" onclick="syncAllToSupabase()" style="font-size: 12.5px;">
+                <span>Re-Sync Product Catalog to Cloud</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Local Admin Storage &amp; Cache</h3>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
+              Reset local browser cache if you want to restore default catalog products or clear unsaved draft edits.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="admin-btn btn-secondary" onclick="resetCatalogToTaxonomy()" style="font-size: 12.5px; color: #dc2626;">
+                <span>Reset to Default Taxonomy</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
     </div>
   </main>
+
+  <!-- USER ACTIVITY & CART MODAL -->
+  <div class="admin-modal" id="userActivityModal" role="dialog" aria-modal="true" aria-labelledby="userActivityModalTitle">
+    <div class="user-modal-card">
+      <div class="admin-modal-header" style="background: linear-gradient(135deg, #512175 0%, #3d1858 100%);">
+        <div>
+          <h3 class="admin-modal-title" id="userActivityModalTitle">Customer Activity &amp; Live Cart</h3>
+          <span style="font-size: 12px; color: #e9d5ff;" id="userActivityModalSubtitle">Registered Customer Details</span>
+        </div>
+        <button type="button" class="admin-modal-close" id="closeUserActivityModal">&times;</button>
+      </div>
+
+      <!-- Tab Buttons Inside Modal -->
+      <div class="user-nav-tabs">
+        <button type="button" class="user-tab-btn active" data-subtab="cart">Active Cart Items (<span id="userSubtabCartCount">0</span>)</button>
+        <button type="button" class="user-tab-btn" data-subtab="saved">Saved Items (<span id="userSubtabSavedCount">0</span>)</button>
+        <button type="button" class="user-tab-btn" data-subtab="reviews">Submitted Reviews (<span id="userSubtabReviewsCount">0</span>)</button>
+        <button type="button" class="user-tab-btn" data-subtab="orders">Order History (<span id="userSubtabOrdersCount">0</span>)</button>
+      </div>
+
+      <!-- Subtab Content Panes -->
+      <div class="user-pane-content" id="userSubtabContent">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="admin-modal-footer">
+        <button type="button" class="admin-btn btn-secondary" id="closeUserActivityModalBtn">Close Drawer</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ADD / EDIT PRODUCT MODAL -->
   <div class="admin-modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
@@ -1083,8 +1830,20 @@
             </div>
 
             <div class="form-field">
-              <label for="modalProductImage">Image URL</label>
-              <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." required>
+              <label for="modalProductStatus">Catalog Visibility</label>
+              <select id="modalProductStatus">
+                <option value="active">Active (Visible in Store)</option>
+                <option value="hidden">Hidden (Archived / Off-shelf)</option>
+              </select>
+              <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Hidden items are removed from customer search &amp; category listings.</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="modalProductImage">Image URL &amp; Live Preview</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <img src="images/subcategories/sub_smartphones.jpg" alt="Preview" id="modalImagePreview" class="modal-img-preview" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." required style="flex: 1;">
             </div>
           </div>
 
@@ -1141,6 +1900,73 @@
     let adminProducts = [];
     let currentEditingId = null;
     let adminReviewsByProd = {};
+    let adminReviewsList = [];
+    let adminUsersList = [];
+    let adminOrdersList = [];
+    let activeSalesPeriod = 'today';
+    let currentUserActivitySubtab = 'cart';
+    let activeUserForModal = null;
+
+    // Tab Navigation Configuration
+    const TAB_HEADINGS = {
+      overview: 'Dashboard Overview',
+      sales: 'Daily Sales & Revenue Ledger',
+      products: 'Products Catalog & Inventory Management',
+      users: 'Registered Customers & Shopping Activity',
+      analytics: 'Store Insights & Product Leaderboards',
+      orders: 'Customer Orders Fulfillment',
+      reviews: 'Customer Reviews & Store Replies',
+      settings: 'Cloud Database & Local Storage Settings'
+    };
+
+    function switchAdminTab(targetTab) {
+      if (!targetTab) targetTab = 'overview';
+      targetTab = targetTab.replace(/^#/, '');
+      if (!TAB_HEADINGS[targetTab]) targetTab = 'overview';
+
+      // Update active nav links
+      document.querySelectorAll('.admin-nav-link').forEach(link => {
+        const linkTab = link.getAttribute('data-tab');
+        if (linkTab === targetTab) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+
+      // Update visible tab pane
+      document.querySelectorAll('.admin-tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+      const activePane = document.getElementById('tab-' + targetTab);
+      if (activePane) activePane.classList.add('active');
+
+      // Update page heading
+      const headingEl = document.getElementById('adminSectionHeading');
+      if (headingEl) headingEl.textContent = TAB_HEADINGS[targetTab] || 'Dashboard Overview';
+
+      // Trigger tab-specific loaders
+      if (targetTab === 'sales') {
+        loadDailySales(activeSalesPeriod);
+      } else if (targetTab === 'users') {
+        loadRegisteredUsers();
+      } else if (targetTab === 'analytics') {
+        renderLeaderboards();
+      } else if (targetTab === 'orders') {
+        loadOrdersTab();
+      } else if (targetTab === 'reviews') {
+        loadAdminReviews();
+      } else if (targetTab === 'overview') {
+        loadDailySales('today');
+        renderLeaderboards();
+      }
+
+      // Close mobile sidebar if open
+      const adminSidebar = document.getElementById('adminSidebar');
+      if (adminSidebar && adminSidebar.classList.contains('open')) {
+        adminSidebar.classList.remove('open');
+      }
+    }
 
     async function loadAdminReviewsForVoting() {
       try {
@@ -1156,6 +1982,8 @@
             });
           }
           renderProductsTable();
+          renderOverviewProductsTable();
+          renderLeaderboards();
         }
       } catch (e) {
         console.warn('Error loading admin reviews for voting:', e);
@@ -1198,16 +2026,84 @@
         adminSidebar.classList.toggle('open');
       });
 
-      // Load products from taxonomy catalog + local storage cache
+      // Sidebar Tab Links & Tab Jumps
+      document.querySelectorAll('.admin-nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tab = link.getAttribute('data-tab');
+          window.location.hash = tab;
+          switchAdminTab(tab);
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        const jump = e.target.closest('.admin-tab-jump');
+        if (jump) {
+          e.preventDefault();
+          const target = jump.getAttribute('data-target');
+          if (target) {
+            window.location.hash = target;
+            switchAdminTab(target);
+          }
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.replace(/^#/, '');
+        if (hash) switchAdminTab(hash);
+      });
+
+      // Initial tab detection from URL hash
+      const initialTab = window.location.hash.replace(/^#/, '') || 'overview';
+      switchAdminTab(initialTab);
+
+      // Load products catalog
       loadProductsCatalog();
 
-      // Search & Filters
+      // Search & Filters on Products tab
       document.getElementById('adminSearchInput').addEventListener('input', renderProductsTable);
       document.getElementById('adminCategoryFilter').addEventListener('change', renderProductsTable);
+      const statusFilterEl = document.getElementById('adminStatusFilter');
+      if (statusFilterEl) statusFilterEl.addEventListener('change', renderProductsTable);
 
-      // Product Modal Actions
+      // User search filter
+      const userSearchEl = document.getElementById('userSearchInput');
+      if (userSearchEl) userSearchEl.addEventListener('input', renderRegisteredUsersTable);
+
+      // Date period filters on Daily Sales tab
+      document.querySelectorAll('.date-chip-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.date-chip-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeSalesPeriod = btn.getAttribute('data-period') || 'today';
+          loadDailySales(activeSalesPeriod);
+        });
+      });
+
+      const salesRefreshBtn = document.getElementById('salesRefreshBtn');
+      if (salesRefreshBtn) salesRefreshBtn.addEventListener('click', () => loadDailySales(activeSalesPeriod));
+
+      const refreshUsersBtn = document.getElementById('refreshUsersBtn');
+      if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', loadRegisteredUsers);
+
+      const refreshLeaderboardsBtn = document.getElementById('refreshLeaderboardsBtn');
+      if (refreshLeaderboardsBtn) refreshLeaderboardsBtn.addEventListener('click', renderLeaderboards);
+
+      const refreshOrdersTabBtn = document.getElementById('refreshOrdersTabBtn');
+      if (refreshOrdersTabBtn) refreshOrdersTabBtn.addEventListener('click', loadOrdersTab);
+
+      // Product Modal Actions & Live Image Preview
       const productModal = document.getElementById('productModal');
       const productForm = document.getElementById('productModalForm');
+      const modalImageInput = document.getElementById('modalProductImage');
+      const modalImagePreview = document.getElementById('modalImagePreview');
+
+      if (modalImageInput && modalImagePreview) {
+        modalImageInput.addEventListener('input', () => {
+          const val = modalImageInput.value.trim();
+          modalImagePreview.src = val || 'images/subcategories/sub_smartphones.jpg';
+        });
+      }
 
       document.getElementById('adminAddProductBtn').addEventListener('click', () => {
         currentEditingId = null;
@@ -1216,6 +2112,9 @@
         document.getElementById('modalProductId').value = '';
         const ratingInput = document.getElementById('modalProductRating');
         if (ratingInput) ratingInput.value = '4.8';
+        const statusSelect = document.getElementById('modalProductStatus');
+        if (statusSelect) statusSelect.value = 'active';
+        if (modalImagePreview) modalImagePreview.src = 'images/subcategories/sub_smartphones.jpg';
         productModal.classList.add('open');
       });
 
@@ -1232,12 +2131,36 @@
         saveProductFromModal();
       });
 
+      // User Activity Modal Subtab switches
+      document.querySelectorAll('.user-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.user-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentUserActivitySubtab = btn.getAttribute('data-subtab') || 'cart';
+          renderUserActivitySubtab(currentUserActivitySubtab);
+        });
+      });
+
+      const closeUserModal = () => {
+        const uModal = document.getElementById('userActivityModal');
+        if (uModal) uModal.classList.remove('open');
+      };
+      const closeUserBtn = document.getElementById('closeUserActivityModal');
+      if (closeUserBtn) closeUserBtn.addEventListener('click', closeUserModal);
+      const closeUserFooterBtn = document.getElementById('closeUserActivityModalBtn');
+      if (closeUserFooterBtn) closeUserFooterBtn.addEventListener('click', closeUserModal);
+
       // Sync to Supabase button
       document.getElementById('adminSyncSupabaseBtn').addEventListener('click', syncAllToSupabase);
+
+      // Initial loads
+      loadDailySales('today');
+      loadRegisteredUsers();
+      loadAdminReviews();
     });
 
     function loadProductsCatalog() {
-      // Priority: localStorage cache > taxonomy CATALOG_PRODUCTS
+      // Priority: localStorage cache > taxonomy CATALOG_PRODUCTS or RALPHMART_CATALOG
       const cached = localStorage.getItem('nkemmart_admin_products');
       if (cached) {
         try {
@@ -1250,14 +2173,21 @@
       if (!adminProducts || adminProducts.length === 0) {
         if (typeof CATALOG_PRODUCTS !== 'undefined' && Array.isArray(CATALOG_PRODUCTS)) {
           adminProducts = JSON.parse(JSON.stringify(CATALOG_PRODUCTS));
+        } else if (typeof window.RALPHMART_CATALOG !== 'undefined' && Array.isArray(window.RALPHMART_CATALOG)) {
+          adminProducts = JSON.parse(JSON.stringify(window.RALPHMART_CATALOG));
         } else {
           adminProducts = [];
         }
+        // Ensure default active status
+        adminProducts.forEach(p => {
+          if (!p.status) p.status = 'active';
+        });
         saveProductsLocal();
       }
 
       updateStats();
       renderProductsTable();
+      renderOverviewProductsTable();
       loadAdminReviewsForVoting();
     }
 
@@ -1300,8 +2230,12 @@
 
     function renderProductsTable() {
       const tbody = document.getElementById('adminProductsTbody');
-      const searchVal = document.getElementById('adminSearchInput').value.trim().toLowerCase();
-      const catVal = document.getElementById('adminCategoryFilter').value;
+      if (!tbody) return;
+
+      const searchVal = (document.getElementById('adminSearchInput') ? document.getElementById('adminSearchInput').value : '').trim().toLowerCase();
+      const catVal = document.getElementById('adminCategoryFilter') ? document.getElementById('adminCategoryFilter').value : 'all';
+      const statusFilterEl = document.getElementById('adminStatusFilter');
+      const statusVal = statusFilterEl ? statusFilterEl.value : 'all';
 
       const filtered = adminProducts.filter(p => {
         const matchesSearch = !searchVal || 
@@ -1309,16 +2243,29 @@
           (p.brand && p.brand.toLowerCase().includes(searchVal)) ||
           (p.id && String(p.id).toLowerCase().includes(searchVal));
         const matchesCat = catVal === 'all' || p.category === catVal || p.category_id === catVal;
-        return matchesSearch && matchesCat;
+        
+        let matchesStatus = true;
+        const pStatus = p.status || 'active';
+        const pStock = Number(p.stock !== undefined ? p.stock : 25);
+        if (statusVal === 'active') {
+          matchesStatus = pStatus === 'active';
+        } else if (statusVal === 'hidden') {
+          matchesStatus = pStatus === 'hidden';
+        } else if (statusVal === 'lowstock') {
+          matchesStatus = pStock < 10;
+        }
+
+        return matchesSearch && matchesCat && matchesStatus;
       });
 
-      document.getElementById('tableCountSummary').textContent = `Showing ${filtered.length} of ${adminProducts.length} items`;
+      const summaryEl = document.getElementById('tableCountSummary');
+      if (summaryEl) summaryEl.textContent = `Showing ${filtered.length} of ${adminProducts.length} items`;
 
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="6" style="text-align: center; padding: 36px 16px; color: #64748b;">
-              No products found matching your search or category filter.
+              No products found matching your search, category, or visibility filter.
             </td>
           </tr>
         `;
@@ -1327,6 +2274,7 @@
 
       tbody.innerHTML = filtered.map(p => {
         const stock = Number(p.stock !== undefined ? p.stock : 25);
+        const isHidden = p.status === 'hidden';
         let stockClass = 'stock-in';
         let stockLabel = `${stock} in stock`;
         if (stock === 0) {
@@ -1347,7 +2295,7 @@
           : { formatted: Number(p.rating || 4.8).toFixed(1), totalReviews: 0, isUserRated: false, ruleApplied: 'admin_base' };
 
         return `
-          <tr>
+          <tr style="${isHidden ? 'opacity: 0.75; background: #fafafa;' : ''}">
             <td>
               <div class="product-row-info">
                 <img src="${escapeHtml(p.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(p.title)}" class="product-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
@@ -1365,7 +2313,12 @@
               ${oldPriceFormatted ? `<div style="font-size: 11px; text-decoration: line-through; color: #94a3b8;">${oldPriceFormatted}</div>` : ''}
             </td>
             <td>
-              <span class="stock-chip ${stockClass}">${stockLabel}</span>
+              <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                <span class="stock-chip ${stockClass}">${stockLabel}</span>
+                <span class="status-chip ${isHidden ? 'hidden' : 'active'}">
+                  ${isHidden ? 'Off-Shelf / Hidden' : 'Active / Visible'}
+                </span>
+              </div>
             </td>
             <td>
               <div style="font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px;">
@@ -1378,9 +2331,17 @@
                 ${ratingInfo.isUserRated ? (ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : (ratingInfo.ruleApplied === 'highest_distinct' ? 'Highest Rating' : 'User Voted')) : 'Base: ' + (p.rating || 4.8)}
               </div>
             </td>
-            <td>
-              <div class="action-btn-row">
-                <button type="button" class="table-icon-btn" onclick="editProduct('${p.id}')" title="Edit Product">
+            <td style="text-align: right;">
+              <div class="action-btn-row" style="justify-content: flex-end;">
+                <!-- Hide / Unhide Toggle Button -->
+                <button type="button" class="table-icon-btn hide-btn ${isHidden ? 'is-hidden' : ''}" onclick="window.toggleProductVisibility('${p.id}')" title="${isHidden ? 'Unhide (Make Visible to Customers)' : 'Hide from Store Catalog'}">
+                  ${isHidden ? `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                  ` : `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  `}
+                </button>
+                <button type="button" class="table-icon-btn" onclick="editProduct('${p.id}')" title="Edit Product Details">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
                 <a href="product.html?id=${p.id}" target="_blank" class="table-icon-btn" title="View on Live Store">
@@ -1396,12 +2357,77 @@
       }).join('');
     }
 
+    function renderOverviewProductsTable() {
+      const tbody = document.getElementById('overviewProductsTbody');
+      if (!tbody) return;
+
+      const recentItems = adminProducts.slice(0, 6);
+      tbody.innerHTML = recentItems.map(p => {
+        const stock = Number(p.stock !== undefined ? p.stock : 25);
+        const isHidden = p.status === 'hidden';
+        const pReviews = adminReviewsByProd[p.id] || [];
+        const ratingInfo = (typeof calculateProductRating === 'function')
+          ? calculateProductRating(p.rating || 4.8, pReviews)
+          : { formatted: Number(p.rating || 4.8).toFixed(1), totalReviews: 0 };
+
+        return `
+          <tr style="${isHidden ? 'opacity: 0.75; background: #fafafa;' : ''}">
+            <td>
+              <div class="product-row-info">
+                <img src="${escapeHtml(p.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(p.title)}" class="product-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+                <div>
+                  <span class="product-row-title">${escapeHtml(p.title)}</span>
+                  <span class="product-row-id">ID: ${escapeHtml(p.id)}</span>
+                </div>
+              </div>
+            </td>
+            <td><span style="font-weight: 600; text-transform: capitalize;">${escapeHtml(p.category || 'general')}</span></td>
+            <td><strong>${formatNaira(p.price)}</strong></td>
+            <td>
+              <span class="status-chip ${isHidden ? 'hidden' : 'active'}">${isHidden ? 'Hidden' : stock + ' in stock'}</span>
+            </td>
+            <td><span style="color: #f59e0b; font-weight: 700;">★ ${ratingInfo.formatted}</span></td>
+            <td style="text-align: right;">
+              <button type="button" class="table-icon-btn hide-btn ${isHidden ? 'is-hidden' : ''}" onclick="window.toggleProductVisibility('${p.id}')" title="${isHidden ? 'Unhide' : 'Hide'}">
+                ${isHidden ? `
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                ` : `
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                `}
+              </button>
+              <button type="button" class="table-icon-btn" onclick="editProduct('${p.id}')" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.toggleProductVisibility = async function(productId) {
+      const idx = adminProducts.findIndex(p => String(p.id) === String(productId));
+      if (idx === -1) return;
+
+      const currentStatus = adminProducts[idx].status || 'active';
+      const newStatus = currentStatus === 'hidden' ? 'active' : 'hidden';
+      adminProducts[idx].status = newStatus;
+
+      saveProductsLocal();
+      renderProductsTable();
+      renderOverviewProductsTable();
+
+      // Cloud sync
+      if (typeof updateProductVisibility === 'function') {
+        await updateProductVisibility(productId, newStatus);
+      }
+    };
+
     window.editProduct = function(productId) {
       const p = adminProducts.find(item => String(item.id) === String(productId));
       if (!p) return;
 
       currentEditingId = p.id;
-      document.getElementById('productModalTitle').textContent = 'Edit Product';
+      document.getElementById('productModalTitle').textContent = 'Edit Product Details';
       document.getElementById('modalProductId').value = p.id;
       document.getElementById('modalProductTitle').value = p.title || '';
       document.getElementById('modalProductCategory').value = p.category || p.category_id || 'phones';
@@ -1410,11 +2436,19 @@
       document.getElementById('modalProductOldPrice').value = p.oldPrice || p.old_price || '';
       document.getElementById('modalProductStock').value = p.stock !== undefined ? p.stock : 25;
       document.getElementById('modalProductDiscount').value = p.discount || 0;
+      
       const ratingInp = document.getElementById('modalProductRating');
       if (ratingInp) ratingInp.value = p.rating || 4.8;
-      document.getElementById('modalProductImage').value = p.image || '';
-      document.getElementById('modalProductDesc').value = p.description || '';
+      
+      const statusSelect = document.getElementById('modalProductStatus');
+      if (statusSelect) statusSelect.value = p.status || 'active';
 
+      const imgInput = document.getElementById('modalProductImage');
+      const imgPreview = document.getElementById('modalImagePreview');
+      if (imgInput) imgInput.value = p.image || '';
+      if (imgPreview) imgPreview.src = p.image || 'images/subcategories/sub_smartphones.jpg';
+
+      document.getElementById('modalProductDesc').value = p.description || '';
       document.getElementById('productModal').classList.add('open');
     };
 
@@ -1422,11 +2456,12 @@
       const p = adminProducts.find(item => String(item.id) === String(productId));
       if (!p) return;
 
-      if (confirm(`Are you sure you want to remove "${p.title}" from the catalog?`)) {
+      if (confirm(`Are you sure you want to delete "${p.title}" from the catalog? This action will remove it completely.`)) {
         adminProducts = adminProducts.filter(item => String(item.id) !== String(productId));
         saveProductsLocal();
         updateStats();
         renderProductsTable();
+        renderOverviewProductsTable();
 
         // Also delete from Supabase if connected
         const client = getSupabase();
@@ -1447,6 +2482,7 @@
       const stock = Number(document.getElementById('modalProductStock').value) || 0;
       const discount = Number(document.getElementById('modalProductDiscount').value) || 0;
       const rating = Number(document.getElementById('modalProductRating') ? document.getElementById('modalProductRating').value : 4.8) || 4.8;
+      const status = document.getElementById('modalProductStatus') ? document.getElementById('modalProductStatus').value : 'active';
       const image = document.getElementById('modalProductImage').value.trim();
       const description = document.getElementById('modalProductDesc').value.trim();
 
@@ -1466,6 +2502,7 @@
             stock,
             discount,
             rating,
+            status,
             image,
             description,
             updated_at: new Date().toISOString()
@@ -1485,6 +2522,7 @@
           old_price: oldPrice,
           stock,
           discount,
+          status,
           image,
           description,
           rating: rating,
@@ -1498,9 +2536,10 @@
       saveProductsLocal();
       updateStats();
       renderProductsTable();
+      renderOverviewProductsTable();
       document.getElementById('productModal').classList.remove('open');
 
-      // Sync updated/created item to Supabase in background
+      // Sync to Supabase in background
       const client = getSupabase();
       if (client) {
         const itemToSave = currentEditingId ? adminProducts.find(p => p.id === currentEditingId) : adminProducts[0];
@@ -1513,6 +2552,7 @@
           old_price: itemToSave.oldPrice || itemToSave.old_price,
           stock: itemToSave.stock,
           discount: itemToSave.discount,
+          status: itemToSave.status || 'active',
           rating: Number(itemToSave.rating) || 4.8,
           image: itemToSave.image,
           description: itemToSave.description,
@@ -1523,6 +2563,14 @@
       }
     }
 
+    window.resetCatalogToTaxonomy = function() {
+      if (confirm('Reset your catalog cache back to the default verified store inventory?')) {
+        localStorage.removeItem('nkemmart_admin_products');
+        loadProductsCatalog();
+        alert('Catalog inventory reset to default verified items.');
+      }
+    };
+
     async function syncAllToSupabase() {
       const client = getSupabase();
       if (!client) {
@@ -1531,8 +2579,10 @@
       }
 
       const btn = document.getElementById('adminSyncSupabaseBtn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = 'Syncing...';
+      if (btn) {
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Syncing...';
+      }
 
       try {
         const payload = adminProducts.map(p => ({
@@ -1544,6 +2594,7 @@
           old_price: Number(p.oldPrice || p.old_price) || null,
           stock: Number(p.stock !== undefined ? p.stock : 25),
           discount: Number(p.discount) || 0,
+          status: p.status || 'active',
           image: p.image || '',
           description: p.description || '',
           rating: Number(p.rating) || 4.8,
@@ -1557,14 +2608,562 @@
       } catch (err) {
         alert('Sync error: ' + (err.message || 'Check connection'));
       } finally {
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'Sync to Supabase';
+        if (btn) {
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Sync to Supabase';
+        }
       }
     }
 
-    // Admin Reviews Management
-    let adminReviewsList = [];
+    // ========================================================
+    // DAILY SALES MODULE
+    // ========================================================
+    async function loadDailySales(period) {
+      if (!period) period = 'today';
+      activeSalesPeriod = period;
 
+      if (typeof getAdminOrdersOverview === 'function') {
+        adminOrdersList = await getAdminOrdersOverview();
+      } else {
+        adminOrdersList = [];
+      }
+
+      renderDailySalesUI(period);
+    }
+
+    function renderDailySalesUI(period) {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      const weekStartStr = new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0];
+      const monthPrefix = todayStr.substring(0, 7); // e.g. "2026-10"
+
+      // Filter orders based on period
+      const filteredOrders = adminOrdersList.filter(o => {
+        const oDate = (o.created_at || '').split('T')[0];
+        if (period === 'today') return oDate === todayStr;
+        if (period === 'yesterday') return oDate === yesterdayStr;
+        if (period === 'week') return oDate >= weekStartStr;
+        if (period === 'month') return oDate.startsWith(monthPrefix);
+        return true; // 'all'
+      });
+
+      // Compute KPIs
+      let grossRevenue = 0;
+      let totalUnits = 0;
+      const ordersCount = filteredOrders.length;
+
+      filteredOrders.forEach(o => {
+        grossRevenue += Number(o.total_amount || 0);
+        if (Array.isArray(o.items)) {
+          o.items.forEach(it => {
+            totalUnits += Number(it.qty || 1);
+          });
+        } else {
+          totalUnits += 1;
+        }
+      });
+
+      const aov = ordersCount > 0 ? Math.round(grossRevenue / ordersCount) : 0;
+
+      // Update KPI strip
+      const revEl = document.getElementById('salesKpiRevenue');
+      const ordersEl = document.getElementById('salesKpiOrders');
+      const unitsEl = document.getElementById('salesKpiUnits');
+      const aovEl = document.getElementById('salesKpiAov');
+
+      if (revEl) revEl.textContent = formatNaira(grossRevenue);
+      if (ordersEl) ordersEl.textContent = formatNumberWithCommas(ordersCount);
+      if (unitsEl) unitsEl.textContent = formatNumberWithCommas(totalUnits);
+      if (aovEl) aovEl.textContent = formatNaira(aov);
+
+      // Also update overview sales banner
+      const overviewSalesEl = document.getElementById('overviewTodaySales');
+      const overviewOrdersEl = document.getElementById('overviewTodayOrders');
+      if (overviewSalesEl && period === 'today') {
+        overviewSalesEl.textContent = formatNaira(grossRevenue);
+      }
+      if (overviewOrdersEl && period === 'today') {
+        overviewOrdersEl.textContent = `${ordersCount} order${ordersCount === 1 ? '' : 's'} placed today across Nigeria`;
+      }
+
+      // Group orders by date for the daily ledger table
+      const byDate = {};
+      adminOrdersList.forEach(o => {
+        const d = (o.created_at || '').split('T')[0] || 'Unknown';
+        if (!byDate[d]) {
+          byDate[d] = { date: d, orders: 0, units: 0, revenue: 0, status: 'Settled (Bank/Paystack)' };
+        }
+        byDate[d].orders += 1;
+        byDate[d].revenue += Number(o.total_amount || 0);
+        if (Array.isArray(o.items)) {
+          o.items.forEach(it => { byDate[d].units += Number(it.qty || 1); });
+        } else {
+          byDate[d].units += 1;
+        }
+      });
+
+      const ledgerDates = Object.values(byDate).sort((a, b) => b.date.localeCompare(a.date));
+      const ledgerTbody = document.getElementById('salesLedgerTbody');
+      if (ledgerTbody) {
+        if (ledgerDates.length === 0) {
+          ledgerTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No sales transactions recorded yet.</td></tr>`;
+        } else {
+          ledgerTbody.innerHTML = ledgerDates.map(row => {
+            const avg = row.orders > 0 ? Math.round(row.revenue / row.orders) : 0;
+            const displayDate = new Date(row.date + 'T00:00:00Z').toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const isToday = row.date === todayStr;
+
+            return `
+              <tr>
+                <td>
+                  <strong>${displayDate}</strong>
+                  ${isToday ? `<span class="status-chip active" style="margin-left: 6px;">Today</span>` : ''}
+                </td>
+                <td><span style="font-weight: 700; color: #091e3a;">${row.orders}</span> orders</td>
+                <td><span style="font-weight: 600; color: #334155;">${row.units}</span> units</td>
+                <td><strong style="color: #15803d; font-size: 14px;">${formatNaira(row.revenue)}</strong></td>
+                <td>${formatNaira(avg)}</td>
+                <td><span class="status-chip active">${row.status}</span></td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      // Render transactions log
+      const transTbody = document.getElementById('salesTransactionsTbody');
+      const transSummary = document.getElementById('salesOrdersCountSummary');
+      if (transSummary) transSummary.textContent = `Showing ${filteredOrders.length} transaction${filteredOrders.length === 1 ? '' : 's'}`;
+
+      if (transTbody) {
+        if (filteredOrders.length === 0) {
+          transTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 28px; color: #64748b;">No orders found for the selected period (${period}).</td></tr>`;
+        } else {
+          transTbody.innerHTML = filteredOrders.map(o => {
+            const dateFmt = o.created_at ? new Date(o.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Recently';
+            let itemsCount = 0;
+            if (Array.isArray(o.items)) {
+              itemsCount = o.items.reduce((s, it) => s + (it.qty || 1), 0);
+            } else {
+              itemsCount = 1;
+            }
+
+            return `
+              <tr>
+                <td><strong>${escapeHtml(o.id)}</strong></td>
+                <td>
+                  <div style="font-weight: 600; color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</div>
+                  <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(o.email || o.phone || '')}</div>
+                </td>
+                <td><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
+                <td>${itemsCount} item${itemsCount === 1 ? '' : 's'}</td>
+                <td><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+                <td><strong style="color: #091e3a;">${formatNaira(o.total_amount)}</strong></td>
+                <td><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+                <td style="font-size: 12px; color: #64748b;">${dateFmt}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    // ========================================================
+    // REGISTERED USERS MODULE
+    // ========================================================
+    async function loadRegisteredUsers() {
+      const summaryEl = document.getElementById('usersCountSummary');
+      if (summaryEl) summaryEl.textContent = 'Loading accounts from Supabase cloud...';
+
+      if (typeof getAdminUsersOverview === 'function') {
+        adminUsersList = await getAdminUsersOverview();
+      } else {
+        adminUsersList = [];
+      }
+
+      // Update sidebar badge
+      const sideUserBadge = document.getElementById('sidebarUsersCount');
+      if (sideUserBadge) sideUserBadge.textContent = adminUsersList.length;
+
+      // Update KPI
+      const totalAccounts = adminUsersList.length;
+      let usersWithCarts = 0;
+      let usersWithSaved = 0;
+      let usersWithReviews = 0;
+
+      adminUsersList.forEach(u => {
+        if (Number(u.cart_count) > 0 || (Array.isArray(u.cart_data) && u.cart_data.length > 0)) usersWithCarts++;
+        if (Number(u.saved_count) > 0 || (Array.isArray(u.saved_data) && u.saved_data.length > 0)) usersWithSaved++;
+        if (Number(u.reviews_count) > 0) usersWithReviews++;
+      });
+
+      const totalEl = document.getElementById('usersKpiTotal');
+      const cartsEl = document.getElementById('usersKpiCarts');
+      const savedEl = document.getElementById('usersKpiSaved');
+      const revEl = document.getElementById('usersKpiReviewers');
+
+      if (totalEl) totalEl.textContent = totalAccounts;
+      if (cartsEl) cartsEl.textContent = usersWithCarts;
+      if (savedEl) savedEl.textContent = usersWithSaved;
+      if (revEl) revEl.textContent = usersWithReviews;
+
+      renderRegisteredUsersTable();
+      renderLeaderboards();
+    }
+
+    function renderRegisteredUsersTable() {
+      const tbody = document.getElementById('adminUsersTbody');
+      if (!tbody) return;
+
+      const searchVal = (document.getElementById('userSearchInput') ? document.getElementById('userSearchInput').value : '').trim().toLowerCase();
+
+      const filtered = adminUsersList.filter(u => {
+        if (!searchVal) return true;
+        const name = (u.full_name || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const phone = (u.phone || '').toLowerCase();
+        const city = (u.city || '').toLowerCase();
+        const state = (u.state || '').toLowerCase();
+        return name.includes(searchVal) || email.includes(searchVal) || phone.includes(searchVal) || city.includes(searchVal) || state.includes(searchVal);
+      });
+
+      const summaryEl = document.getElementById('usersCountSummary');
+      if (summaryEl) summaryEl.textContent = `Showing ${filtered.length} of ${adminUsersList.length} registered accounts`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 32px; color: #64748b;">No registered users found matching your search.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const initials = (u.full_name || u.email || 'U').charAt(0).toUpperCase();
+        const cartItems = Array.isArray(u.cart_data) ? u.cart_data : [];
+        const cartCount = Number(u.cart_count || cartItems.reduce((s, it) => s + (it.qty || 1), 0));
+        let cartTotal = 0;
+        cartItems.forEach(it => { cartTotal += (Number(it.price) || 0) * (Number(it.qty) || 1); });
+
+        const savedItems = Array.isArray(u.saved_data) ? u.saved_data : [];
+        const savedCount = Number(u.saved_count || savedItems.length);
+
+        const joinedDate = u.created_at ? new Date(u.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently';
+
+        return `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: #512175; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+                  ${initials}
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${escapeHtml(u.full_name || 'Customer')}</div>
+                  <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">${escapeHtml(u.role || 'customer')}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-size: 13px; color: #1e293b;">${escapeHtml(u.email || 'No email')}</div>
+              <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
+                ${u.phone ? escapeHtml(u.phone) + ' &bull; ' : ''}${escapeHtml(u.city ? u.city + ', ' + u.state : (u.state || 'Nigeria'))}
+              </div>
+            </td>
+            <td>
+              <div style="display: inline-flex; flex-direction: column; gap: 2px;">
+                <span class="status-chip active" style="font-size: 11px;">
+                  ${cartCount} item${cartCount === 1 ? '' : 's'} in cart
+                </span>
+                ${cartTotal > 0 ? `<span style="font-size: 11px; font-weight: 700; color: #15803d;">Total: ${formatNaira(cartTotal)}</span>` : ''}
+              </div>
+            </td>
+            <td>
+              <span class="status-chip" style="background: #fee2e2; color: #dc2626; font-size: 11px;">
+                ${savedCount} wishlist item${savedCount === 1 ? '' : 's'}
+              </span>
+            </td>
+            <td>
+              <div style="font-size: 12.5px; color: #334155;">
+                <strong>${u.reviews_count || (u.reviews_data ? u.reviews_data.length : 0)}</strong> reviews &bull; 
+                <strong>${u.orders_count || (u.orders_data ? u.orders_data.length : 0)}</strong> orders
+              </div>
+            </td>
+            <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${joinedDate}</td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button type="button" class="admin-btn btn-secondary" onclick="window.viewUserActivity('${u.id}')" style="padding: 6px 12px; font-size: 12px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span>View Activity</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.viewUserActivity = function(userId) {
+      activeUserForModal = adminUsersList.find(u => String(u.id) === String(userId));
+      if (!activeUserForModal) return;
+
+      const titleEl = document.getElementById('userActivityModalTitle');
+      const subtitleEl = document.getElementById('userActivityModalSubtitle');
+      if (titleEl) titleEl.textContent = `${activeUserForModal.full_name || 'Customer'} - Activity Drawer`;
+      if (subtitleEl) subtitleEl.textContent = `${activeUserForModal.email} • ${activeUserForModal.phone || 'No phone'} • ${activeUserForModal.city || ''} ${activeUserForModal.state || 'Nigeria'}`;
+
+      // Update badge counts on modal subtabs
+      const cartItems = Array.isArray(activeUserForModal.cart_data) ? activeUserForModal.cart_data : [];
+      const savedItems = Array.isArray(activeUserForModal.saved_data) ? activeUserForModal.saved_data : [];
+      const reviewsItems = Array.isArray(activeUserForModal.reviews_data) ? activeUserForModal.reviews_data : [];
+      const ordersItems = Array.isArray(activeUserForModal.orders_data) ? activeUserForModal.orders_data : [];
+
+      const cartCntEl = document.getElementById('userSubtabCartCount');
+      const savedCntEl = document.getElementById('userSubtabSavedCount');
+      const revCntEl = document.getElementById('userSubtabReviewsCount');
+      const ordCntEl = document.getElementById('userSubtabOrdersCount');
+
+      if (cartCntEl) cartCntEl.textContent = cartItems.reduce((s, it) => s + (it.qty || 1), 0);
+      if (savedCntEl) savedCntEl.textContent = savedItems.length;
+      if (revCntEl) revCntEl.textContent = reviewsItems.length;
+      if (ordCntEl) ordCntEl.textContent = ordersItems.length;
+
+      // Reset to cart subtab
+      currentUserActivitySubtab = 'cart';
+      document.querySelectorAll('.user-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-subtab') === 'cart') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      renderUserActivitySubtab('cart');
+      document.getElementById('userActivityModal').classList.add('open');
+    };
+
+    function renderUserActivitySubtab(subtabName) {
+      const container = document.getElementById('userSubtabContent');
+      if (!container || !activeUserForModal) return;
+
+      if (subtabName === 'cart') {
+        const cartItems = Array.isArray(activeUserForModal.cart_data) ? activeUserForModal.cart_data : [];
+        if (cartItems.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">This customer currently has no items in their shopping cart.</div>`;
+          return;
+        }
+
+        let grandTotal = 0;
+        const listHtml = cartItems.map(it => {
+          const qty = Number(it.qty) || 1;
+          const price = Number(it.price) || 0;
+          const subtotal = qty * price;
+          grandTotal += subtotal;
+
+          return `
+            <div class="user-item-row">
+              <img src="${escapeHtml(it.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(it.title)}" class="user-item-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(it.title)}</div>
+                <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">Unit Price: ${formatNaira(price)} &bull; Quantity: <strong>${qty}</strong></div>
+              </div>
+              <div style="font-size: 13.5px; font-weight: 800; color: #15803d;">${formatNaira(subtotal)}</div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; background: #faf5ff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e9d5ff;">
+            <span style="font-size: 12.5px; font-weight: 700; color: #512175;">Customer's Active Cart Summary</span>
+            <span style="font-size: 14px; font-weight: 800; color: #512175;">Total Cart Value: ${formatNaira(grandTotal)}</span>
+          </div>
+          <div>${listHtml}</div>
+        `;
+      } else if (subtabName === 'saved') {
+        const savedItems = Array.isArray(activeUserForModal.saved_data) ? activeUserForModal.saved_data : [];
+        if (savedItems.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">This customer has not bookmarked any products to their saved wishlist yet.</div>`;
+          return;
+        }
+
+        container.innerHTML = savedItems.map(it => `
+          <div class="user-item-row">
+            <img src="${escapeHtml(it.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(it.title)}" class="user-item-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(it.title)}</div>
+              <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">ID: ${escapeHtml(it.id || 'N/A')}</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #091e3a;">${formatNaira(it.price || 0)}</div>
+          </div>
+        `).join('');
+      } else if (subtabName === 'reviews') {
+        const reviewsItems = Array.isArray(activeUserForModal.reviews_data) ? activeUserForModal.reviews_data : [];
+        if (reviewsItems.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">This customer has not submitted any product reviews yet.</div>`;
+          return;
+        }
+
+        container.innerHTML = reviewsItems.map(r => `
+          <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(r.product_title || r.product_id)}</strong>
+              <span style="font-weight: 800; color: #f59e0b; font-size: 12px;">★ ${r.rating}.0</span>
+            </div>
+            <div style="font-size: 13px; color: #334155; margin-top: 6px; font-style: italic;">"${escapeHtml(r.comment)}"</div>
+          </div>
+        `).join('');
+      } else if (subtabName === 'orders') {
+        const ordersItems = Array.isArray(activeUserForModal.orders_data) ? activeUserForModal.orders_data : [];
+        if (ordersItems.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">No prior completed order records found for this user account.</div>`;
+          return;
+        }
+
+        container.innerHTML = ordersItems.map(o => `
+          <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(o.id)} &bull; ${escapeHtml(o.date)}</strong>
+              <span class="status-chip active">${escapeHtml(o.status)}</span>
+            </div>
+            <div style="font-size: 12.5px; color: #475569; margin-top: 4px;">Items: ${escapeHtml(o.items)}</div>
+            <div style="font-size: 13px; font-weight: 700; color: #15803d; margin-top: 4px;">Total: ${formatNaira(o.total)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ========================================================
+    // LEADERBOARDS & STORE INTELLIGENCE MODULE
+    // ========================================================
+    function renderLeaderboards() {
+      if (typeof calculateStoreLeaderboards !== 'function') return;
+
+      const leaderboards = calculateStoreLeaderboards(adminProducts, adminReviewsList, adminUsersList);
+
+      // 1. Most Carted
+      const cartListEl = document.getElementById('leaderboardCartList');
+      if (cartListEl) {
+        cartListEl.innerHTML = leaderboards.mostCarted.map((item, idx) => `
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+            <div class="leaderboard-info">
+              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
+            </div>
+            <span class="leaderboard-metric-badge">${item.cartCount} in carts</span>
+          </li>
+        `).join('');
+
+        // Overview Snapshot
+        if (leaderboards.mostCarted[0]) {
+          const top = leaderboards.mostCarted[0];
+          const topImg = document.getElementById('overviewTopCartImg');
+          const topTitle = document.getElementById('overviewTopCartTitle');
+          const topMeta = document.getElementById('overviewTopCartMeta');
+          if (topImg) topImg.src = top.image;
+          if (topTitle) topTitle.textContent = top.title;
+          if (topMeta) topMeta.textContent = `${top.cartCount} active customer carts • ${formatNaira(top.price)}`;
+        }
+      }
+
+      // 2. Most Saved
+      const savedListEl = document.getElementById('leaderboardSavedList');
+      if (savedListEl) {
+        savedListEl.innerHTML = leaderboards.mostSaved.map((item, idx) => `
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+            <div class="leaderboard-info">
+              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
+            </div>
+            <span class="leaderboard-metric-badge" style="color: #dc2626; background: #fef2f2; border-color: #fecaca;">${item.savedCount} saved</span>
+          </li>
+        `).join('');
+      }
+
+      // 3. Most Reviewed
+      const revListEl = document.getElementById('leaderboardReviewsList');
+      if (revListEl) {
+        revListEl.innerHTML = leaderboards.mostReviewed.map((item, idx) => `
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+            <div class="leaderboard-info">
+              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; ${item.ratingInfo.formatted} ★</div>
+            </div>
+            <span class="leaderboard-metric-badge" style="color: #d97706; background: #fffbeb; border-color: #fde68a;">${item.reviewsCount} reviews</span>
+          </li>
+        `).join('');
+      }
+
+      // 4. Highest Rated (Voting Champions)
+      const rateListEl = document.getElementById('leaderboardRatingsList');
+      if (rateListEl) {
+        rateListEl.innerHTML = leaderboards.highestRated.map((item, idx) => `
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+            <div class="leaderboard-info">
+              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              <div class="leaderboard-meta">${item.ratingInfo.isUserRated ? (item.ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : 'Highest User Vote') : 'Admin Rated'}</div>
+            </div>
+            <span class="leaderboard-metric-badge" style="color: #059669; background: #ecfdf5; border-color: #a7f3d0;">★ ${item.ratingInfo.formatted}</span>
+          </li>
+        `).join('');
+      }
+    }
+
+    // ========================================================
+    // ORDERS TAB MODULE
+    // ========================================================
+    async function loadOrdersTab() {
+      const tbody = document.getElementById('tabOrdersTbody');
+      if (!tbody) return;
+
+      if (typeof getAdminOrdersOverview === 'function') {
+        adminOrdersList = await getAdminOrdersOverview();
+      } else {
+        adminOrdersList = [];
+      }
+
+      // Update sidebar badge
+      const sideOrdersBadge = document.getElementById('sidebarOrdersBadge');
+      if (sideOrdersBadge) sideOrdersBadge.textContent = adminOrdersList.length;
+
+      if (adminOrdersList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 32px; color: #64748b;">No customer orders placed yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = adminOrdersList.map(o => {
+        const dateFmt = o.created_at ? new Date(o.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
+        let itemsSummary = '';
+        if (Array.isArray(o.items)) {
+          itemsSummary = o.items.map(it => `${it.qty || 1}x ${it.title}`).slice(0, 2).join(', ');
+          if (o.items.length > 2) itemsSummary += ` (+${o.items.length - 2} more)`;
+        } else {
+          itemsSummary = 'General store items';
+        }
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(o.id)}</strong></td>
+            <td>
+              <div style="font-weight: 700; color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</div>
+              <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(o.email || o.phone || '')}</div>
+            </td>
+            <td><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
+            <td style="max-width: 240px; font-size: 12.5px; color: #334155;">${escapeHtml(itemsSummary)}</td>
+            <td><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+            <td><strong style="color: #15803d; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
+            <td><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+            <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ========================================================
+    // REVIEWS & REPLIES MODULE
+    // ========================================================
     async function loadAdminReviews() {
       const tbody = document.getElementById('adminReviewsTableBody');
       const badge = document.getElementById('adminReviewsBadge');
@@ -1700,13 +3299,9 @@
     const refreshBtn = document.getElementById('adminRefreshReviewsBtn');
     if (refreshBtn) refreshBtn.addEventListener('click', loadAdminReviews);
 
-    // Initial load and realtime
-    document.addEventListener('DOMContentLoaded', () => {
-      loadAdminReviews();
-    });
-
     window.addEventListener('nkemmart_review_updated', () => {
       loadAdminReviews();
+      loadAdminReviewsForVoting();
     });
 
     function escapeHtml(str) {

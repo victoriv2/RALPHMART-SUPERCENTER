@@ -1322,8 +1322,22 @@ window.NKEMMART_SEARCH = window.RALPHMART_SEARCH = function(rawQuery, catFilter,
   var catalog = window.RALPHMART_CATALOG || [];
   var q = (rawQuery || '').trim().toLowerCase();
 
+  // Filter out hidden products set by store administrator
+  var hiddenMap = {};
+  try {
+    var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+    adminProds.forEach(function(ap) {
+      if (ap && ap.status === 'hidden') hiddenMap[String(ap.id)] = true;
+    });
+  } catch(e) {}
+
+  var pool = catalog.filter(function(p) {
+    if (!p) return false;
+    if (p.status === 'hidden' || hiddenMap[String(p.id)]) return false;
+    return true;
+  });
+
   // If filtered by category / subcategory
-  var pool = catalog;
   if (catFilter) {
     pool = pool.filter(function(p) { return p.category === catFilter; });
   }
