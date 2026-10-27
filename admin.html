@@ -667,6 +667,12 @@
       border-color: #fecaca;
     }
 
+    /* Lock background scrolling when modal is active */
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
     /* Modal Form */
     .admin-modal {
       display: none;
@@ -678,6 +684,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      overscroll-behavior: contain;
     }
 
     .admin-modal.open {
@@ -688,12 +695,21 @@
       background: #ffffff;
       border-radius: 14px;
       width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
+      max-width: 620px;
+      max-height: calc(100vh - 40px);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .admin-modal-card > form {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      margin: 0;
     }
 
     .admin-modal-header {
@@ -703,6 +719,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .admin-modal-title {
@@ -716,13 +733,25 @@
       border: none;
       color: #cbd5e1;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .admin-modal-close:hover {
+      color: #ffffff;
     }
 
     .admin-modal-body {
       padding: 22px 24px;
       overflow-y: auto;
-      flex: 1;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      flex: 1 1 auto;
+      min-height: 0;
+      scrollbar-width: thin;
     }
 
     .form-grid-2 {
@@ -764,6 +793,7 @@
       display: flex;
       justify-content: flex-end;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     /* Tab Panes */
@@ -1001,7 +1031,7 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-      max-height: 90vh;
+      max-height: calc(100vh - 40px);
       display: flex;
       flex-direction: column;
     }
@@ -1011,6 +1041,7 @@
       border-bottom: 1px solid var(--admin-border);
       padding: 0 20px;
       overflow-x: auto;
+      flex-shrink: 0;
     }
     .user-tab-btn {
       padding: 12px 16px;
@@ -1031,7 +1062,11 @@
     .user-pane-content {
       padding: 20px;
       overflow-y: auto;
-      max-height: 55vh;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      flex: 1 1 auto;
+      min-height: 0;
+      scrollbar-width: thin;
     }
 
     .table-icon-btn.hide-btn:hover {
@@ -1972,6 +2007,25 @@
     let currentUserActivitySubtab = 'cart';
     let activeUserForModal = null;
 
+    // Modal scroll & lock helpers
+    window.openAdminModal = function(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.add('open');
+        document.body.classList.add('modal-open');
+      }
+    };
+
+    window.closeAdminModal = function(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.remove('open');
+        if (!document.querySelector('.admin-modal.open')) {
+          document.body.classList.remove('modal-open');
+        }
+      }
+    };
+
     // Tab Navigation Configuration
     const TAB_HEADINGS = {
       overview: 'Dashboard Overview',
@@ -2253,15 +2307,15 @@
         const statusSelect = document.getElementById('modalProductStatus');
         if (statusSelect) statusSelect.value = 'active';
         if (modalImagePreview) modalImagePreview.src = 'images/subcategories/sub_smartphones.jpg';
-        productModal.classList.add('open');
+        openAdminModal('productModal');
       });
 
       document.getElementById('closeProductModal').addEventListener('click', () => {
-        productModal.classList.remove('open');
+        closeAdminModal('productModal');
       });
 
       document.getElementById('cancelProductModal').addEventListener('click', () => {
-        productModal.classList.remove('open');
+        closeAdminModal('productModal');
       });
 
       productForm.addEventListener('submit', (e) => {
@@ -2279,14 +2333,29 @@
         });
       });
 
-      const closeUserModal = () => {
-        const uModal = document.getElementById('userActivityModal');
-        if (uModal) uModal.classList.remove('open');
-      };
       const closeUserBtn = document.getElementById('closeUserActivityModal');
-      if (closeUserBtn) closeUserBtn.addEventListener('click', closeUserModal);
+      if (closeUserBtn) closeUserBtn.addEventListener('click', () => closeAdminModal('userActivityModal'));
       const closeUserFooterBtn = document.getElementById('closeUserActivityModalBtn');
-      if (closeUserFooterBtn) closeUserFooterBtn.addEventListener('click', closeUserModal);
+      if (closeUserFooterBtn) closeUserFooterBtn.addEventListener('click', () => closeAdminModal('userActivityModal'));
+
+      // Close modals on backdrop click
+      document.querySelectorAll('.admin-modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeAdminModal(modal.id);
+          }
+        });
+      });
+
+      // Close modals on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const activeOpenModal = document.querySelector('.admin-modal.open');
+          if (activeOpenModal) {
+            closeAdminModal(activeOpenModal.id);
+          }
+        }
+      });
 
       // Sync to Supabase button
       document.getElementById('adminSyncSupabaseBtn').addEventListener('click', syncAllToSupabase);
@@ -2613,7 +2682,7 @@
       if (imgPreview) imgPreview.src = p.image || 'images/subcategories/sub_smartphones.jpg';
 
       document.getElementById('modalProductDesc').value = p.description || '';
-      document.getElementById('productModal').classList.add('open');
+      openAdminModal('productModal');
     };
 
     window.deleteProduct = function(productId) {
@@ -2701,7 +2770,7 @@
       updateStats();
       renderProductsTable();
       renderOverviewProductsTable();
-      document.getElementById('productModal').classList.remove('open');
+      closeAdminModal('productModal');
 
       // Sync to Supabase in background
       const client = getSupabase();
@@ -3105,7 +3174,7 @@
       });
 
       renderUserActivitySubtab('cart');
-      document.getElementById('userActivityModal').classList.add('open');
+      openAdminModal('userActivityModal');
     };
 
     function renderUserActivitySubtab(subtabName) {
@@ -3430,15 +3499,15 @@
       document.getElementById('replyModalReviewerName').textContent = review.reviewer_name + ' on ' + (review.product_title || review.product_id);
       document.getElementById('replyModalComment').textContent = `"${review.comment}"`;
       document.getElementById('replyModalText').value = review.admin_reply || '';
-      document.getElementById('replyReviewModal').classList.add('open');
+      openAdminModal('replyReviewModal');
     };
 
     document.getElementById('closeReplyReviewModal').addEventListener('click', () => {
-      document.getElementById('replyReviewModal').classList.remove('open');
+      closeAdminModal('replyReviewModal');
     });
 
     document.getElementById('cancelReplyReviewModal').addEventListener('click', () => {
-      document.getElementById('replyReviewModal').classList.remove('open');
+      closeAdminModal('replyReviewModal');
     });
 
     document.getElementById('replyReviewForm').addEventListener('submit', async (e) => {
@@ -3456,7 +3525,7 @@
         if (typeof adminReplyToReview === 'function') {
           await adminReplyToReview(reviewId, replyText);
         }
-        document.getElementById('replyReviewModal').classList.remove('open');
+        closeAdminModal('replyReviewModal');
         await loadAdminReviews();
         alert('Official store reply published successfully to Supabase cloud!');
       } catch (err) {
