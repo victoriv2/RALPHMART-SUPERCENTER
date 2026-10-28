@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RALPHMART SUPERCENTER - SUPABASE CLIENT & AUTH HELPER
  * Project: ralphmart.supercenter@gmail.com's Project
  * Region: eu-west-1
@@ -2912,205 +2912,38 @@ function initHeaderDropdowns() {
 
 async function getAdminUsersOverview() {
   const client = getSupabase();
-  let cloudUsers = [];
-
   if (client) {
     try {
       const { data, error } = await client.rpc('get_admin_users_overview');
-      if (!error && Array.isArray(data) && data.length > 0) {
-        cloudUsers = data;
+      if (!error && Array.isArray(data)) {
+        return data;
       }
     } catch (err) {
       console.warn('RPC get_admin_users_overview note:', err);
     }
-  }
 
-  // Synthesize or supplement with local user & realistic registered customers across Nigeria
-  const localCart = (function() {
-    try { return JSON.parse(localStorage.getItem('nkemmart_cart')) || []; } catch(e) { return []; }
-  })();
-  const localSaved = (function() {
-    try { return JSON.parse(localStorage.getItem('nkemmart_saved_items')) || []; } catch(e) { return []; }
-  })();
+    try {
+      const { data, error } = await client
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const sampleUsers = [
-    {
-      id: 'usr-lag-01',
-      full_name: 'Chinedu Okeke',
-      email: 'chinedu.okeke@gmail.com',
-      phone: '08034567891',
-      city: 'Ikeja',
-      state: 'Lagos',
-      role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 12).toISOString(),
-      cart_count: 3,
-      saved_count: 5,
-      reviews_count: 4,
-      orders_count: 2,
-      cart_data: [
-        { id: 'prod-1', title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank', price: 7650, qty: 1, image: 'images/product_powerbank.jpg' },
-        { id: 'prod-8', title: 'Hikers 32 Smart HD Frameless Panel Digital LED TV', price: 102246, qty: 1, image: 'images/product_tv.jpg' },
-        { id: 'prod-3', title: 'Silver Crest 2L Commercial High Performance Blender', price: 21999, qty: 1, image: 'images/product_blender.jpg' }
-      ],
-      saved_data: [
-        { id: 'prod-4', title: 'Syinix 43 Inch Frameless Full HD Smart Google TV', price: 185000, image: 'images/product_syinix43.jpg' },
-        { id: 'prod-5', title: 'Firman 2.5kVA Manual Starter Copper Generator SPG3000', price: 210000, image: 'images/product_generator.jpg' }
-      ],
-      reviews_data: [
-        { product_id: 'prod-1', product_title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank', rating: 5, comment: 'Charges my phone 4 times full! Very clean and solid.' },
-        { product_id: 'prod-3', product_title: 'Silver Crest 2L Commercial Blender', rating: 5, comment: 'Smooth blending for beans and pepper. High quality.' }
-      ],
-      orders_data: [
-        { id: 'ORD-9821', date: '2026-10-25', status: 'delivered', total: 29649, items: 'Ace Elec Powerbank + Silver Crest Blender' },
-        { id: 'ORD-8940', date: '2026-10-18', status: 'delivered', total: 102246, items: 'Hikers 32 Smart TV' }
-      ]
-    },
-    {
-      id: 'usr-abj-02',
-      full_name: 'Amina Mohammed',
-      email: 'amina.m@yahoo.com',
-      phone: '08123456782',
-      city: 'Maitama',
-      state: 'Abuja (FCT)',
-      role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 8).toISOString(),
-      cart_count: 2,
-      saved_count: 3,
-      reviews_count: 2,
-      orders_count: 1,
-      cart_data: [
-        { id: 'prod-2', title: 'Hansen 16 Inch Rechargeable Solar Standing Fan', price: 34500, qty: 2, image: 'images/product_fan.jpg' }
-      ],
-      saved_data: [
-        { id: 'prod-1', title: 'Ace Elec 20000 mAh Power Bank', price: 7650, image: 'images/product_powerbank.jpg' }
-      ],
-      reviews_data: [
-        { product_id: 'prod-2', product_title: 'Hansen 16 Inch Rechargeable Fan', rating: 5, comment: 'Battery lasts overnight during NEPA blackout. Highly recommended!' }
-      ],
-      orders_data: [
-        { id: 'ORD-9912', date: '2026-10-26', status: 'shipped', total: 69000, items: '2x Hansen 16 Inch Rechargeable Fan' }
-      ]
-    },
-    {
-      id: 'usr-ph-03',
-      full_name: 'Emeka Nnamdi',
-      email: 'emeka.nnamdi@gmail.com',
-      phone: '08098765432',
-      city: 'Port Harcourt',
-      state: 'Rivers',
-      role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-      cart_count: 1,
-      saved_count: 4,
-      reviews_count: 3,
-      orders_count: 2,
-      cart_data: [
-        { id: 'prod-5', title: 'Firman 2.5kVA Manual Starter Copper Generator SPG3000', price: 210000, qty: 1, image: 'images/product_generator.jpg' }
-      ],
-      saved_data: [
-        { id: 'prod-8', title: 'Hikers 32 Smart HD TV', price: 102246, image: 'images/product_tv.jpg' }
-      ],
-      reviews_data: [
-        { product_id: 'prod-5', product_title: 'Firman 2.5kVA Generator', rating: 5, comment: '100% pure copper coil. Powered all my lights, freezer and fans without shaking.' }
-      ],
-      orders_data: [
-        { id: 'ORD-9742', date: '2026-10-22', status: 'delivered', total: 210000, items: 'Firman 2.5kVA Generator' }
-      ]
-    },
-    {
-      id: 'usr-enu-04',
-      full_name: 'Ngozi Eze',
-      email: 'ngozi.eze@outlook.com',
-      phone: '07031122334',
-      city: 'Enugu',
-      state: 'Enugu',
-      role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-      cart_count: 2,
-      saved_count: 2,
-      reviews_count: 1,
-      orders_count: 1,
-      cart_data: [
-        { id: 'prod-3', title: 'Silver Crest 2L Commercial High Performance Blender', price: 21999, qty: 1, image: 'images/product_blender.jpg' }
-      ],
-      saved_data: [
-        { id: 'prod-2', title: 'Hansen 16 Inch Rechargeable Fan', price: 34500, image: 'images/product_fan.jpg' }
-      ],
-      reviews_data: [
-        { product_id: 'prod-3', product_title: 'Silver Crest 2L Blender', rating: 4, comment: 'Very powerful machine. Grinds beans smoothly.' }
-      ],
-      orders_data: [
-        { id: 'ORD-9950', date: '2026-10-27', status: 'processing', total: 21999, items: 'Silver Crest 2L Blender' }
-      ]
-    },
-    {
-      id: 'usr-ibd-05',
-      full_name: 'Babatunde Adeleke',
-      email: 'babatunde.adeleke@gmail.com',
-      phone: '08187654321',
-      city: 'Ibadan',
-      state: 'Oyo',
-      role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 1).toISOString(),
-      cart_count: 1,
-      saved_count: 1,
-      reviews_count: 0,
-      orders_count: 0,
-      cart_data: [
-        { id: 'prod-1', title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank', price: 7650, qty: 2, image: 'images/product_powerbank.jpg' }
-      ],
-      saved_data: [
-        { id: 'prod-7', title: 'Maxi 20L Manual Control Compact Microwave Oven', price: 55999, image: 'images/product_microwave.jpg' }
-      ],
-      reviews_data: [],
-      orders_data: []
-    }
-  ];
-
-  // If local active user has cart or saved items, add as the live browser profile
-  if (localCart.length > 0 || localSaved.length > 0) {
-    const liveProfile = (function() {
-      try { return JSON.parse(localStorage.getItem('nkemmart_profile')) || null; } catch(e) { return null; }
-    })();
-    const localUser = {
-      id: (liveProfile && liveProfile.id) || 'usr-local-active',
-      full_name: (liveProfile && liveProfile.full_name) || 'Current Active Browser User',
-      email: (liveProfile && liveProfile.email) || 'active.customer@ralphmart.ng',
-      phone: (liveProfile && liveProfile.phone) || '08000000000',
-      city: (liveProfile && liveProfile.city) || 'Lagos',
-      state: (liveProfile && liveProfile.state) || 'Lagos',
-      role: 'customer',
-      created_at: new Date().toISOString(),
-      cart_count: localCart.reduce((sum, it) => sum + (it.qty || 1), 0),
-      saved_count: localSaved.length,
-      reviews_count: 1,
-      orders_count: 1,
-      cart_data: localCart,
-      saved_data: localSaved,
-      reviews_data: [
-        { product_id: 'prod-1', product_title: 'Ace Elec 20000 mAh Power Bank', rating: 5, comment: 'Super fast delivery and original item. Tested and confirmed.' }
-      ],
-      orders_data: [
-        { id: 'ORD-LIVE-01', date: new Date().toISOString().split('T')[0], status: 'confirmed', total: localCart.reduce((s, it) => s + (it.price * (it.qty || 1)), 0) || 15000, items: localCart.map(it => it.title).slice(0, 2).join(' + ') || 'Active Order' }
-      ]
-    };
-
-    // Prepend live active user
-    sampleUsers.unshift(localUser);
-  }
-
-  // Merge cloud users if present
-  if (cloudUsers.length > 0) {
-    const combined = [...cloudUsers];
-    sampleUsers.forEach(su => {
-      if (!combined.some(cu => cu.email === su.email)) {
-        combined.push(su);
+      if (!error && Array.isArray(data)) {
+        return data;
       }
-    });
-    return combined;
+    } catch (err) {
+      console.warn('Profiles query error:', err);
+    }
   }
 
-  return sampleUsers;
+  try {
+    const prof = JSON.parse(localStorage.getItem('nkemmart_profile'));
+    if (prof && prof.email) {
+      return [prof];
+    }
+  } catch(e) {}
+
+  return [];
 }
 
 async function getAdminOrdersOverview() {
@@ -3118,129 +2951,35 @@ async function getAdminOrdersOverview() {
   if (client) {
     try {
       const { data, error } = await client.rpc('get_admin_orders_overview');
-      if (!error && Array.isArray(data) && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         return data;
       }
     } catch (err) {
       console.warn('RPC get_admin_orders_overview note:', err);
     }
+
+    try {
+      const { data, error } = await client
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && Array.isArray(data)) {
+        return data;
+      }
+    } catch (err) {
+      console.warn('Orders query error:', err);
+    }
   }
 
-  // Fallback realistic daily orders across Nigeria
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const d3 = new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0];
-  const d4 = new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0];
-  const d5 = new Date(Date.now() - 86400000 * 4).toISOString().split('T')[0];
-
-  return [
-    {
-      id: 'ORD-10024',
-      user_id: 'usr-lag-01',
-      full_name: 'Chinedu Okeke',
-      email: 'chinedu.okeke@gmail.com',
-      phone: '08034567891',
-      state: 'Lagos',
-      items: [
-        { id: 'prod-1', title: 'Ace Elec 20000 mAh Ultra Slim Power Bank', qty: 2, price: 7650 },
-        { id: 'prod-3', title: 'Silver Crest 2L Commercial Blender', qty: 1, price: 21999 }
-      ],
-      total_amount: 37299,
-      payment_method: 'Paystack Card / Transfer',
-      status: 'completed',
-      created_at: today + 'T14:22:10Z'
-    },
-    {
-      id: 'ORD-10023',
-      user_id: 'usr-abj-02',
-      full_name: 'Amina Mohammed',
-      email: 'amina.m@yahoo.com',
-      phone: '08123456782',
-      state: 'Abuja (FCT)',
-      items: [
-        { id: 'prod-2', title: 'Hansen 16 Inch Rechargeable Solar Standing Fan', qty: 1, price: 34500 }
-      ],
-      total_amount: 34500,
-      payment_method: 'Bank Transfer (Verified)',
-      status: 'completed',
-      created_at: today + 'T10:15:40Z'
-    },
-    {
-      id: 'ORD-10022',
-      user_id: 'usr-ph-03',
-      full_name: 'Emeka Nnamdi',
-      email: 'emeka.nnamdi@gmail.com',
-      phone: '08098765432',
-      state: 'Rivers',
-      items: [
-        { id: 'prod-8', title: 'Hikers 32 Smart HD Frameless Panel LED TV', qty: 1, price: 102246 }
-      ],
-      total_amount: 102246,
-      payment_method: 'Paystack Online',
-      status: 'completed',
-      created_at: yesterday + 'T16:45:00Z'
-    },
-    {
-      id: 'ORD-10021',
-      user_id: 'usr-enu-04',
-      full_name: 'Ngozi Eze',
-      email: 'ngozi.eze@outlook.com',
-      phone: '07031122334',
-      state: 'Enugu',
-      items: [
-        { id: 'prod-3', title: 'Silver Crest 2L Commercial High Performance Blender', qty: 1, price: 21999 }
-      ],
-      total_amount: 21999,
-      payment_method: 'Cash on Delivery',
-      status: 'pending',
-      created_at: yesterday + 'T11:30:15Z'
-    },
-    {
-      id: 'ORD-10020',
-      user_id: 'usr-lag-01',
-      full_name: 'Chinedu Okeke',
-      email: 'chinedu.okeke@gmail.com',
-      phone: '08034567891',
-      state: 'Lagos',
-      items: [
-        { id: 'prod-5', title: 'Firman 2.5kVA Manual Starter Copper Generator SPG3000', qty: 1, price: 210000 }
-      ],
-      total_amount: 210000,
-      payment_method: 'Direct Bank Wire',
-      status: 'completed',
-      created_at: d3 + 'T09:10:00Z'
-    },
-    {
-      id: 'ORD-10019',
-      user_id: 'usr-ibd-05',
-      full_name: 'Babatunde Adeleke',
-      email: 'babatunde.adeleke@gmail.com',
-      phone: '08187654321',
-      state: 'Oyo',
-      items: [
-        { id: 'prod-1', title: 'Ace Elec 20000 mAh Power Bank', qty: 3, price: 7650 }
-      ],
-      total_amount: 22950,
-      payment_method: 'Paystack Transfer',
-      status: 'completed',
-      created_at: d4 + 'T15:20:00Z'
-    },
-    {
-      id: 'ORD-10018',
-      user_id: 'usr-abj-02',
-      full_name: 'Amina Mohammed',
-      email: 'amina.m@yahoo.com',
-      phone: '08123456782',
-      state: 'Abuja (FCT)',
-      items: [
-        { id: 'prod-7', title: 'Maxi 20L Manual Control Compact Microwave Oven', qty: 1, price: 55999 }
-      ],
-      total_amount: 55999,
-      payment_method: 'Paystack Card',
-      status: 'completed',
-      created_at: d5 + 'T13:40:00Z'
+  try {
+    const localOrders = JSON.parse(localStorage.getItem('nkemmart_orders')) || [];
+    if (Array.isArray(localOrders) && localOrders.length > 0) {
+      return localOrders;
     }
-  ];
+  } catch(e) {}
+
+  return [];
 }
 
 async function updateProductVisibility(productId, newStatus) {

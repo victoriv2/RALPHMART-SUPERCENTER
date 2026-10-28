@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>Product Details - RALPHMART SUPERCENTER</title>
-  <link rel="stylesheet" href="styles.css?v=21.0">
+  <link rel="stylesheet" href="styles.css?v=22.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
-  <script src="taxonomy.js?v=3.3"></script>
+  <script src="taxonomy.js?v=4.0"></script>
   <script src="modular-select-picker.js"></script>
 </head>
 <body class="pdp-page">
@@ -1188,289 +1188,7 @@
       var CART_KEY = 'nkemmart_cart';
       var SAVED_KEY = 'nkemmart_saved_items';
 
-      var CATALOG_PRODUCTS = [
-        {
-          id: 'prod-1',
-          title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank - Type C Dual Input',
-          price: 7650,
-          originalPrice: 12000,
-          discount: '-36%',
-          image: 'images/product_powerbank.jpg',
-          images: [
-            'images/product_powerbank.jpg',
-            'images/product_powerbank_angle2.jpg',
-            'images/product_powerbank_angle3.jpg',
-            'images/product_powerbank_angle4.jpg'
-          ],
-          brand: 'Ace Elec',
-          categoryKey: 'phones',
-          categoryName: 'Phones & Tablets',
-          rating: 4.8,
-          reviews: 1420,
-          sku: 'NKEM-ACE-20K',
-          features: [
-            '20,000 mAh high capacity lithium polymer battery with smart power management.',
-            'Dual USB output + Type-C and Micro USB input for maximum compatibility.',
-            'Ultra-slim aerodynamic pocket profile with anti-scratch matte grip finish.',
-            'Intelligent circuit protection against overcharging, overheating and short circuits.'
-          ],
-          description: 'Never run out of power on the go. The Ace Elec 20000 mAh Ultra Slim Power Bank is engineered with cutting-edge high-density battery cells to provide multiple full charges for your smartphones, tablets, earphones and USB accessories. Sleek, dependable, and fully compliant with international aviation travel safety standards.',
-          specs: [
-            ['Brand', 'Ace Elec'],
-            ['Capacity', '20,000 mAh (74Wh)'],
-            ['Input Ports', 'Micro-USB (5V/2A) & Type-C (5V/2.1A)'],
-            ['Output Ports', '2x USB-A (5V/2.1A Fast Charge)'],
-            ['Battery Type', 'Lithium Polymer Grade A+'],
-            ['Dimensions', '140 x 68 x 16 mm'],
-            ['Weight', '220g'],
-            ['Warranty', '12 Months Official Manufacturer Warranty']
-          ]
-        },
-        {
-          id: 'prod-2',
-          title: 'SILVER CREST 2L Industrial 8500W Food Crusher Blender With 2 Jar',
-          price: 20954,
-          originalPrice: 26386,
-          discount: '-21%',
-          image: 'images/product_blender.webp',
-          images: [
-            'images/product_blender.webp',
-            'images/subcategories/appliances_kitchen.jpg',
-            'images/product_airfryer.jpg',
-            'images/product_kettle.webp'
-          ],
-          brand: 'Silver Crest',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.9,
-          reviews: 8420,
-          sku: 'NKEM-SC-8500W',
-          features: [
-            'Massive 8500W copper wound high torque motor capable of crushing beans, tiger nuts, ice, and spices.',
-            'Unbreakable 2-Litre BPA-free polycarbonate jug plus supplementary dry grinding jar.',
-            '6-leaf laser hardened stainless steel serrated blades.',
-            'Variable 15-speed stepless dial and high-intensity pulse switch.'
-          ],
-          description: 'The Silver Crest 8500W Industrial Blender is Nigeria\'s favorite kitchen workhorse. Whether you are smoothly blending soaked beans for Akara and Moi-Moi, dry grinding egusi, ogbono, crayfish, or crushing hard ice blocks, this blender handles it effortlessly in seconds without overheating.',
-          specs: [
-            ['Brand', 'Silver Crest'],
-            ['Motor Power', '8500W Pure Copper Core Motor'],
-            ['Capacity', '2.0 Litres Main Jar + 0.8L Grinder Jar'],
-            ['Blade System', '6 Stainless Steel 304 Sawtooth Blades'],
-            ['Speed Levels', '15 Variable Speeds + Pulse Mode'],
-            ['Safety Mechanism', 'Auto Overheat & Overload Circuit Breaker'],
-            ['Voltage', '220V - 240V / 50-60Hz'],
-            ['Warranty', '12 Months Manufacturer Warranty']
-          ]
-        },
-        {
-          id: 'prod-3',
-          title: 'HANSEN Electric Iron Pressing Clothes 1000W',
-          price: 5959,
-          originalPrice: 7117,
-          discount: '-16%',
-          image: 'images/product_iron.jpg',
-          images: [
-            'images/product_iron.jpg',
-            'images/subcategories/appliances_garment.jpg',
-            'images/subcategories/home_kitchen_dining.jpg'
-          ],
-          brand: 'Hansen',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.7,
-          reviews: 3110,
-          sku: 'NKEM-HAN-1000W',
-          features: [
-            'Polished non-stick ceramic soleplate glides effortlessly over all fabric types.',
-            'Precise thermostatic temperature dial for cotton, linen, silk, wool and synthetic materials.',
-            'Comfort-grip ergonomic handle with 360-degree swivel cord to prevent tangling.',
-            'Energy efficient 1000W quick heating element designed for generator compatibility.'
-          ],
-          description: 'Look crisp and professional every day with the Hansen 1000W Heavy Duty Dry Pressing Iron. Engineered with uniform heat distribution and a non-stick soleplate that protects your expensive native attires, shirts, and delicate fabrics.',
-          specs: [
-            ['Brand', 'Hansen'],
-            ['Power Rating', '1000 Watts'],
-            ['Soleplate Type', 'Non-Stick Ceramic Coated Golden Base'],
-            ['Cord Length', '1.8 Metres with 360-degree swivel'],
-            ['Safety Feature', 'Thermal Overheat Fuse Protection'],
-            ['Warranty', '12 Months Warranty']
-          ]
-        },
-        {
-          id: 'prod-4',
-          title: 'HANSEN 18 inches industrial level standing fan',
-          price: 16998,
-          originalPrice: 20060,
-          discount: '-15%',
-          image: 'images/product_fan.webp',
-          images: [
-            'images/product_fan.webp',
-            'images/subcategories/appliances_climate.jpg',
-            'images/subcategories/home_office_furniture.jpg'
-          ],
-          brand: 'Hansen',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.6,
-          reviews: 5890,
-          sku: 'NKEM-FAN-18IN',
-          features: [
-            'Aerodynamically balanced 5-blade aluminum alloy system delivering high-velocity air circulation.',
-            'Heavy-duty copper wound motor with self-lubricating bearings for whisper-quiet performance.',
-            'Heavy weighted round base for vibration-free anti-topple stability.',
-            'Adjustable telescopic height (up to 1.4m) with 90-degree wide oscillation.'
-          ],
-          description: 'Beat the tropical heat with the Hansen 18-Inch Industrial Standing Fan. Built for sustained heavy-duty operation in Nigerian homes, shops, offices, and religious centers.',
-          specs: [
-            ['Brand', 'Hansen'],
-            ['Fan Size', '18 Inches (45cm)'],
-            ['Blade Material', 'Reinforced Aluminum 5-Blade Design'],
-            ['Speed Settings', '3 Speed Rotary Push Buttons'],
-            ['Oscillation', '90-degree horizontal with tilt adjustment'],
-            ['Warranty', '12 Months Warranty']
-          ]
-        },
-        {
-          id: 'prod-5',
-          title: 'Syinix 2.2L Electric Kettle - Food Grade Stainless Steel SKE22U1',
-          price: 6399,
-          originalPrice: 7229,
-          discount: '-12%',
-          image: 'images/product_kettle.webp',
-          images: [
-            'images/product_kettle.webp',
-            'images/subcategories/appliances_kitchen.jpg',
-            'images/subcategories/home_kitchen_dining.jpg'
-          ],
-          brand: 'Syinix',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.8,
-          reviews: 15262,
-          sku: 'NKEM-SYI-KETTLE',
-          features: [
-            'Food-grade 304 stainless steel interior with zero chemical plastic odor.',
-            'Rapid boiling technology heats 2.2 litres in under 4 minutes.',
-            'Double-wall cool-touch exterior prevents accidental burns.',
-            'Automatic shut-off and boil-dry safety protection.'
-          ],
-          description: 'Start your mornings right with the Syinix 2.2L Stainless Steel Electric Kettle. Boils water in record time for your tea, coffee, baby cereal, and cooking with complete safety and energy efficiency.',
-          specs: [
-            ['Brand', 'Syinix'],
-            ['Capacity', '2.2 Litres'],
-            ['Material', '304 Food-Grade Stainless Steel & Cool-Touch Polypropylene'],
-            ['Power', '1800W Rapid Heating'],
-            ['Base', '360-Degree Cordless Swivel Base'],
-            ['Warranty', '12 Months Official Manufacturer Warranty']
-          ]
-        },
-        {
-          id: 'prod-6',
-          title: 'SILVER CREST 8L Extra Large Digital Air Fryer 2400W',
-          price: 30999,
-          originalPrice: 44000,
-          discount: '-30%',
-          image: 'images/product_airfryer.jpg',
-          images: [
-            'images/product_airfryer.jpg',
-            'images/subcategories/appliances_kitchen.jpg',
-            'images/product_blender.webp'
-          ],
-          brand: 'Silver Crest',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.9,
-          reviews: 7523,
-          sku: 'NKEM-SC-AF8L',
-          features: [
-            'Extra-large 8-Litre capacity fits whole chicken, large cuts of beef, plantain, and pastries.',
-            '360-degree rapid hot air circulation cooks with up to 85% less oil for healthy living.',
-            'Intuitive smart digital LED touch screen with 8 pre-programmed culinary presets.',
-            'Non-stick dishwasher-safe basket with cool-touch handle.'
-          ],
-          description: 'Cook delicious, crispy, and guilt-free meals for the whole family with the Silver Crest 8L Digital Air Fryer. Fry chicken, bake cakes, roast fish, grill steak, and crisp dodo without bathing your food in cholesterol-heavy cooking oil.',
-          specs: [
-            ['Brand', 'Silver Crest'],
-            ['Capacity', '8.0 Litres (Family Size)'],
-            ['Power', '2400W High Efficiency Thermal Element'],
-            ['Display', 'Digital One-Touch LED Interface'],
-            ['Temperature Range', '80°C - 200°C Adjustable'],
-            ['Timer', '0 - 60 Minutes Auto Shutoff'],
-            ['Warranty', '12 Months Warranty']
-          ]
-        },
-        {
-          id: 'prod-7',
-          title: 'Maxi 20 Litres Manual Microwave Oven (MAXIMWO2021W) - 12 Months Warranty',
-          price: 55999,
-          originalPrice: 71550,
-          discount: '-22%',
-          image: 'images/product_microwave.jpg',
-          images: [
-            'images/product_microwave.jpg',
-            'images/subcategories/appliances_large.jpg',
-            'images/subcategories/appliances_kitchen.jpg'
-          ],
-          brand: 'Maxi',
-          categoryKey: 'appliances',
-          categoryName: 'Appliances',
-          rating: 4.8,
-          reviews: 1496,
-          sku: 'NKEM-MAX-20L',
-          features: [
-            'Spacious 20-Litre cavity with durable rotating glass turntable plate.',
-            'Dual ergonomic mechanical rotary dials for hassle-free timer and power selection.',
-            'Defrost by weight or time feature for frozen meats, poultry, and fish.',
-            'Easy-to-clean enamel cavity resistant to oil splatters and stains.'
-          ],
-          description: 'Warm up meals, defrost frozen proteins, and prepare quick snacks with the Maxi 20L Manual Microwave Oven. Designed for maximum reliability and ease of use in Nigerian kitchens.',
-          specs: [
-            ['Brand', 'Maxi'],
-            ['Capacity', '20 Litres'],
-            ['Power Levels', '5 Power Settings (700W Microwave Output)'],
-            ['Turntable', '255mm Removable Glass Turntable'],
-            ['Control Type', 'Dual Mechanical Knobs'],
-            ['Dimensions', '440 x 330 x 258 mm'],
-            ['Warranty', '12 Months Official Manufacturer Warranty']
-          ]
-        },
-        {
-          id: 'prod-8',
-          title: 'Hikers 32 Smart HD Frameless Panel Digital LED TV with Android',
-          price: 102246,
-          originalPrice: 171000,
-          discount: '-40%',
-          image: 'images/product_tv.jpg',
-          images: [
-            'images/product_tv.jpg',
-            'images/subcategories/electronics_tv.jpg',
-            'images/subcategories/electronics_audio.jpg'
-          ],
-          brand: 'Hikers',
-          categoryKey: 'electronics',
-          categoryName: 'Electronics',
-          rating: 4.7,
-          reviews: 4210,
-          sku: 'NKEM-HIK-32TV',
-          features: [
-            'Stunning 32-Inch High Definition frameless edge-to-edge cinematic display.',
-            'Built-in Android OS with YouTube, Netflix, Prime Video, and Google Play Store.',
-            'Dual integrated surround sound stereo box speakers with rich bass.',
-            'Full connectivity: 2x HDMI, 2x USB, Wi-Fi, AV, and Optical Audio Out.'
-          ],
-          description: 'Elevate your home entertainment with the Hikers 32 Smart Frameless Android TV. Enjoy crystal clear visuals, ultra-slim bezels, and seamless wireless streaming of your favorite movies, football matches, and TV shows.',
-          specs: [
-            ['Brand', 'Hikers'],
-            ['Screen Size', '32 Inches (81 cm)'],
-            ['Resolution', '1366 x 768 HD with HDR Enhancement'],
-            ['Operating System', 'Android Smart TV Platform'],
-            ['Connectivity', 'Wi-Fi, 2x HDMI, 2x USB, AV In, Earphone Out'],
-            ['Speakers', '2x 8W Stereo Box Speakers'],
-            ['Warranty', '12 Months Official Warranty']
-          ]
-        }
-      ];
+      var CATALOG_PRODUCTS = [];
 
       function formatNumberWithCommas(num) {
         if (num === null || num === undefined || isNaN(num)) return '0';
@@ -1479,8 +1197,8 @@
         return parts.join('.');
       }
 
-      function formatNaira(num) {
-        return '₦ ' + formatNumberWithCommas(num);
+      function formatNaira(amount) {
+        return '\u20A6 ' + formatNumberWithCommas(amount);
       }
 
       function getCart() {
@@ -1841,6 +1559,22 @@
         }
       } catch (err) {
         console.warn('Recently viewed track note:', err);
+      }
+
+      if (!activeProduct) {
+        document.title = 'Store Inventory Blank - RALPHMART SUPERCENTER';
+        var mainEl = document.querySelector('.pdp-main-content') || document.body;
+        if (mainEl) {
+          mainEl.innerHTML = '<div style="max-width: 600px; margin: 80px auto; text-align: center; padding: 48px 24px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); font-family: inherit;">' +
+            '<div style="margin-bottom: 16px; color: #512175;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>' +
+            '<h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Store Inventory Is Currently Blank</h2>' +
+            '<p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 24px;">All sample goods and test data have been wiped clean. Open the Admin Command Center to create your real products.</p>' +
+            '<div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">' +
+            '<a href="admin.html" style="background: #512175; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Go to Admin Center</a>' +
+            '<a href="index.html" style="background: #f1f5f9; color: #0f172a; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Return to Home</a>' +
+            '</div></div>';
+        }
+        return;
       }
 
       // Update page title
@@ -3504,7 +3238,18 @@
         var cart = getCart();
         var saved = getSaved();
         var savedIds = saved.map(function(s) { return s.id; });
-        var related = CATALOG_PRODUCTS.filter(function(p) { return p.id !== activeProduct.id; }).slice(0, 4);
+        var allPool = [];
+        try {
+          var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+          if (Array.isArray(adminProds)) allPool = adminProds;
+        } catch(e) {}
+        if (allPool.length === 0 && Array.isArray(CATALOG_PRODUCTS)) allPool = CATALOG_PRODUCTS;
+        var related = allPool.filter(function(p) { return p && p.id !== activeProduct.id; }).slice(0, 4);
+
+        if (related.length === 0) {
+          recGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px; color: #94a3b8; font-size: 13.5px;">No other products in catalog yet.</div>';
+          return;
+        }
 
         recGrid.innerHTML = '';
         related.forEach(function(prod) {

@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>Admin Command Center - RALPHMART SUPERCENTER</title>
-  <link rel="stylesheet" href="styles.css?v=21.0">
+  <link rel="stylesheet" href="styles.css?v=22.0">
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
-  <script src="taxonomy.js?v=3.3"></script>
+  <script src="taxonomy.js?v=4.0"></script>
   <script src="modular-select-picker.js"></script>
   <style>
     :root {
@@ -2019,13 +2019,16 @@
           </div>
 
           <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
-            <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Local Admin Storage &amp; Cache</h3>
+            <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Store Data Reset &amp; Clean Slate</h3>
             <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
-              Reset local browser cache if you want to restore default catalog products or clear unsaved draft edits.
+              Wipe out all local inventory, customer activities, reviews cache, and session data to start with a 100% clean, blank store ready for real inventory.
             </p>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button type="button" class="admin-btn btn-secondary" onclick="resetCatalogToTaxonomy()" style="font-size: 12.5px; color: #dc2626;">
-                <span>Reset to Default Taxonomy</span>
+              <button type="button" class="admin-btn btn-secondary" onclick="resetCatalogToTaxonomy()" style="font-size: 12.5px; color: #e11d48; border-color: #fecdd3; background: #fff1f2;">
+                <span>Clear Catalog Only</span>
+              </button>
+              <button type="button" class="admin-btn btn-secondary" onclick="wipeAllStoreData()" style="font-size: 12.5px; color: #ffffff; background: #dc2626; border-color: #dc2626; font-weight: 700;">
+                <span>Wipe All Store Data (Factory Clean)</span>
               </button>
             </div>
           </div>
@@ -2661,29 +2664,16 @@
     });
 
     function loadProductsCatalog() {
-      // Priority: localStorage cache > taxonomy CATALOG_PRODUCTS or RALPHMART_CATALOG
       const cached = localStorage.getItem('nkemmart_admin_products');
       if (cached) {
         try {
           adminProducts = JSON.parse(cached);
+          if (!Array.isArray(adminProducts)) adminProducts = [];
         } catch (e) {
           adminProducts = [];
         }
-      }
-
-      if (!adminProducts || adminProducts.length === 0) {
-        if (typeof CATALOG_PRODUCTS !== 'undefined' && Array.isArray(CATALOG_PRODUCTS)) {
-          adminProducts = JSON.parse(JSON.stringify(CATALOG_PRODUCTS));
-        } else if (typeof window.RALPHMART_CATALOG !== 'undefined' && Array.isArray(window.RALPHMART_CATALOG)) {
-          adminProducts = JSON.parse(JSON.stringify(window.RALPHMART_CATALOG));
-        } else {
-          adminProducts = [];
-        }
-        // Ensure default active status
-        adminProducts.forEach(p => {
-          if (!p.status) p.status = 'active';
-        });
-        saveProductsLocal();
+      } else {
+        adminProducts = [];
       }
 
       updateStats();
@@ -2700,8 +2690,8 @@
     }
 
     function formatNaira(amount) {
-      return '₦' + formatNumberWithCommas(amount);
-    }
+        return '\u20A6 ' + formatNumberWithCommas(amount);
+      }
 
     function saveProductsLocal() {
       localStorage.setItem('nkemmart_admin_products', JSON.stringify(adminProducts));
@@ -3265,11 +3255,32 @@
     }
 
     window.resetCatalogToTaxonomy = function() {
-      if (confirm('Reset your catalog cache back to the default verified store inventory?')) {
-        localStorage.removeItem('nkemmart_admin_products');
+      if (confirm('Clear all catalog products to start with a completely blank inventory?')) {
+        adminProducts = [];
+        localStorage.setItem('nkemmart_admin_products', JSON.stringify([]));
         loadProductsCatalog();
-        alert('Catalog inventory reset to default verified items.');
+        alert('Catalog inventory is now completely blank. Click  Add Product to create your real goods.');
       }
+    };
+
+    window.wipeAllStoreData = function() {
+      if (!confirm('Are you sure you want to wipe all local store data (catalog, orders, cart, saved items, reviews cache, and session) to start completely blank?')) {
+        return;
+      }
+      localStorage.removeItem('nkemmart_admin_products');
+      localStorage.removeItem('nkemmart_cart');
+      localStorage.removeItem('nkemmart_saved_items');
+      localStorage.removeItem('nkemmart_all_cloud_reviews');
+      localStorage.removeItem('nkemmart_orders');
+      localStorage.removeItem('nkemmart_users');
+      localStorage.removeItem('nkemmart_profile');
+      localStorage.removeItem('nkemmart_admin_auth');
+      adminProducts = [];
+      adminOrdersList = [];
+      adminUsersList = [];
+      loadProductsCatalog();
+      alert('Store data has been wiped clean. Reloading page...');
+      window.location.reload();
     };
 
     async function syncAllToSupabase() {

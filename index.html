@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>RALPHMART SUPERCENTER - Online Shopping | Groceries & Supermarket</title>
-  <link rel="stylesheet" href="styles.css?v=21.0">
+  <link rel="stylesheet" href="styles.css?v=22.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
-  <script src="taxonomy.js?v=3.3"></script>
+  <script src="taxonomy.js?v=4.0"></script>
 </head>
 <body>
 
@@ -702,297 +702,16 @@
         </div>
       </div>
 
-        <!-- Products Grid (4 columns desktop, 2 columns mobile) -->
-        <div class="products-grid">
-
-          <!-- Product Card 1: Ace Elec Power Bank -->
-          <article class="product-card" data-id="prod-1" data-rating="4.8" data-title="Ace Elec 20000 mAh Ultra Slim Portable Power Bank - Type C Dual Input" data-price="7650" data-original="12000" data-image="images/product_powerbank.jpg" data-brand="Ace Elec">
-            <div class="card-media">
-              <img src="images/product_powerbank.jpg" alt="Ace Elec 20000 mAh Ultra Slim Portable Power Bank" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
+        <!-- Products Grid (Dynamic from Real Store Inventory) -->
+        <div class="products-grid" id="mainProductsGrid">
+          <div class="empty-catalog-card" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 20px 0;">
+            <div style="margin-bottom: 14px; color: #512175;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-1" class="product-title">Ace Elec 20000 mAh Ultra Slim Portable Power Bank - Type C Dual Input</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 7,650</span>
-                <span class="original-price">₦ 12,000</span>
-                <span class="discount-text">-36%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(163,787)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 2: Silver Crest Blender -->
-          <article class="product-card" data-id="prod-2" data-rating="4.9" data-title="SILVER CREST 2L Industrial 8500W Food Crusher Blender With 2 Jar" data-price="20954" data-original="26386" data-image="images/product_blender.webp" data-brand="Silver Crest">
-            <div class="card-media">
-              <img src="images/product_blender.webp" alt="SILVER CREST 2L Industrial 8500W Food Crusher Blender" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-2" class="product-title">SILVER CREST 2L Industrial 8500W Food Crusher Blender With 2 Jar</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 20,954</span>
-                <span class="original-price">₦ 26,386</span>
-                <span class="discount-text">-21%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(21,418)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 3: Hansen Electric Iron -->
-          <article class="product-card" data-id="prod-3" data-rating="4.7" data-title="HANSEN Electric Iron Pressing Clothes 1000W" data-price="5959" data-original="7117" data-image="images/product_iron.jpg" data-brand="Hansen">
-            <div class="card-media">
-              <img src="images/product_iron.jpg" alt="HANSEN Electric Iron Pressing Clothes 1000W" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-3" class="product-title">HANSEN Electric Iron Pressing Clothes 1000W</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 5,959</span>
-                <span class="original-price">₦ 7,117</span>
-                <span class="discount-text">-16%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(11,501)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 4: Standing Fan -->
-          <article class="product-card" data-id="prod-4" data-rating="4.6" data-title="HANSEN 18 inches industrial level standing fan" data-price="16998" data-original="20060" data-image="images/product_fan.webp" data-brand="Hansen">
-            <div class="card-media">
-              <img src="images/product_fan.webp" alt="HANSEN 18 inches industrial level standing fan" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-4" class="product-title">HANSEN 18 inches industrial level standing fan</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 16,998</span>
-                <span class="original-price">₦ 20,060</span>
-                <span class="discount-text">-15%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(11,928)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 5: Electric Kettle -->
-          <article class="product-card" data-id="prod-5" data-rating="4.8" data-title="Syinix 2.2L Electric Kettle - Food Grade Stainless Steel SKE22U1" data-price="6399" data-original="7229" data-image="images/product_kettle.webp" data-brand="Syinix">
-            <div class="card-media">
-              <img src="images/product_kettle.webp" alt="Syinix 2.2L Electric Kettle - Food Grade Stainless Steel" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-5" class="product-title">Syinix 2.2L Electric Kettle - Food Grade Stainless Steel SKE22U1</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 6,399</span>
-                <span class="original-price">₦ 7,229</span>
-                <span class="discount-text">-12%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(15,262)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 6: Air Fryer -->
-          <article class="product-card" data-id="prod-6" data-rating="4.9" data-title="SILVER CREST 8L Extra Large Digital Air Fryer 2400W" data-price="30999" data-original="44000" data-image="images/product_airfryer.jpg" data-brand="Silver Crest">
-            <div class="card-media">
-              <img src="images/product_airfryer.jpg" alt="SILVER CREST 8L Extra Large Digital Air Fryer" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-6" class="product-title">SILVER CREST 8L Extra Large Digital Air Fryer 2400W</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 30,999</span>
-                <span class="original-price">₦ 44,000</span>
-                <span class="discount-text">-30%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(7,523)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 7: Microwave Oven -->
-          <article class="product-card" data-id="prod-7" data-rating="4.8" data-title="Maxi 20 Litres Manual Microwave Oven (MAXIMWO2021W) - 12 Months Warranty" data-price="55999" data-original="71550" data-image="images/product_microwave.jpg" data-brand="Maxi">
-            <div class="card-media">
-              <img src="images/product_microwave.jpg" alt="Maxi 20 Litres Manual Microwave Oven" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-7" class="product-title">Maxi 20 Litres Manual Microwave Oven (MAXIMWO2021W) - 12 Months Warranty</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 55,999</span>
-                <span class="original-price">₦ 71,550</span>
-                <span class="discount-text">-22%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(1,496)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
-          <!-- Product Card 8: Smart LED TV -->
-          <article class="product-card" data-id="prod-8" data-rating="4.7" data-title="Hikers 32 Smart HD Frameless Panel Digital LED TV with Android" data-price="102246" data-original="171000" data-image="images/product_tv.jpg" data-brand="Hikers">
-            <div class="card-media">
-              <img src="images/product_tv.jpg" alt="Hikers 32 Smart HD Frameless Digital LED TV" class="card-img">
-
-              <button class="wishlist-btn" aria-label="Add to wishlist" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <a href="product.html?id=prod-8" class="product-title">Hikers 32 Smart HD Frameless Panel Digital LED TV with Android</a>
-              
-              <div class="price-row">
-                <span class="current-price">₦ 102,246</span>
-                <span class="original-price">₦ 171,000</span>
-                <span class="discount-text">-40%</span>
-              </div>
-
-              <div class="rating-row">
-                <div class="stars-row">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <span class="rating-count">(1,565)</span>
-              </div>
-
-              <div class="card-action-wrap">
-                <button class="card-action-btn" type="button">Add to cart</button>
-              </div>
-            </div>
-          </article>
-
+            <h3 style="font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Store Inventory Is Currently Blank</h3>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6;">All sample goods and test data have been wiped clean. Open the Admin Center to add your real products.</p>
+            <a href="admin.html" style="display: inline-block; background: #512175; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">Add Real Products in Admin Center</a>
+          </div>
         </div>
 
       </section>
@@ -1439,7 +1158,7 @@
       }
 
       function formatNaira(amount) {
-        return '₦ ' + formatNumberWithCommas(amount);
+        return '\u20A6 ' + formatNumberWithCommas(amount);
       }
       // Dropdown Popups for Brand, Price, Rating, and Sort
       var dropdowns = [
@@ -2949,7 +2668,71 @@
 
 
 
+      function renderHomePageProducts() {
+        var grid = document.querySelector('.products-grid');
+        if (!grid) return;
+
+        var prods = [];
+        try {
+          var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+          if (Array.isArray(adminProds) && adminProds.length > 0) {
+            prods = adminProds.filter(function(p) { return p && p.status !== 'hidden'; });
+          }
+        } catch(e) {}
+
+        if (prods.length === 0 && typeof window.RALPHMART_CATALOG !== 'undefined' && Array.isArray(window.RALPHMART_CATALOG)) {
+          prods = window.RALPHMART_CATALOG.filter(function(p) { return p && p.status !== 'hidden'; });
+        }
+
+        if (prods.length === 0) {
+          grid.innerHTML = '<div class="empty-catalog-card" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 20px 0;">' +
+            '<div style="margin-bottom: 14px; color: #512175;">' +
+              '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>' +
+            '</div>' +
+            '<h3 style="font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Store Inventory Is Currently Blank</h3>' +
+            '<p style="font-size: 14px; color: #64748b; margin-bottom: 20px; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6;">All sample goods and test data have been wiped clean. Open the Admin Center to add your real products.</p>' +
+            '<a href="admin.html" style="display: inline-block; background: #512175; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">Add Real Products in Admin Center</a>' +
+          '</div>';
+          return;
+        }
+
+        grid.innerHTML = prods.map(function(p) {
+          var priceNum = Number(p.price) || 0;
+          var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || Math.round(priceNum * 1.15);
+          var disc = p.discount ? (String(p.discount).startsWith('-') ? p.discount : '-' + p.discount + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : '');
+          var rating = Number(p.rating) || 5.0;
+          var img = p.image || 'images/subcategories/sub_smartphones.jpg';
+
+          return '<article class="product-card" data-id="' + escapeHtml(p.id) + '" data-rating="' + rating + '" data-title="' + escapeHtml(p.title) + '" data-price="' + priceNum + '" data-original="' + origNum + '" data-image="' + escapeHtml(img) + '" data-brand="' + escapeHtml(p.brand || 'Verified') + '">' +
+            '<div class="card-media">' +
+              '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.title) + '" class="card-img">' +
+              '<button class="wishlist-btn" aria-label="Add to wishlist" type="button">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
+              '</button>' +
+            '</div>' +
+            '<div class="card-body">' +
+              '<a href="product.html?id=' + encodeURIComponent(p.id) + '" class="product-title">' + escapeHtml(p.title) + '</a>' +
+              '<div class="price-row">' +
+                '<span class="current-price">₦ ' + formatNumberWithCommas(priceNum) + '</span>' +
+                (origNum > priceNum ? '<span class="original-price">₦ ' + formatNumberWithCommas(origNum) + '</span>' : '') +
+                (disc ? '<span class="discount-text">' + disc + '</span>' : '') +
+              '</div>' +
+              '<div class="rating-row">' +
+                '<div class="stars-row">' +
+                  renderRatingStarsHtml(rating, 11, '#f59e0b', '#cbd5e1') +
+                '</div>' +
+                '<span class="rating-count">(' + (p.reviewsCount || p.reviews || 0) + ')</span>' +
+              '</div>' +
+              '<div class="card-action-wrap">' +
+                '<button class="card-action-btn" type="button">Add to cart</button>' +
+              '</div>' +
+            '</div>' +
+          '</article>';
+        }).join('');
+      }
+
       // Synchronize badges, product card steppers, and wishlist hearts on page load
+      renderHomePageProducts();
       updateCartBadges();
       syncProductCardsUI();
       syncWishlistButtons();
