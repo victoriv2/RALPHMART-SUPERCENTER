@@ -571,6 +571,7 @@
       border-collapse: collapse;
       text-align: left;
       font-size: 13px;
+      white-space: nowrap;
     }
 
     .admin-table th {
@@ -582,12 +583,14 @@
       font-size: 11px;
       letter-spacing: 0.5px;
       border-bottom: 1px solid var(--admin-border);
+      white-space: nowrap;
     }
 
     .admin-table td {
-      padding: 14px 16px;
+      padding: 13px 16px;
       border-bottom: 1px solid var(--admin-border);
       vertical-align: middle;
+      white-space: nowrap;
     }
 
     .admin-table tr:hover td {
@@ -2535,32 +2538,29 @@
               <span style="font-weight: 600; text-transform: capitalize; color: #334155;">${escapeHtml(p.category || p.category_id || 'general')}</span>
             </td>
             <td style="white-space: nowrap;">
-              <div style="font-weight: 700; color: #091e3a; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-                <span>${priceFormatted}</span>
+              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span style="font-weight: 700; color: #091e3a;">${priceFormatted}</span>
+                ${oldPriceFormatted ? `<span style="font-size: 11.5px; text-decoration: line-through; color: #94a3b8;">${oldPriceFormatted}</span>` : ''}
                 ${discountBadge}
               </div>
-              ${oldPriceFormatted ? `<div style="font-size: 11px; text-decoration: line-through; color: #94a3b8; white-space: nowrap; margin-top: 2px;">${oldPriceFormatted}</div>` : ''}
             </td>
             <td style="white-space: nowrap;">
-              <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; white-space: nowrap;">
-                <span class="stock-chip ${stockClass}" style="white-space: nowrap;">${stockLabel}</span>
-                <span class="status-chip ${isHidden ? 'hidden' : 'active'}" style="white-space: nowrap;">
-                  ${isHidden ? 'Off-Shelf / Hidden' : 'Active / Visible'}
+              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span class="stock-chip ${stockClass}">${stockLabel}</span>
+                <span class="status-chip ${isHidden ? 'hidden' : 'active'}">
+                  ${isHidden ? 'Hidden' : 'Active'}
                 </span>
               </div>
             </td>
             <td style="white-space: nowrap;">
-              <div style="font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-                <span style="display: inline-flex; align-items: center; gap: 3px;">
+              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span style="display: inline-flex; align-items: center; gap: 3px; font-weight: 700; color: #f59e0b;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                   <span>${ratingInfo.formatted}</span>
                 </span>
-                <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; ${ratingInfo.isUserRated ? 'background: #f3e8ff; color: #512175;' : 'background: #f1f5f9; color: #64748b;'}">
-                  ${ratingInfo.isUserRated ? (ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' vote' : ' votes')) : 'Admin Base'}
+                <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; ${ratingInfo.isUserRated ? 'background: #f3e8ff; color: #512175;' : 'background: #f1f5f9; color: #64748b;'}">
+                  ${ratingInfo.isUserRated ? (ratingInfo.totalReviews + (ratingInfo.totalReviews === 1 ? ' user vote' : ' user votes')) : 'Admin Base (' + (p.rating || 4.8) + ')'}
                 </span>
-              </div>
-              <div style="font-size: 11px; color: #94a3b8; margin-top: 2px; white-space: nowrap;">
-                ${ratingInfo.isUserRated ? (ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : (ratingInfo.ruleApplied === 'highest_distinct' ? 'Highest Rating' : 'User Voted')) : 'Base: ' + (p.rating || 4.8)}
               </div>
             </td>
             <td style="text-align: right; white-space: nowrap;">
@@ -2616,7 +2616,10 @@
             <td style="white-space: nowrap;"><span style="font-weight: 600; text-transform: capitalize;">${escapeHtml(p.category || 'general')}</span></td>
             <td style="white-space: nowrap;"><strong>${formatNaira(p.price)}</strong></td>
             <td style="white-space: nowrap;">
-              <span class="status-chip ${isHidden ? 'hidden' : 'active'}" style="white-space: nowrap;">${isHidden ? 'Hidden' : stock + ' in stock'}</span>
+              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <span class="stock-chip ${stock === 0 ? 'stock-out' : (stock < 10 ? 'stock-low' : 'stock-in')}">${stock === 0 ? 'Out of Stock' : stock + ' in stock'}</span>
+                <span class="status-chip ${isHidden ? 'hidden' : 'active'}">${isHidden ? 'Hidden' : 'Active'}</span>
+              </div>
             </td>
             <td style="white-space: nowrap;"><span style="color: #f59e0b; font-weight: 700; white-space: nowrap;">★ ${ratingInfo.formatted}</span></td>
             <td style="text-align: right; white-space: nowrap;">
@@ -2991,17 +2994,19 @@
 
             return `
               <tr>
-                <td><strong>${escapeHtml(o.id)}</strong></td>
-                <td>
-                  <div style="font-weight: 600; color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</div>
-                  <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(o.email || o.phone || '')}</div>
+                <td style="white-space: nowrap;"><strong>${escapeHtml(o.id)}</strong></td>
+                <td style="white-space: nowrap;">
+                  <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                    <strong style="color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</strong>
+                    ${(o.email || o.phone) ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(o.email || o.phone)})</span>` : ''}
+                  </div>
                 </td>
-                <td><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
-                <td>${itemsCount} item${itemsCount === 1 ? '' : 's'}</td>
-                <td><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
-                <td><strong style="color: #091e3a;">${formatNaira(o.total_amount)}</strong></td>
-                <td><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
-                <td style="font-size: 12px; color: #64748b;">${dateFmt}</td>
+                <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
+                <td style="white-space: nowrap;">${itemsCount} item${itemsCount === 1 ? '' : 's'}</td>
+                <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+                <td style="white-space: nowrap;"><strong style="color: #091e3a;">${formatNaira(o.total_amount)}</strong></td>
+                <td style="white-space: nowrap;"><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+                <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
               </tr>
             `;
           }).join('');
@@ -3090,38 +3095,40 @@
 
         return `
           <tr>
-            <td>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 38px; height: 38px; border-radius: 50%; background: #512175; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">
+            <td style="white-space: nowrap;">
+              <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                <div style="width: 34px; height: 34px; border-radius: 50%; background: #512175; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 13.5px; flex-shrink: 0;">
                   ${initials}
                 </div>
-                <div>
-                  <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${escapeHtml(u.full_name || 'Customer')}</div>
-                  <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">${escapeHtml(u.role || 'customer')}</div>
+                <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                  <strong style="color: #0f172a; font-size: 13.5px;">${escapeHtml(u.full_name || 'Customer')}</strong>
+                  <span style="font-size: 10px; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700;">${escapeHtml(u.role || 'customer')}</span>
                 </div>
               </div>
             </td>
-            <td>
-              <div style="font-size: 13px; color: #1e293b;">${escapeHtml(u.email || 'No email')}</div>
-              <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">
-                ${u.phone ? escapeHtml(u.phone) + ' &bull; ' : ''}${escapeHtml(u.city ? u.city + ', ' + u.state : (u.state || 'Nigeria'))}
+            <td style="white-space: nowrap;">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #1e293b; white-space: nowrap;">
+                <span>${escapeHtml(u.email || 'No email')}</span>
+                ${u.phone ? `<span style="color: #cbd5e1;">&bull;</span><span style="color: #475569;">${escapeHtml(u.phone)}</span>` : ''}
+                <span style="color: #cbd5e1;">&bull;</span>
+                <span style="color: #64748b; font-size: 12px;">${escapeHtml(u.city ? u.city + ', ' + u.state : (u.state || 'Nigeria'))}</span>
               </div>
             </td>
-            <td>
-              <div style="display: inline-flex; flex-direction: column; gap: 2px;">
+            <td style="white-space: nowrap;">
+              <div style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
                 <span class="status-chip active" style="font-size: 11px;">
-                  ${cartCount} item${cartCount === 1 ? '' : 's'} in cart
+                  ${cartCount} in cart
                 </span>
-                ${cartTotal > 0 ? `<span style="font-size: 11px; font-weight: 700; color: #15803d;">Total: ${formatNaira(cartTotal)}</span>` : ''}
+                ${cartTotal > 0 ? `<strong style="font-size: 11.5px; color: #15803d;">(${formatNaira(cartTotal)})</strong>` : ''}
               </div>
             </td>
-            <td>
-              <span class="status-chip" style="background: #fee2e2; color: #dc2626; font-size: 11px;">
-                ${savedCount} wishlist item${savedCount === 1 ? '' : 's'}
+            <td style="white-space: nowrap;">
+              <span class="status-chip" style="background: #fee2e2; color: #dc2626; font-size: 11px; white-space: nowrap;">
+                ${savedCount} in wishlist
               </span>
             </td>
-            <td>
-              <div style="font-size: 12.5px; color: #334155;">
+            <td style="white-space: nowrap;">
+              <div style="font-size: 12.5px; color: #334155; white-space: nowrap;">
                 <strong>${u.reviews_count || (u.reviews_data ? u.reviews_data.length : 0)}</strong> reviews &bull; 
                 <strong>${u.orders_count || (u.orders_data ? u.orders_data.length : 0)}</strong> orders
               </div>
@@ -3385,16 +3392,18 @@
 
         return `
           <tr>
-            <td><strong>${escapeHtml(o.id)}</strong></td>
-            <td>
-              <div style="font-weight: 700; color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</div>
-              <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(o.email || o.phone || '')}</div>
+            <td style="white-space: nowrap;"><strong>${escapeHtml(o.id)}</strong></td>
+            <td style="white-space: nowrap;">
+              <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <strong style="color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</strong>
+                ${(o.email || o.phone) ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(o.email || o.phone)})</span>` : ''}
+              </div>
             </td>
-            <td><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
-            <td style="max-width: 240px; font-size: 12.5px; color: #334155;">${escapeHtml(itemsSummary)}</td>
-            <td><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
-            <td><strong style="color: #15803d; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
-            <td><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+            <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
+            <td style="max-width: 260px; font-size: 12.5px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(itemsSummary)}">${escapeHtml(itemsSummary)}</td>
+            <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+            <td style="white-space: nowrap;"><strong style="color: #15803d; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
+            <td style="white-space: nowrap;"><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
             <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
           </tr>
         `;
@@ -3457,24 +3466,30 @@
 
           return `
             <tr>
-              <td>
-                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${escapeHtml(r.product_title || r.product_id)}</div>
-                <div style="font-size: 11px; color: #94a3b8;">ID: ${escapeHtml(r.product_id)}</div>
+              <td style="white-space: nowrap;">
+                <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                  <strong style="color: #0f172a; font-size: 13.5px;">${escapeHtml(r.product_title || r.product_id)}</strong>
+                  <span style="font-size: 11px; color: #94a3b8;">(ID: ${escapeHtml(r.product_id)})</span>
+                </div>
               </td>
-              <td>
-                <div style="font-weight: 600; color: #1e293b; font-size: 13px;">${escapeHtml(r.reviewer_name || 'Verified Buyer')}</div>
-                <div style="font-size: 11px; color: #64748b;">${escapeHtml(r.user_email || 'Direct User')}</div>
+              <td style="white-space: nowrap;">
+                <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                  <strong style="color: #1e293b; font-size: 13px;">${escapeHtml(r.reviewer_name || 'Verified Buyer')}</strong>
+                  <span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(r.user_email || 'Direct User')})</span>
+                </div>
               </td>
-              <td>
-                <div style="display: flex; align-items: center; gap: 4px;">
+              <td style="white-space: nowrap;">
+                <div style="display: flex; align-items: center; gap: 4px; white-space: nowrap;">
                   <div style="display: inline-flex; align-items: center; gap: 1px;">${stars}</div>
                   <span style="font-weight: 700; font-size: 12px; color: #0f172a;">${rating}.0</span>
                 </div>
               </td>
-              <td style="max-width: 260px;">
-                <div style="font-size: 13px; color: #334155; line-height: 1.4; word-break: break-word;">${escapeHtml(r.comment)}</div>
+              <td style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.comment)}">
+                <span style="font-size: 13px; color: #334155;">"${escapeHtml(r.comment)}"</span>
               </td>
-              <td>${replySnippet}</td>
+              <td style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.admin_reply || '')}">
+                ${r.admin_reply ? `<strong style="font-size: 12.5px; color: #512175;">"${escapeHtml(r.admin_reply)}"</strong>` : '<span style="color: #94a3b8; font-size: 12px;">No reply yet</span>'}
+              </td>
               <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${createdDate}</td>
               <td style="text-align: right; white-space: nowrap;">
                 <button type="button" class="admin-action-btn edit" onclick="window.openReplyModal('${escapeHtml(r.id)}')">
