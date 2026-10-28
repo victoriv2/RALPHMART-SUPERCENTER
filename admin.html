@@ -799,6 +799,147 @@
       flex-shrink: 0;
     }
 
+    /* Product Overview Sections Builder */
+    .admin-builder-section {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .admin-builder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .admin-builder-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+    .admin-builder-desc {
+      font-size: 11.5px;
+      color: #64748b;
+      margin: 2px 0 0 0;
+    }
+    .admin-overview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .admin-overview-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .admin-overview-card-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-overview-card-row input {
+      flex: 1;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .admin-overview-card-row select {
+      width: 220px;
+      padding: 8px 11px;
+      font-size: 12.5px;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #1e293b;
+    }
+    .admin-overview-card textarea {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: inherit;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #0f172a;
+      resize: vertical;
+    }
+    .admin-overview-card-hint {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    /* Technical Specifications Table Builder */
+    .admin-specs-table-wrap {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      margin-top: 12px;
+    }
+    .admin-specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .admin-specs-table th {
+      background: #f8fafc;
+      padding: 9px 12px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    .admin-specs-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .admin-specs-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-specs-table input {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+    }
+    .admin-specs-table input:focus {
+      border-color: #2563eb;
+    }
+    .admin-row-delete-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 6px;
+      color: #e11d48;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .admin-row-delete-btn:hover {
+      background: #e11d48;
+      color: #ffffff;
+      border-color: #e11d48;
+    }
+
     /* Tab Panes */
     .admin-tab-pane {
       display: none;
@@ -1860,7 +2001,7 @@
 
   <!-- ADD / EDIT PRODUCT MODAL -->
   <div class="admin-modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-    <div class="admin-modal-card">
+    <div class="admin-modal-card" style="max-width: 840px;">
       <div class="admin-modal-header">
         <h3 class="admin-modal-title" id="productModalTitle">Add New Product</h3>
         <button type="button" class="admin-modal-close" id="closeProductModal">&times;</button>
@@ -1872,7 +2013,7 @@
 
           <div class="form-field">
             <label for="modalProductTitle">Product Title</label>
-            <input type="text" id="modalProductTitle" placeholder="e.g. iPhone 15 Pro Max 256GB Natural Titanium" required>
+            <input type="text" id="modalProductTitle" placeholder="e.g. Ace Elec 20000mAh Ultra-Slim Fast Charge Power Bank" required>
           </div>
 
           <div class="form-grid-2">
@@ -1897,19 +2038,19 @@
 
             <div class="form-field">
               <label for="modalProductBrand">Brand Name</label>
-              <input type="text" id="modalProductBrand" placeholder="e.g. Apple, Samsung, LG">
+              <input type="text" id="modalProductBrand" placeholder="e.g. Ace Elec, Apple, Samsung">
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
               <label for="modalProductPrice">Selling Price (₦)</label>
-              <input type="number" id="modalProductPrice" placeholder="e.g. 1500000" required min="100">
+              <input type="number" id="modalProductPrice" placeholder="e.g. 18500" required min="100">
             </div>
 
             <div class="form-field">
               <label for="modalProductOldPrice">Original / Old Price (₦)</label>
-              <input type="number" id="modalProductOldPrice" placeholder="e.g. 1750000">
+              <input type="number" id="modalProductOldPrice" placeholder="e.g. 24000">
             </div>
           </div>
 
@@ -1951,8 +2092,51 @@
           </div>
 
           <div class="form-field">
-            <label for="modalProductDesc">Brief Product Description</label>
-            <textarea id="modalProductDesc" rows="3" placeholder="Describe the item, features, warranty, and contents..."></textarea>
+            <label for="modalProductDesc">Brief Product Summary</label>
+            <textarea id="modalProductDesc" rows="2" placeholder="Short description used in search results, cards, and quick overviews..."></textarea>
+          </div>
+
+          <!-- Product Overview Sections Builder -->
+          <div class="admin-builder-section">
+            <div class="admin-builder-header">
+              <div>
+                <h4 class="admin-builder-title">Product Overview Sections</h4>
+                <p class="admin-builder-desc">Add and customize sections under the Product Overview tab. Select Numbered List (1, 2, 3, 4, 5), Bullet Points, or Straight Text.</p>
+              </div>
+              <button type="button" class="admin-btn btn-secondary" id="btnAddOverviewSection" style="padding: 6px 14px; font-size: 12px; height: 32px; white-space: nowrap;">
+                + Add Section
+              </button>
+            </div>
+            <div class="admin-overview-list" id="adminOverviewSectionsList">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+          <!-- Technical Specifications Table Builder -->
+          <div class="admin-builder-section">
+            <div class="admin-builder-header">
+              <div>
+                <h4 class="admin-builder-title">Technical Specifications</h4>
+                <p class="admin-builder-desc">Tabular specifications displayed under the Technical Specifications tab (e.g. Brand, Capacity, Input Ports, Output Ports, Weight, Warranty).</p>
+              </div>
+              <button type="button" class="admin-btn btn-secondary" id="btnAddSpecRow" style="padding: 6px 14px; font-size: 12px; height: 32px; white-space: nowrap;">
+                + Add Spec Row
+              </button>
+            </div>
+            <div class="admin-specs-table-wrap">
+              <table class="admin-specs-table">
+                <thead>
+                  <tr>
+                    <th style="width: 42%;">Specification Name (Key)</th>
+                    <th style="width: 48%;">Specification Value</th>
+                    <th style="width: 10%; text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminSpecsTableBody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -2310,8 +2494,29 @@
         const statusSelect = document.getElementById('modalProductStatus');
         if (statusSelect) statusSelect.value = 'active';
         if (modalImagePreview) modalImagePreview.src = 'images/subcategories/sub_smartphones.jpg';
+        populateProductModalBuilders(null);
         openAdminModal('productModal');
       });
+
+      const btnAddOverview = document.getElementById('btnAddOverviewSection');
+      if (btnAddOverview) {
+        btnAddOverview.addEventListener('click', () => {
+          const list = document.getElementById('adminOverviewSectionsList');
+          if (list) {
+            list.appendChild(createOverviewSectionCard({ title: 'New Overview Section', type: 'bullets', content: '' }));
+          }
+        });
+      }
+
+      const btnAddSpec = document.getElementById('btnAddSpecRow');
+      if (btnAddSpec) {
+        btnAddSpec.addEventListener('click', () => {
+          const tbody = document.getElementById('adminSpecsTableBody');
+          if (tbody) {
+            tbody.appendChild(createSpecTableRow('', ''));
+          }
+        });
+      }
 
       document.getElementById('closeProductModal').addEventListener('click', () => {
         closeAdminModal('productModal');
@@ -2657,6 +2862,214 @@
       }
     };
 
+    // ========================================================
+    // PRODUCT OVERVIEW SECTIONS & TECHNICAL SPECS BUILDERS
+    // ========================================================
+    function defaultOverviewSections(p) {
+      const brand = (p && p.brand) ? p.brand : 'Verified';
+      const title = (p && p.title) ? p.title : 'this item';
+      
+      return [
+        {
+          title: 'Key Features and Highlights',
+          type: 'bullets',
+          content: [
+            'High quality components engineered for long-lasting daily performance',
+            'Optimized for Nigerian domestic power and climate conditions',
+            'Ergonomic, modern exterior design with anti-scratch and heat-resistant finish',
+            'Full quality inspection and certified multi-stage safety protection'
+          ].join('\n')
+        },
+        {
+          title: 'Product Description',
+          type: 'text',
+          content: (p && p.description && p.description.length > 20)
+            ? p.description
+            : `Enjoy outstanding quality, high efficiency, and reliable daily operation with ${title}. Backed by genuine manufacturer warranty coverage and rapid doorstep delivery to all 36 states across Nigeria.`
+        },
+        {
+          title: 'What is in the Box',
+          type: 'bullets',
+          content: [
+            '1 x Main Unit',
+            '1 x Standard Accessory / Connection Cable',
+            '1 x User Manual and Safety Guide',
+            '1 x Official Warranty Certificate'
+          ].join('\n')
+        }
+      ];
+    }
+
+    function defaultSpecs(p) {
+      const brand = (p && p.brand) ? p.brand : 'Ace Elec';
+      const idCode = (p && p.id) ? String(p.id).toUpperCase() : 'NK-2026-PRO';
+
+      return [
+        ['Brand', brand],
+        ['Model Code', idCode],
+        ['Capacity', '20,000 mAh (74Wh)'],
+        ['Condition', 'Brand New in Factory Sealed Packaging'],
+        ['Input Ports', 'Micro-USB (5V/2A) & Type-C (5V/2.1A)'],
+        ['Output Ports', 'Dual USB-A (5V/2.1A Intelligent Fast Charge)'],
+        ['Battery Type', 'High-Density Lithium-Polymer Cell'],
+        ['Dimensions', '142 x 68 x 28 mm'],
+        ['Weight', '415g'],
+        ['Warranty Coverage', '12 Months Official Manufacturer Warranty']
+      ];
+    }
+
+    function createOverviewSectionCard(sectionData) {
+      const card = document.createElement('div');
+      card.className = 'admin-overview-card';
+
+      const secTitle = escapeHtml(sectionData && sectionData.title ? sectionData.title : 'Key Features and Highlights');
+      const secType = (sectionData && sectionData.type) ? sectionData.type : 'bullets';
+      
+      let rawContent = '';
+      if (sectionData) {
+        if (Array.isArray(sectionData.content)) {
+          rawContent = sectionData.content.join('\n');
+        } else if (typeof sectionData.content === 'string') {
+          rawContent = sectionData.content;
+        }
+      }
+
+      card.innerHTML = `
+        <div class="admin-overview-card-row">
+          <input type="text" class="overview-sec-title" value="${secTitle}" placeholder="Section Title (e.g. Key Features, Description, What is in the Box)" required>
+          <select class="overview-sec-type" onchange="updateOverviewCardPlaceholder(this)">
+            <option value="bullets" ${secType === 'bullets' ? 'selected' : ''}>Bullet Points (• List)</option>
+            <option value="numbered" ${secType === 'numbered' ? 'selected' : ''}>Numbered List (1, 2, 3, 4, 5...)</option>
+            <option value="text" ${secType === 'text' ? 'selected' : ''}>Straight Text (Paragraph)</option>
+          </select>
+          <button type="button" class="admin-row-delete-btn" title="Remove Section" onclick="this.closest('.admin-overview-card').remove()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </div>
+        <textarea class="overview-sec-content" rows="4" placeholder="${getOverviewPlaceholder(secType)}">${escapeHtml(rawContent)}</textarea>
+        <div class="admin-overview-card-hint">${getOverviewHint(secType)}</div>
+      `;
+
+      return card;
+    }
+
+    function getOverviewPlaceholder(type) {
+      if (type === 'numbered') return 'Enter items (one item per line, automatically numbered 1, 2, 3, 4, 5...)...';
+      if (type === 'bullets') return 'Enter items (one item per line, automatically rendered with bullet points)...';
+      return 'Write continuous paragraph description here...';
+    }
+
+    function getOverviewHint(type) {
+      if (type === 'numbered') return 'Each new line becomes an item in a numbered list (1, 2, 3...).';
+      if (type === 'bullets') return 'Each new line becomes a bullet point item.';
+      return 'Rendered as full straight paragraph text on the product page.';
+    }
+
+    window.updateOverviewCardPlaceholder = function(selectEl) {
+      const card = selectEl.closest('.admin-overview-card');
+      if (!card) return;
+      const textarea = card.querySelector('.overview-sec-content');
+      const hint = card.querySelector('.admin-overview-card-hint');
+      const type = selectEl.value;
+      if (textarea) textarea.placeholder = getOverviewPlaceholder(type);
+      if (hint) hint.textContent = getOverviewHint(type);
+    };
+
+    function createSpecTableRow(key, val) {
+      const tr = document.createElement('tr');
+      const k = escapeHtml(key || '');
+      const v = escapeHtml(val || '');
+
+      tr.innerHTML = `
+        <td>
+          <input type="text" class="admin-spec-key" value="${k}" placeholder="e.g. Capacity, Brand, Ports, Warranty">
+        </td>
+        <td>
+          <input type="text" class="admin-spec-val" value="${v}" placeholder="e.g. 20,000 mAh, Micro-USB, 12 Months">
+        </td>
+        <td style="text-align: center;">
+          <button type="button" class="admin-row-delete-btn" title="Remove Specification" onclick="this.closest('tr').remove()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </td>
+      `;
+      return tr;
+    }
+
+    function populateProductModalBuilders(product) {
+      // 1. Overview sections
+      const overviewContainer = document.getElementById('adminOverviewSectionsList');
+      if (overviewContainer) {
+        overviewContainer.innerHTML = '';
+        const sections = (product && product.overview_sections && Array.isArray(product.overview_sections) && product.overview_sections.length > 0)
+          ? product.overview_sections
+          : defaultOverviewSections(product);
+
+        sections.forEach(sec => {
+          overviewContainer.appendChild(createOverviewSectionCard(sec));
+        });
+      }
+
+      // 2. Technical specs table
+      const specsTbody = document.getElementById('adminSpecsTableBody');
+      if (specsTbody) {
+        specsTbody.innerHTML = '';
+        let specsList = [];
+        if (product && product.specs) {
+          if (Array.isArray(product.specs)) {
+            specsList = product.specs;
+          } else if (typeof product.specs === 'object' && product.specs !== null) {
+            specsList = Object.entries(product.specs);
+          }
+        }
+        if (!specsList || specsList.length === 0) {
+          specsList = defaultSpecs(product);
+        }
+
+        specsList.forEach(pair => {
+          const k = Array.isArray(pair) ? pair[0] : (pair.key || pair.name || '');
+          const v = Array.isArray(pair) ? pair[1] : (pair.value || '');
+          specsTbody.appendChild(createSpecTableRow(k, v));
+        });
+      }
+    }
+
+    function collectOverviewSectionsFromModal() {
+      const results = [];
+      const cards = document.querySelectorAll('#adminOverviewSectionsList .admin-overview-card');
+      cards.forEach(card => {
+        const titleInput = card.querySelector('.overview-sec-title');
+        const typeSelect = card.querySelector('.overview-sec-type');
+        const contentTextarea = card.querySelector('.overview-sec-content');
+
+        const title = titleInput ? titleInput.value.trim() : '';
+        const type = typeSelect ? typeSelect.value : 'bullets';
+        const content = contentTextarea ? contentTextarea.value.trim() : '';
+
+        if (title || content) {
+          results.push({ title: title || 'Overview', type, content });
+        }
+      });
+      return results;
+    }
+
+    function collectSpecsFromModal() {
+      const results = [];
+      const rows = document.querySelectorAll('#adminSpecsTableBody tr');
+      rows.forEach(tr => {
+        const keyInput = tr.querySelector('.admin-spec-key');
+        const valInput = tr.querySelector('.admin-spec-val');
+
+        const k = keyInput ? keyInput.value.trim() : '';
+        const v = valInput ? valInput.value.trim() : '';
+
+        if (k || v) {
+          results.push([k, v]);
+        }
+      });
+      return results;
+    }
+
     window.editProduct = function(productId) {
       const p = adminProducts.find(item => String(item.id) === String(productId));
       if (!p) return;
@@ -2685,6 +3098,10 @@
       if (imgPreview) imgPreview.src = p.image || 'images/subcategories/sub_smartphones.jpg';
 
       document.getElementById('modalProductDesc').value = p.description || '';
+
+      // Populate Overview & Specs Builders
+      populateProductModalBuilders(p);
+
       openAdminModal('productModal');
     };
 
@@ -2721,6 +3138,8 @@
       const status = document.getElementById('modalProductStatus') ? document.getElementById('modalProductStatus').value : 'active';
       const image = document.getElementById('modalProductImage').value.trim();
       const description = document.getElementById('modalProductDesc').value.trim();
+      const overview_sections = collectOverviewSectionsFromModal();
+      const specs = collectSpecsFromModal();
 
       if (currentEditingId) {
         // Update existing
@@ -2741,6 +3160,8 @@
             status,
             image,
             description,
+            overview_sections,
+            specs,
             updated_at: new Date().toISOString()
           };
         }
@@ -2761,6 +3182,8 @@
           status,
           image,
           description,
+          overview_sections,
+          specs,
           rating: rating,
           reviewsCount: 0,
           verified: true,
@@ -2792,6 +3215,8 @@
           rating: Number(itemToSave.rating) || 4.8,
           image: itemToSave.image,
           description: itemToSave.description,
+          overview_sections: itemToSave.overview_sections || null,
+          specs: itemToSave.specs || null,
           verified: true
         }).then(({ error }) => {
           if (error) console.warn('Supabase upsert note:', error.message);
@@ -2833,6 +3258,8 @@
           status: p.status || 'active',
           image: p.image || '',
           description: p.description || '',
+          overview_sections: p.overview_sections || null,
+          specs: p.specs || null,
           rating: Number(p.rating) || 4.8,
           reviews_count: Number(p.reviewsCount || p.reviews_count) || 12,
           verified: p.verified !== false

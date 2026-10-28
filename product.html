@@ -1756,10 +1756,42 @@
       // 1. Identify Product from URL
       var params = new URLSearchParams(window.location.search);
       var currentId = params.get('id') || 'prod-5';
-      var activeProduct = CATALOG_PRODUCTS.find(function(p) { return p.id === currentId; });
+      var activeProduct = null;
+
+      // Check admin products cache first
+      try {
+        var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+        var foundAdmin = adminProds.find(function(p) { return String(p.id) === String(currentId); });
+        if (foundAdmin) {
+          var adminCat = foundAdmin.category || foundAdmin.category_id || 'phones';
+          var adminTax = (window.RALPHMART_TAXONOMY || {})[adminCat] || {};
+          activeProduct = {
+            id: foundAdmin.id,
+            title: foundAdmin.title,
+            brand: foundAdmin.brand || 'Verified',
+            categoryKey: adminCat,
+            categoryName: adminTax.name || adminCat,
+            price: Number(foundAdmin.price) || 0,
+            originalPrice: Number(foundAdmin.oldPrice || foundAdmin.old_price) || (Number(foundAdmin.price) * 1.15),
+            discount: foundAdmin.discount ? ('-' + foundAdmin.discount + '%') : '',
+            image: foundAdmin.image || 'images/subcategories/sub_smartphones.jpg',
+            images: [foundAdmin.image || 'images/subcategories/sub_smartphones.jpg', foundAdmin.image || 'images/subcategories/sub_smartphones.jpg'],
+            rating: Number(foundAdmin.rating) || 4.8,
+            reviewCount: Number(foundAdmin.reviewsCount || foundAdmin.reviews_count) || 120,
+            description: foundAdmin.description || '',
+            overview_sections: foundAdmin.overview_sections,
+            specs: foundAdmin.specs,
+            features: foundAdmin.features
+          };
+        }
+      } catch (e) {}
+
+      if (!activeProduct && typeof CATALOG_PRODUCTS !== 'undefined' && Array.isArray(CATALOG_PRODUCTS)) {
+        activeProduct = CATALOG_PRODUCTS.find(function(p) { return String(p.id) === String(currentId); });
+      }
 
       if (!activeProduct && Array.isArray(window.RALPHMART_CATALOG)) {
-        var fromCatalog = window.RALPHMART_CATALOG.find(function(p) { return p.id === currentId; });
+        var fromCatalog = window.RALPHMART_CATALOG.find(function(p) { return String(p.id) === String(currentId); });
         if (fromCatalog) {
           var taxCat = (window.RALPHMART_TAXONOMY || {})[fromCatalog.category] || {};
           activeProduct = {
@@ -1776,18 +1808,19 @@
             rating: fromCatalog.rating || 5,
             reviewCount: fromCatalog.reviews || 120,
             description: fromCatalog.title + '. Genuine verified product available at RALPHMART SUPERCENTER with nationwide doorstep delivery and satisfaction guarantee.',
-            specs: {
+            specs: fromCatalog.specs || {
               'Brand': fromCatalog.brand || 'Verified',
               'Condition': 'Brand New / Verified',
               'Warranty': '12 Months Official Warranty',
               'Delivery': 'Nationwide Doorstep Delivery'
-            }
+            },
+            overview_sections: fromCatalog.overview_sections
           };
         }
       }
 
       // Fallback if id was not found
-      if (!activeProduct) {
+      if (!activeProduct && typeof CATALOG_PRODUCTS !== 'undefined' && CATALOG_PRODUCTS.length > 0) {
         activeProduct = CATALOG_PRODUCTS[0];
       }
 
@@ -2143,35 +2176,96 @@
       var specModel = document.getElementById('specModel');
       if (specModel) specModel.textContent = activeProduct.sku || activeProduct.id;
 
-      if (activeProduct.specs && activeProduct.specs.length) {
+      if (activeProduct.specs) {
         var specTbody = document.getElementById('pdpSpecsTableBody');
         if (specTbody) {
           specTbody.innerHTML = '';
-          activeProduct.specs.forEach(function(pair) {
+          var specList = [];
+          if (Array.isArray(activeProduct.specs)) {
+            specList = activeProduct.specs;
+          } else if (typeof activeProduct.specs === 'object' && activeProduct.specs !== null) {
+            specList = Object.entries(activeProduct.specs);
+          }
+          specList.forEach(function(pair) {
+            var k = Array.isArray(pair) ? pair[0] : (pair.key || pair.name || '');
+            var v = Array.isArray(pair) ? pair[1] : (pair.value || '');
+            if (!k && !v) return;
             var tr = document.createElement('tr');
-            tr.innerHTML = '<td class="pdp-spec-label">' + pair[0] + '</td><td class="pdp-spec-value">' + pair[1] + '</td>';
+            var tdKey = document.createElement('td');
+            tdKey.className = 'pdp-spec-label';
+            tdKey.textContent = k;
+            var tdVal = document.createElement('td');
+            tdVal.className = 'pdp-spec-value';
+            tdVal.textContent = v;
+            tr.appendChild(tdKey);
+            tr.appendChild(tdVal);
             specTbody.appendChild(tr);
           });
         }
       }
 
-      // Feature highlights
-      if (activeProduct.features && activeProduct.features.length) {
-        var featList = document.getElementById('pdpKeyFeaturesList');
-        if (featList) {
-          featList.innerHTML = '';
-          activeProduct.features.forEach(function(feat) {
-            var li = document.createElement('li');
-            li.textContent = feat;
-            featList.appendChild(li);
-          });
-        }
-      }
+      // Product Overview Sections Rendering
+      var overviewContainer = document.getElementById('pdpOverviewContent');
+      if (overviewContainer) {
+        if (activeProduct.overview_sections && Array.isArray(activeProduct.overview_sections) && activeProduct.overview_sections.length > 0) {
+          overviewContainer.innerHTML = '';
+          activeProduct.overview_sections.forEach(function(sec) {
+            if (!sec || (!sec.title && !sec.content)) return;
+            
+            var heading = document.createElement('h4');
+            heading.textContent = sec.title || 'Product Overview';
+            overviewContainer.appendChild(heading);
 
-      // Long description
-      var longDesc = document.getElementById('pdpLongDesc');
-      if (longDesc && activeProduct.description) {
-        longDesc.textContent = activeProduct.description;
+            var type = sec.type || 'bullets';
+            var rawContent = sec.content || '';
+            var lines = Array.isArray(rawContent)
+              ? rawContent
+              : String(rawContent).split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+
+            if (type === 'numbered') {
+              var ol = document.createElement('ol');
+              lines.forEach(function(item) {
+                var li = document.createElement('li');
+                li.textContent = item.replace(/^\d+[\.\)\-]\s*/, '');
+                ol.appendChild(li);
+              });
+              overviewContainer.appendChild(ol);
+            } else if (type === 'bullets') {
+              var ul = document.createElement('ul');
+              lines.forEach(function(item) {
+                var li = document.createElement('li');
+                li.textContent = item.replace(/^[•\-\*]\s*/, '');
+                ul.appendChild(li);
+              });
+              overviewContainer.appendChild(ul);
+            } else {
+              // Straight text / paragraph
+              var p = document.createElement('p');
+              p.style.whiteSpace = 'pre-line';
+              p.textContent = typeof rawContent === 'string' ? rawContent : lines.join('\n');
+              overviewContainer.appendChild(p);
+            }
+          });
+        } else {
+          // Feature highlights fallback
+          if (activeProduct.features && activeProduct.features.length) {
+            var featList = document.getElementById('pdpKeyFeaturesList');
+            if (featList) {
+              featList.innerHTML = '';
+              activeProduct.features.forEach(function(feat) {
+                var li = document.createElement('li');
+                li.textContent = feat;
+                featList.appendChild(li);
+              });
+            }
+          }
+
+          // Long description fallback
+          var longDesc = document.getElementById('pdpLongDesc');
+          if (longDesc && activeProduct.description) {
+            longDesc.textContent = activeProduct.description;
+          }
+        }
       }
 
       // Quantity Stepper Logic

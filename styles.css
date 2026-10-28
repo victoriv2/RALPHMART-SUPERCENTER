@@ -6758,15 +6758,23 @@ body.modal-open {
   font-size: 16px;
   color: #0f172a;
   margin: 18px 0 8px 0;
+  font-weight: 700;
 }
 
-.pdp-description-body ul {
-  padding-left: 20px;
-  margin-bottom: 14px;
+.pdp-description-body ul,
+.pdp-description-body ol {
+  padding-left: 22px;
+  margin-bottom: 16px;
 }
 
 .pdp-description-body li {
-  margin-bottom: 6px;
+  margin-bottom: 7px;
+  line-height: 1.6;
+}
+
+.pdp-description-body p {
+  margin-bottom: 16px;
+  line-height: 1.7;
 }
 
 /* Specifications Table Tab */
