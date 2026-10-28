@@ -2020,6 +2020,7 @@
             <div class="form-field">
               <label for="modalProductCategory">Category</label>
               <select id="modalProductCategory" required>
+                <option value="" disabled selected>Select Category</option>
                 <option value="phones">Phones & Tablets</option>
                 <option value="appliances">Appliances</option>
                 <option value="electronics">Electronics</option>
@@ -2057,19 +2058,19 @@
           <div class="form-grid-2">
             <div class="form-field">
               <label for="modalProductStock">Stock Quantity</label>
-              <input type="number" id="modalProductStock" placeholder="50" value="50" min="0">
+              <input type="number" id="modalProductStock" placeholder="e.g. 50" min="0">
             </div>
 
             <div class="form-field">
               <label for="modalProductDiscount">Discount (%)</label>
-              <input type="number" id="modalProductDiscount" placeholder="10" value="0" min="0" max="99">
+              <input type="number" id="modalProductDiscount" placeholder="e.g. 10" min="0" max="99">
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
               <label for="modalProductRating">Initial Admin Rating (1.0 - 5.0)</label>
-              <input type="number" id="modalProductRating" placeholder="4.8" value="4.8" min="1.0" max="5.0" step="0.1" required>
+              <input type="number" id="modalProductRating" placeholder="e.g. 4.8" min="1.0" max="5.0" step="0.1">
               <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Active until customer reviews are submitted. When users rate, user voting automatically takes over.</span>
             </div>
 
@@ -2086,8 +2087,8 @@
           <div class="form-field">
             <label for="modalProductImage">Image URL &amp; Live Preview</label>
             <div style="display: flex; gap: 12px; align-items: center;">
-              <img src="images/subcategories/sub_smartphones.jpg" alt="Preview" id="modalImagePreview" class="modal-img-preview" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
-              <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." required style="flex: 1;">
+              <img src="" alt="Preview" id="modalImagePreview" class="modal-img-preview" style="display: none;" onerror="this.style.display='none'">
+              <input type="text" id="modalProductImage" placeholder="images/subcategories/sub_smartphones.jpg or https://..." style="flex: 1;">
             </div>
           </div>
 
@@ -2480,7 +2481,13 @@
       if (modalImageInput && modalImagePreview) {
         modalImageInput.addEventListener('input', () => {
           const val = modalImageInput.value.trim();
-          modalImagePreview.src = val || 'images/subcategories/sub_smartphones.jpg';
+          if (val) {
+            modalImagePreview.src = val;
+            modalImagePreview.style.display = 'block';
+          } else {
+            modalImagePreview.src = '';
+            modalImagePreview.style.display = 'none';
+          }
         });
       }
 
@@ -2489,11 +2496,23 @@
         document.getElementById('productModalTitle').textContent = 'Add New Product';
         productForm.reset();
         document.getElementById('modalProductId').value = '';
+        document.getElementById('modalProductTitle').value = '';
+        document.getElementById('modalProductCategory').value = '';
+        document.getElementById('modalProductBrand').value = '';
+        document.getElementById('modalProductPrice').value = '';
+        document.getElementById('modalProductOldPrice').value = '';
+        document.getElementById('modalProductStock').value = '';
+        document.getElementById('modalProductDiscount').value = '';
         const ratingInput = document.getElementById('modalProductRating');
-        if (ratingInput) ratingInput.value = '4.8';
+        if (ratingInput) ratingInput.value = '';
         const statusSelect = document.getElementById('modalProductStatus');
         if (statusSelect) statusSelect.value = 'active';
-        if (modalImagePreview) modalImagePreview.src = 'images/subcategories/sub_smartphones.jpg';
+        if (modalImageInput) modalImageInput.value = '';
+        if (modalImagePreview) {
+          modalImagePreview.src = '';
+          modalImagePreview.style.display = 'none';
+        }
+        document.getElementById('modalProductDesc').value = '';
         populateProductModalBuilders(null);
         openAdminModal('productModal');
       });
@@ -2503,7 +2522,7 @@
         btnAddOverview.addEventListener('click', () => {
           const list = document.getElementById('adminOverviewSectionsList');
           if (list) {
-            list.appendChild(createOverviewSectionCard({ title: 'New Overview Section', type: 'bullets', content: '' }));
+            list.appendChild(createOverviewSectionCard({ title: '', type: 'bullets', content: '' }));
           }
         });
       }
@@ -2865,64 +2884,11 @@
     // ========================================================
     // PRODUCT OVERVIEW SECTIONS & TECHNICAL SPECS BUILDERS
     // ========================================================
-    function defaultOverviewSections(p) {
-      const brand = (p && p.brand) ? p.brand : 'Verified';
-      const title = (p && p.title) ? p.title : 'this item';
-      
-      return [
-        {
-          title: 'Key Features and Highlights',
-          type: 'bullets',
-          content: [
-            'High quality components engineered for long-lasting daily performance',
-            'Optimized for Nigerian domestic power and climate conditions',
-            'Ergonomic, modern exterior design with anti-scratch and heat-resistant finish',
-            'Full quality inspection and certified multi-stage safety protection'
-          ].join('\n')
-        },
-        {
-          title: 'Product Description',
-          type: 'text',
-          content: (p && p.description && p.description.length > 20)
-            ? p.description
-            : `Enjoy outstanding quality, high efficiency, and reliable daily operation with ${title}. Backed by genuine manufacturer warranty coverage and rapid doorstep delivery to all 36 states across Nigeria.`
-        },
-        {
-          title: 'What is in the Box',
-          type: 'bullets',
-          content: [
-            '1 x Main Unit',
-            '1 x Standard Accessory / Connection Cable',
-            '1 x User Manual and Safety Guide',
-            '1 x Official Warranty Certificate'
-          ].join('\n')
-        }
-      ];
-    }
-
-    function defaultSpecs(p) {
-      const brand = (p && p.brand) ? p.brand : 'Ace Elec';
-      const idCode = (p && p.id) ? String(p.id).toUpperCase() : 'NK-2026-PRO';
-
-      return [
-        ['Brand', brand],
-        ['Model Code', idCode],
-        ['Capacity', '20,000 mAh (74Wh)'],
-        ['Condition', 'Brand New in Factory Sealed Packaging'],
-        ['Input Ports', 'Micro-USB (5V/2A) & Type-C (5V/2.1A)'],
-        ['Output Ports', 'Dual USB-A (5V/2.1A Intelligent Fast Charge)'],
-        ['Battery Type', 'High-Density Lithium-Polymer Cell'],
-        ['Dimensions', '142 x 68 x 28 mm'],
-        ['Weight', '415g'],
-        ['Warranty Coverage', '12 Months Official Manufacturer Warranty']
-      ];
-    }
-
     function createOverviewSectionCard(sectionData) {
       const card = document.createElement('div');
       card.className = 'admin-overview-card';
 
-      const secTitle = escapeHtml(sectionData && sectionData.title ? sectionData.title : 'Key Features and Highlights');
+      const secTitle = escapeHtml(sectionData && sectionData.title ? sectionData.title : '');
       const secType = (sectionData && sectionData.type) ? sectionData.type : 'bullets';
       
       let rawContent = '';
@@ -2997,40 +2963,34 @@
     }
 
     function populateProductModalBuilders(product) {
-      // 1. Overview sections
+      // 1. Overview sections: completely blank for new product
       const overviewContainer = document.getElementById('adminOverviewSectionsList');
       if (overviewContainer) {
         overviewContainer.innerHTML = '';
-        const sections = (product && product.overview_sections && Array.isArray(product.overview_sections) && product.overview_sections.length > 0)
-          ? product.overview_sections
-          : defaultOverviewSections(product);
-
-        sections.forEach(sec => {
-          overviewContainer.appendChild(createOverviewSectionCard(sec));
-        });
+        if (product && product.overview_sections && Array.isArray(product.overview_sections)) {
+          product.overview_sections.forEach(sec => {
+            overviewContainer.appendChild(createOverviewSectionCard(sec));
+          });
+        }
       }
 
-      // 2. Technical specs table
+      // 2. Technical specs table: completely blank for new product
       const specsTbody = document.getElementById('adminSpecsTableBody');
       if (specsTbody) {
         specsTbody.innerHTML = '';
-        let specsList = [];
         if (product && product.specs) {
+          let specsList = [];
           if (Array.isArray(product.specs)) {
             specsList = product.specs;
           } else if (typeof product.specs === 'object' && product.specs !== null) {
             specsList = Object.entries(product.specs);
           }
+          specsList.forEach(pair => {
+            const k = Array.isArray(pair) ? pair[0] : (pair.key || pair.name || '');
+            const v = Array.isArray(pair) ? pair[1] : (pair.value || '');
+            specsTbody.appendChild(createSpecTableRow(k, v));
+          });
         }
-        if (!specsList || specsList.length === 0) {
-          specsList = defaultSpecs(product);
-        }
-
-        specsList.forEach(pair => {
-          const k = Array.isArray(pair) ? pair[0] : (pair.key || pair.name || '');
-          const v = Array.isArray(pair) ? pair[1] : (pair.value || '');
-          specsTbody.appendChild(createSpecTableRow(k, v));
-        });
       }
     }
 
@@ -3078,16 +3038,16 @@
       document.getElementById('productModalTitle').textContent = 'Edit Product Details';
       document.getElementById('modalProductId').value = p.id;
       document.getElementById('modalProductTitle').value = p.title || '';
-      document.getElementById('modalProductCategory').value = p.category || p.category_id || 'phones';
+      document.getElementById('modalProductCategory').value = p.category || p.category_id || '';
       document.getElementById('modalProductBrand').value = p.brand || '';
       document.getElementById('modalProductPrice').value = p.price || '';
       document.getElementById('modalProductOldPrice').value = p.oldPrice || p.old_price || '';
-      document.getElementById('modalProductStock').value = p.stock !== undefined ? p.stock : 25;
+      document.getElementById('modalProductStock').value = p.stock !== undefined ? p.stock : '';
       const cleanDiscVal = p.discount ? Number(String(p.discount).replace(/[^0-9]/g, '')) : 0;
-      document.getElementById('modalProductDiscount').value = cleanDiscVal || 0;
+      document.getElementById('modalProductDiscount').value = cleanDiscVal || '';
       
       const ratingInp = document.getElementById('modalProductRating');
-      if (ratingInp) ratingInp.value = p.rating || 4.8;
+      if (ratingInp) ratingInp.value = p.rating || '';
       
       const statusSelect = document.getElementById('modalProductStatus');
       if (statusSelect) statusSelect.value = p.status || 'active';
@@ -3095,7 +3055,15 @@
       const imgInput = document.getElementById('modalProductImage');
       const imgPreview = document.getElementById('modalImagePreview');
       if (imgInput) imgInput.value = p.image || '';
-      if (imgPreview) imgPreview.src = p.image || 'images/subcategories/sub_smartphones.jpg';
+      if (imgPreview) {
+        if (p.image) {
+          imgPreview.src = p.image;
+          imgPreview.style.display = 'block';
+        } else {
+          imgPreview.src = '';
+          imgPreview.style.display = 'none';
+        }
+      }
 
       document.getElementById('modalProductDesc').value = p.description || '';
 
