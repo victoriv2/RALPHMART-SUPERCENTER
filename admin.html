@@ -8,7 +8,7 @@
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
-  <script src="taxonomy.js?v=4.0"></script>
+  <script src="taxonomy.js?v=5.0"></script>
   <script src="modular-select-picker.js"></script>
   <style>
     :root {
@@ -1697,6 +1697,7 @@
             <select class="admin-select" id="adminCategoryFilter">
               <option value="all">All Categories</option>
               <option value="vehicles">Vehicles</option>
+              <option value="property">Real Estate &amp; Properties</option>
               <option value="appliances">Appliances</option>
               <option value="phones">Phones &amp; Tablets</option>
               <option value="electronics">Electronics</option>
@@ -2091,6 +2092,7 @@
               <label for="modalProductCategory">Category</label>
               <select id="modalProductCategory" required>
                 <option value="" disabled selected>Select Category</option>
+                <option value="property">Real Estate & Properties</option>
                 <option value="phones">Phones & Tablets</option>
                 <option value="appliances">Appliances</option>
                 <option value="electronics">Electronics</option>
