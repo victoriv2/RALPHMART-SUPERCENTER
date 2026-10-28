@@ -670,6 +670,73 @@
       border-color: #fecaca;
     }
 
+    /* Action Buttons in Tables (e.g. Reviews & Replies) */
+    .admin-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--admin-border);
+      background: #ffffff;
+      color: #334155;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      line-height: 1;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .admin-action-btn svg {
+      flex-shrink: 0;
+      transition: stroke 0.15s ease;
+    }
+
+    .admin-action-btn:hover {
+      background: #f1f5f9;
+      color: var(--admin-navy);
+      border-color: #cbd5e1;
+    }
+
+    .admin-action-btn.edit {
+      background: #faf5ff;
+      color: #512175;
+      border: 1.5px solid #d8b4fe;
+    }
+
+    .admin-action-btn.edit:hover {
+      background: #512175;
+      color: #ffffff;
+      border-color: #512175;
+      box-shadow: 0 2px 8px rgba(81, 33, 117, 0.28);
+    }
+
+    .admin-action-btn.edit:hover svg {
+      stroke: #ffffff;
+    }
+
+    .admin-action-btn.reply {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1.5px solid #86efac;
+    }
+
+    .admin-action-btn.reply:hover {
+      background: #16a34a;
+      color: #ffffff;
+      border-color: #16a34a;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.28);
+    }
+
+    .admin-action-btn.reply:hover svg {
+      stroke: #ffffff;
+    }
+
     /* Lock background scrolling when modal is active */
     body.modal-open {
       overflow: hidden !important;
@@ -2151,11 +2218,11 @@
 
   <!-- Modal: Official Store Reply to Review -->
   <div class="admin-modal" id="replyReviewModal" role="dialog" aria-modal="true" aria-labelledby="replyModalHeading">
-    <div class="admin-modal-card" style="max-width: 540px;">
+    <div class="admin-modal-card" style="max-width: 560px;">
       <div class="admin-modal-header">
-        <h3 class="admin-modal-title" id="replyModalHeading">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#512175" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-          <span>Send Official Store Reply</span>
+        <h3 class="admin-modal-title" id="replyModalHeading" style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <span id="replyModalHeadingText">Send Official Store Reply</span>
         </h3>
         <button type="button" class="admin-modal-close" id="closeReplyReviewModal">&times;</button>
       </div>
@@ -2171,7 +2238,7 @@
 
           <div class="form-field">
             <label for="replyModalText">Official Store Response</label>
-            <textarea id="replyModalText" rows="4" placeholder="Type your response to the customer regarding product quality, warranty, delivery, or gratitude..." required style="width: 100%; box-sizing: border-box; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13.5px; outline: none;"></textarea>
+            <textarea id="replyModalText" rows="4" placeholder="Type your response to the customer regarding product quality, warranty, delivery, or gratitude..." required style="width: 100%; box-sizing: border-box; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13.5px; outline: none; font-family: inherit; resize: vertical;"></textarea>
           </div>
         </div>
 
@@ -2845,7 +2912,12 @@
                 <span class="status-chip ${isHidden ? 'hidden' : 'active'}">${isHidden ? 'Hidden' : 'Active'}</span>
               </div>
             </td>
-            <td style="white-space: nowrap;"><span style="color: #f59e0b; font-weight: 700; white-space: nowrap;">★ ${ratingInfo.formatted}</span></td>
+            <td style="white-space: nowrap;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; font-weight: 700; color: #f59e0b;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>${ratingInfo.formatted}</span>
+              </span>
+            </td>
             <td style="text-align: right; white-space: nowrap;">
               <button type="button" class="table-icon-btn hide-btn ${isHidden ? 'is-hidden' : ''}" onclick="window.toggleProductVisibility('${p.id}')" title="${isHidden ? 'Unhide' : 'Hide'}">
                 ${isHidden ? `
@@ -3848,15 +3920,7 @@
             stars += `<svg width="12" height="12" viewBox="0 0 24 24" fill="${i < rating ? '#f59e0b' : '#cbd5e1'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
           }
 
-          let replySnippet = '<span style="color: #94a3b8; font-size: 12px;">No reply yet</span>';
-          if (r.admin_reply) {
-            replySnippet = `
-              <div style="font-size: 12.5px; color: #512175; font-weight: 600; line-height: 1.35; max-width: 240px;">
-                "${escapeHtml(r.admin_reply)}"
-              </div>
-            `;
-          }
-
+          const hasReply = Boolean(r.admin_reply && r.admin_reply.trim());
           const createdDate = r.created_at ? new Date(r.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently';
 
           return `
@@ -3882,14 +3946,23 @@
               <td style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.comment)}">
                 <span style="font-size: 13px; color: #334155;">"${escapeHtml(r.comment)}"</span>
               </td>
-              <td style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.admin_reply || '')}">
-                ${r.admin_reply ? `<strong style="font-size: 12.5px; color: #512175;">"${escapeHtml(r.admin_reply)}"</strong>` : '<span style="color: #94a3b8; font-size: 12px;">No reply yet</span>'}
+              <td style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.admin_reply || '')}">
+                ${hasReply ? `
+                  <div style="display: inline-flex; align-items: center; gap: 6px; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 4px 10px; max-width: 260px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    <span style="font-size: 12px; color: #512175; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(r.admin_reply)}</span>
+                  </div>
+                ` : `
+                  <span style="display: inline-flex; align-items: center; gap: 4px; color: #94a3b8; font-size: 11.5px; background: #f1f5f9; padding: 3px 8px; border-radius: 4px;">
+                    No reply yet
+                  </span>
+                `}
               </td>
               <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${createdDate}</td>
               <td style="text-align: right; white-space: nowrap;">
-                <button type="button" class="admin-action-btn edit" onclick="window.openReplyModal('${escapeHtml(r.id)}')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                  <span>${r.admin_reply ? 'Edit Reply' : 'Send Reply'}</span>
+                <button type="button" class="admin-action-btn ${hasReply ? 'edit' : 'reply'}" onclick="window.openReplyModal('${escapeHtml(r.id)}')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  <span>${hasReply ? 'Edit Reply' : 'Send Reply'}</span>
                 </button>
               </td>
             </tr>
@@ -3905,8 +3978,15 @@
       const review = adminReviewsList.find(r => r.id === reviewId);
       if (!review) return;
 
+      const hasReply = Boolean(review.admin_reply && review.admin_reply.trim());
+      const headingTextEl = document.getElementById('replyModalHeadingText');
+      if (headingTextEl) headingTextEl.textContent = hasReply ? 'Edit Official Store Reply' : 'Send Official Store Reply';
+
+      const saveBtn = document.getElementById('saveReplyReviewBtn');
+      if (saveBtn) saveBtn.textContent = hasReply ? 'Update & Save Reply' : 'Save & Publish Reply to Cloud';
+
       document.getElementById('replyReviewId').value = review.id;
-      document.getElementById('replyModalReviewerName').textContent = review.reviewer_name + ' on ' + (review.product_title || review.product_id);
+      document.getElementById('replyModalReviewerName').textContent = (review.reviewer_name || 'Customer') + ' on ' + (review.product_title || review.product_id);
       document.getElementById('replyModalComment').textContent = `"${review.comment}"`;
       document.getElementById('replyModalText').value = review.admin_reply || '';
       openAdminModal('replyReviewModal');

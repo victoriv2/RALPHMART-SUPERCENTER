@@ -9607,3 +9607,70 @@ html, body {
     display: none !important;
   }
 }
+
+/* Admin Action Buttons (Reviews, Orders, Tables) */
+.admin-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.admin-action-btn svg {
+  flex-shrink: 0;
+  transition: stroke 0.15s ease;
+}
+
+.admin-action-btn:hover {
+  background: #f1f5f9;
+  color: #091e3a;
+  border-color: #cbd5e1;
+}
+
+.admin-action-btn.edit {
+  background: #faf5ff;
+  color: #512175;
+  border: 1.5px solid #d8b4fe;
+}
+
+.admin-action-btn.edit:hover {
+  background: #512175;
+  color: #ffffff;
+  border-color: #512175;
+  box-shadow: 0 2px 8px rgba(81, 33, 117, 0.28);
+}
+
+.admin-action-btn.edit:hover svg {
+  stroke: #ffffff;
+}
+
+.admin-action-btn.reply {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+}
+
+.admin-action-btn.reply:hover {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.28);
+}
+
+.admin-action-btn.reply:hover svg {
+  stroke: #ffffff;
+}
