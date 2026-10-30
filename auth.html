@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=21.0">
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js"></script>
+  <script src="supabase-client.js?v=6.0"></script>
   <script src="taxonomy.js?v=3.3"></script>
   <style>
     html {
@@ -1698,9 +1698,6 @@
           return { valid: false, message: 'Please enter your email address.' };
         }
         const clean = email.trim();
-        if (clean.toLowerCase() === 'admin') {
-          return { valid: true, cleanEmail: 'admin@ralphmart.ng' };
-        }
         if (!clean.includes('@')) {
           return { valid: false, message: 'Email address must contain an "@" symbol (e.g. name@example.com).' };
         }

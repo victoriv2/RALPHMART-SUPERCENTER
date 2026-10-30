@@ -1,4 +1,4 @@
-﻿/**
+/**
  * RALPHMART SUPERCENTER - SUPABASE CLIENT & AUTH HELPER
  * Project: ralphmart.supercenter@gmail.com's Project
  * Region: eu-west-1
@@ -49,41 +49,27 @@ async function getCurrentSession() {
   }
 }
 
-async function getCurrentProfile() {
-  if (typeof localStorage !== 'undefined' && localStorage.getItem('nkemmart_admin_auth') === 'true') {
-    const cached = localStorage.getItem('nkemmart_profile');
-    if (cached) {
-      try {
-        const cp = JSON.parse(cached);
-        if (cp && cp.role === 'admin') return cp;
-      } catch(e) {}
+// Self-cleaning: Remove any legacy fake admin tokens or profiles from localStorage immediately
+(function purgeLegacyMasterAdminArtifacts() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const p = localStorage.getItem('nkemmart_profile');
+      if (p && (p.includes('admin@ralphmart.ng') || p.includes('Master Admin'))) {
+        localStorage.removeItem('nkemmart_profile');
+      }
+      if (localStorage.getItem('nkemmart_admin_auth') === 'true') {
+        localStorage.removeItem('nkemmart_admin_auth');
+      }
     }
-    return {
-      id: 'e9fcd760-0cff-461c-811c-e20e6345b3e1',
-      email: 'admin@ralphmart.ng',
-      full_name: 'Master Admin',
-      first_name: 'Master',
-      last_name: 'Admin',
-      role: 'admin',
-      phone: '08155608447',
-      state: 'Lagos'
-    };
-  }
+  } catch (e) {}
+})();
 
+async function getCurrentProfile() {
   const client = getSupabase();
   if (!client) return null;
   try {
     const user = await getCurrentUser();
     if (!user) {
-      if (typeof localStorage !== 'undefined') {
-        const cached = localStorage.getItem('nkemmart_profile');
-        if (cached) {
-          try {
-            const cp = JSON.parse(cached);
-            if (cp && cp.role === 'admin') return cp;
-          } catch(e) {}
-        }
-      }
       return null;
     }
 
@@ -100,9 +86,7 @@ async function getCurrentProfile() {
     // Default admin detection for store owner
     const isOwner = user.email && (
       user.email.toLowerCase() === 'ralphmart.supercenter@gmail.com' ||
-      user.email.toLowerCase() === 'nkemmart.supercenter@gmail.com' ||
-      user.email.toLowerCase() === 'admin@ralphmart.ng' ||
-      user.email.toLowerCase() === 'admin'
+      user.email.toLowerCase() === 'nkemmart.supercenter@gmail.com'
     );
     const role = (profile && profile.role) || (isOwner ? 'admin' : 'customer');
 
@@ -259,40 +243,9 @@ async function signUpUser(email, password, { firstName, lastName, fullName, phon
 
 async function signInUser(email, password) {
   const client = getSupabase();
-  let cleanEmail = (email || '').trim().toLowerCase();
-  if (cleanEmail === 'admin') cleanEmail = 'admin@ralphmart.ng';
-
-  // Master Admin built-in login handler
-  if ((cleanEmail === 'admin@ralphmart.ng' || cleanEmail === 'admin') && password === 'admin123') {
-    let authData = null;
-    if (client) {
-      try {
-        const { data, error } = await client.auth.signInWithPassword({
-          email: 'admin@ralphmart.ng',
-          password: 'admin123'
-        });
-        if (!error && data) authData = data;
-      } catch (e) {}
-    }
-
-    const adminProfile = {
-      id: (authData && authData.user && authData.user.id) || 'e9fcd760-0cff-461c-811c-e20e6345b3e1',
-      email: 'admin@ralphmart.ng',
-      full_name: 'Master Admin',
-      first_name: 'Master',
-      last_name: 'Admin',
-      phone: '08155608447',
-      state: 'Lagos',
-      role: 'admin'
-    };
-
-    localStorage.setItem('nkemmart_profile', JSON.stringify(adminProfile));
-    localStorage.setItem('nkemmart_admin_auth', 'true');
-
-    return authData || { user: adminProfile, session: { user: adminProfile } };
-  }
-
   if (!client) throw new Error('Supabase client unavailable');
+
+  const cleanEmail = (email || '').trim().toLowerCase();
 
   const { data, error } = await client.auth.signInWithPassword({
     email: cleanEmail,
@@ -2536,6 +2489,15 @@ async function updateSiteAccountMenu() {
         btn.onclick = (e) => window.openAccountModal(e);
       });
 
+      const mobileAccountItems = document.querySelectorAll('#mobileAccountSubNav a[href="profile.html"], .mobile-account-auth-link');
+      mobileAccountItems.forEach(item => {
+        item.href = 'auth.html';
+        const span = item.querySelector('span');
+        if (span) {
+          span.textContent = 'Sign In / Register';
+        }
+      });
+
       modalOverlay.innerHTML = `
         <div class="site-account-modal-dialog">
           <div class="site-account-modal-header">
@@ -2935,13 +2897,6 @@ async function getAdminUsersOverview() {
       console.warn('Profiles query error:', err);
     }
   }
-
-  try {
-    const prof = JSON.parse(localStorage.getItem('nkemmart_profile'));
-    if (prof && prof.email) {
-      return [prof];
-    }
-  } catch(e) {}
 
   return [];
 }

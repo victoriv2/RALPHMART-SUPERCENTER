@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=22.0">
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js"></script>
+  <script src="supabase-client.js?v=6.0"></script>
   <script src="taxonomy.js?v=5.0"></script>
   <script src="modular-select-picker.js"></script>
   <style>
@@ -1358,8 +1358,8 @@
 
       <form id="adminGateLoginForm" style="width: 100%; text-align: left;">
         <div style="margin-bottom: 14px;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Admin Username or Email</label>
-          <input type="text" id="adminGateUsername" placeholder="e.g. admin or admin@ralphmart.ng" required style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Admin Email Address</label>
+          <input type="email" id="adminGateUsername" placeholder="Enter your registered admin email" required style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
         </div>
 
         <div style="margin-bottom: 16px;">
@@ -1447,7 +1447,7 @@
         <div class="admin-avatar" id="adminUserAvatar">A</div>
         <div class="admin-user-details">
           <span class="admin-user-title" id="adminUserName">Admin Officer</span>
-          <span class="admin-user-sub" id="adminUserRole">Master Admin</span>
+          <span class="admin-user-sub" id="adminUserRole">Administrator</span>
         </div>
       </div>
       <button type="button" class="admin-signout-btn" id="adminSignOutBtn" title="Sign Out">
@@ -2382,8 +2382,8 @@
         gateOverlay.style.display = 'flex';
       } else {
         gateOverlay.style.display = 'none';
-        adminUserName.textContent = profile.full_name || 'Master Admin';
-        adminUserAvatar.textContent = (profile.full_name || 'Admin').charAt(0).toUpperCase();
+        adminUserName.textContent = profile.full_name || profile.email || 'Administrator';
+        adminUserAvatar.textContent = (profile.full_name || profile.email || 'A').charAt(0).toUpperCase();
         adminUserRole.textContent = (profile.role || 'ADMIN').toUpperCase();
       }
 
@@ -2398,43 +2398,6 @@
 
           if (gateError) gateError.style.display = 'none';
 
-          if ((userInput.toLowerCase() === 'admin' || userInput.toLowerCase() === 'admin@ralphmart.ng') && passInput === 'admin123') {
-            gateBtn.disabled = true;
-            gateBtn.textContent = 'Authenticating Master Admin...';
-
-            try {
-              if (typeof signInUser === 'function') {
-                await signInUser('admin@ralphmart.ng', 'admin123');
-              }
-            } catch (err) {
-              console.warn('Supabase auth note:', err);
-            }
-
-            const adminProfile = {
-              id: 'e9fcd760-0cff-461c-811c-e20e6345b3e1',
-              email: 'admin@ralphmart.ng',
-              full_name: 'Master Admin',
-              first_name: 'Master',
-              last_name: 'Admin',
-              role: 'admin',
-              phone: '08155608447',
-              state: 'Lagos'
-            };
-            localStorage.setItem('nkemmart_profile', JSON.stringify(adminProfile));
-            localStorage.setItem('nkemmart_admin_auth', 'true');
-
-            gateOverlay.style.display = 'none';
-            adminUserName.textContent = 'Master Admin';
-            adminUserAvatar.textContent = 'A';
-            adminUserRole.textContent = 'ADMIN';
-
-            loadProductsCatalog();
-            loadDailySales(activeSalesPeriod);
-            loadRegisteredUsers();
-            renderLeaderboards();
-            return;
-          }
-
           gateBtn.disabled = true;
           gateBtn.textContent = 'Verifying...';
           try {
@@ -2446,7 +2409,14 @@
                 adminUserName.textContent = prof.full_name || prof.email;
                 adminUserAvatar.textContent = (prof.full_name || prof.email).charAt(0).toUpperCase();
                 adminUserRole.textContent = prof.role.toUpperCase();
+
+                loadProductsCatalog();
+                loadDailySales(activeSalesPeriod);
+                loadRegisteredUsers();
+                renderLeaderboards();
                 return;
+              } else if (prof) {
+                throw new Error('Access denied: this account does not have administrator privileges.');
               }
             }
             throw new Error('Invalid administrator credentials.');
