@@ -868,20 +868,51 @@
 
     .admin-image-order-badge {
       position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(15, 23, 42, 0.75);
+      top: 6px;
+      left: 6px;
+      background: rgba(15, 23, 42, 0.85);
       color: #ffffff;
       font-size: 10px;
       font-weight: 700;
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       pointer-events: none;
       z-index: 2;
+    }
+
+    .admin-image-card.is-cover .admin-image-order-badge {
+      left: 56px;
+    }
+
+    .admin-image-remove-x {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #dc2626;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      transition: all 0.15s ease;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .admin-image-remove-x:hover {
+      background: #b91c1c;
+      transform: scale(1.15);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.45);
     }
 
     .admin-image-card-actions {
@@ -2293,7 +2324,7 @@
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label for="modalProductCategory">Category</label>
+              <label for="modalProductCategory">Category <span style="color:#ef4444;">*</span></label>
               <select id="modalProductCategory" required>
                 <option value="" disabled selected>Select Category</option>
                 <option value="property">Real Estate & Properties</option>
@@ -2302,62 +2333,68 @@
                 <option value="electronics">Electronics</option>
                 <option value="vehicles">Vehicles</option>
                 <option value="fashion">Fashion</option>
-                <option value="beauty">Health & Beauty</option>
-                <option value="home">Home & Office</option>
+                <option value="health-beauty">Health & Beauty</option>
+                <option value="home-office">Home & Office</option>
                 <option value="computing">Computing</option>
                 <option value="supermarket">Groceries & Supermarket</option>
                 <option value="baby">Baby Products</option>
                 <option value="gaming">Gaming</option>
-                <option value="sports">Sports & Fitness</option>
-                <option value="services">Services</option>
+                <option value="other">Other Categories</option>
               </select>
             </div>
 
             <div class="form-field">
-              <label for="modalProductBrand">Brand Name</label>
-              <input type="text" id="modalProductBrand" placeholder="e.g. Ace Elec, Apple, Samsung">
+              <label for="modalProductSubcategory">Subcategory <span style="color:#ef4444;">*</span></label>
+              <select id="modalProductSubcategory" required>
+                <option value="" disabled selected>Select Category First</option>
+              </select>
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label for="modalProductPrice">Selling Price (₦)</label>
+              <label for="modalProductBrand">Brand / Manufacturer</label>
+              <input type="text" id="modalProductBrand" placeholder="e.g. Ace Elec, Apple, Samsung, Toyota">
+            </div>
+
+            <div class="form-field">
+              <label for="modalProductStock">Stock Quantity</label>
+              <input type="number" id="modalProductStock" placeholder="e.g. 50" min="0">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="modalProductPrice">Selling Price (₦) <span style="color:#ef4444;">*</span></label>
               <input type="number" id="modalProductPrice" placeholder="e.g. 18500" required min="100">
             </div>
 
             <div class="form-field">
-              <label for="modalProductOldPrice">Original / Old Price (₦)</label>
+              <label for="modalProductOldPrice">Original / Old Price (â‚¦)</label>
               <input type="number" id="modalProductOldPrice" placeholder="e.g. 24000">
             </div>
           </div>
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label for="modalProductStock">Stock Quantity</label>
-              <input type="number" id="modalProductStock" placeholder="e.g. 50" min="0">
-            </div>
-
-            <div class="form-field">
               <label for="modalProductDiscount">Discount (%)</label>
               <input type="number" id="modalProductDiscount" placeholder="e.g. 10" min="0" max="99">
             </div>
-          </div>
 
-          <div class="form-grid-2">
             <div class="form-field">
               <label for="modalProductRating">Initial Admin Rating (1.0 - 5.0)</label>
               <input type="number" id="modalProductRating" placeholder="e.g. 4.8" min="1.0" max="5.0" step="0.1">
               <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Active until customer reviews are submitted. When users rate, user voting automatically takes over.</span>
             </div>
+          </div>
 
-            <div class="form-field">
-              <label for="modalProductStatus">Catalog Visibility</label>
-              <select id="modalProductStatus">
-                <option value="active">Active (Visible in Store)</option>
-                <option value="hidden">Hidden (Archived / Off-shelf)</option>
-              </select>
-              <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Hidden items are removed from customer search &amp; category listings.</span>
-            </div>
+          <div class="form-field" style="margin-bottom: 16px;">
+            <label for="modalProductStatus">Catalog Visibility</label>
+            <select id="modalProductStatus">
+              <option value="active">Active (Visible in Store)</option>
+              <option value="hidden">Hidden (Archived / Off-shelf)</option>
+            </select>
+            <span style="font-size: 11px; color: #64748b; margin-top: 3px; display: block;">Hidden items are removed from customer search &amp; category listings.</span>
           </div>
 
           <div class="form-field">
@@ -2368,7 +2405,7 @@
             <div class="admin-image-manager">
               <input type="file" id="modalProductFileInput" multiple accept="image/*" style="display: none;">
               
-              <div class="admin-image-dropzone" id="modalImageDropzone" onclick="document.getElementById('modalProductFileInput').click()">
+              <div class="admin-image-dropzone" id="modalImageDropzone">
                 <div class="admin-image-dropzone-icon">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 </div>
@@ -2599,6 +2636,16 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+            // 0. Image Manager and Category/Subcategory listeners
+      initProductImageManagerListeners();
+
+      const catSelect = document.getElementById('modalProductCategory');
+      if (catSelect) {
+        catSelect.addEventListener('change', () => {
+          populateModalSubcategories(catSelect.value, null);
+        });
+      }
+
       // 1. Auth Verification
       const gateOverlay = document.getElementById('adminGateOverlay');
       const gateForm = document.getElementById('adminGateLoginForm');
@@ -2762,6 +2809,7 @@
         document.getElementById('modalProductId').value = '';
         document.getElementById('modalProductTitle').value = '';
         document.getElementById('modalProductCategory').value = '';
+        populateModalSubcategories('', null);
         document.getElementById('modalProductBrand').value = '';
         document.getElementById('modalProductPrice').value = '';
         document.getElementById('modalProductOldPrice').value = '';
@@ -2885,6 +2933,8 @@
             adminProducts = data.map(p => ({
               ...p,
               category: p.category_id || p.category,
+              subcategory: p.subcategory_id || p.subcategory || '',
+              subcategory_id: p.subcategory_id || p.subcategory || '',
               oldPrice: p.old_price || p.oldPrice,
               reviewsCount: p.reviews_count || p.reviewsCount || 0,
               images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image ? [p.image] : [])
@@ -3031,8 +3081,11 @@
                 </div>
               </div>
             </td>
-            <td style="white-space: nowrap;">
-              <span style="font-weight: 600; text-transform: capitalize; color: #334155;">${escapeHtml(p.category || p.category_id || 'general')}</span>
+                        <td style="white-space: nowrap;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-weight: 600; text-transform: capitalize; color: #1e293b;">${escapeHtml(p.category || p.category_id || 'general')}</span>
+                ${(p.subcategory || p.subcategory_id) ? `<span style="font-size: 11px; color: #64748b; font-weight: 500;">${escapeHtml(p.subcategory || p.subcategory_id)}</span>` : ''}
+              </div>
             </td>
             <td style="white-space: nowrap;">
               <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
@@ -3240,6 +3293,62 @@
       return tr;
     }
 
+        function populateModalSubcategories(catKey, preselectedSubId) {
+      const subSelect = document.getElementById('modalProductSubcategory');
+      if (!subSelect) return;
+      subSelect.innerHTML = '';
+
+      if (!catKey) {
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select Category First';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        subSelect.appendChild(placeholder);
+        return;
+      }
+
+      const tax = window.RALPHMART_TAXONOMY || window.NKEMMART_TAXONOMY || {};
+      const catData = tax[catKey];
+      const subs = (catData && Array.isArray(catData.subcategories)) ? catData.subcategories : [];
+
+      if (subs.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = 'general';
+        opt.textContent = 'General / All ' + (catData ? catData.name : 'Category');
+        opt.selected = true;
+        subSelect.appendChild(opt);
+        return;
+      }
+
+      const promptOpt = document.createElement('option');
+      promptOpt.value = '';
+      promptOpt.textContent = 'Select Subcategory';
+      promptOpt.disabled = true;
+      if (!preselectedSubId) promptOpt.selected = true;
+      subSelect.appendChild(promptOpt);
+
+      let matched = false;
+      subs.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        if (preselectedSubId && (s.id === preselectedSubId || s.name.toLowerCase() === String(preselectedSubId).toLowerCase())) {
+          opt.selected = true;
+          matched = true;
+        }
+        subSelect.appendChild(opt);
+      });
+
+      if (preselectedSubId && !matched && preselectedSubId !== 'general') {
+        const customOpt = document.createElement('option');
+        customOpt.value = preselectedSubId;
+        customOpt.textContent = preselectedSubId;
+        customOpt.selected = true;
+        subSelect.appendChild(customOpt);
+      }
+    }
+
     function populateProductModalBuilders(product) {
       // 1. Overview sections: completely blank for new product
       const overviewContainer = document.getElementById('adminOverviewSectionsList');
@@ -3309,7 +3418,7 @@
           };
           img.src = e.target.result;
         };
-        reader.onerror = reject;
+        reader.onerror = function() { resolve(null); };
         reader.readAsDataURL(file);
       });
     }
@@ -3343,6 +3452,12 @@
           <div class="admin-image-card ${isCover ? 'is-cover' : ''}" data-idx="${idx}">
             <img src="${escapeHtml(src)}" alt="Product Image ${idx + 1}" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
             ${isCover ? '<span class="admin-image-cover-badge">Cover</span>' : ''}
+            <button type="button" class="admin-image-remove-x" onclick="removeProductImage(${idx}); event.stopPropagation();" title="Remove this photo" aria-label="Remove photo">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
             <span class="admin-image-order-badge">${idx + 1}</span>
             <div class="admin-image-card-actions">
               ${!isCover ? `<button type="button" class="admin-image-card-footer-btn" onclick="makeCoverProductImage(${idx})" title="Set as primary cover image">Make Cover</button>` : '<span style="color:#a7f3d0;font-size:10px;font-weight:700;">Cover</span>'}
@@ -3392,13 +3507,21 @@
           for (const file of files) {
             try {
               const dataUrl = await processImageFile(file);
-              modalProductImages.push(dataUrl);
+              if (dataUrl) modalProductImages.push(dataUrl);
             } catch (err) {
               console.error('Failed to process image file:', err);
             }
           }
           fileInput.value = '';
           renderModalImageGallery();
+        });
+      }
+
+      if (dropzone && fileInput) {
+        dropzone.addEventListener('click', (e) => {
+          if (e.target !== fileInput) {
+            fileInput.click();
+          }
         });
       }
 
@@ -3424,7 +3547,7 @@
           for (const file of files) {
             try {
               const dataUrl = await processImageFile(file);
-              modalProductImages.push(dataUrl);
+              if (dataUrl) modalProductImages.push(dataUrl);
             } catch (err) {
               console.error('Failed to process dropped image:', err);
             }
@@ -3496,7 +3619,9 @@
       document.getElementById('productModalTitle').textContent = 'Edit Product Details';
       document.getElementById('modalProductId').value = p.id;
       document.getElementById('modalProductTitle').value = p.title || '';
-      document.getElementById('modalProductCategory').value = p.category || p.category_id || '';
+      const editCat = p.category || p.category_id || '';
+      document.getElementById('modalProductCategory').value = editCat;
+      populateModalSubcategories(editCat, p.subcategory || p.subcategory_id || '');
       document.getElementById('modalProductBrand').value = p.brand || '';
       document.getElementById('modalProductPrice').value = p.price || '';
       document.getElementById('modalProductOldPrice').value = p.oldPrice || p.old_price || '';
@@ -3564,6 +3689,7 @@
     function saveProductFromModal() {
       const title = document.getElementById('modalProductTitle').value.trim();
       const category = document.getElementById('modalProductCategory').value;
+      const subcategory = document.getElementById('modalProductSubcategory') ? document.getElementById('modalProductSubcategory').value : '';
       const brand = document.getElementById('modalProductBrand').value.trim();
       const price = Number(document.getElementById('modalProductPrice').value);
       const oldPrice = Number(document.getElementById('modalProductOldPrice').value) || null;
@@ -3586,6 +3712,8 @@
             title,
             category,
             category_id: category,
+            subcategory,
+            subcategory_id: subcategory,
             brand,
             price,
             oldPrice,
@@ -3610,6 +3738,8 @@
           title,
           category,
           category_id: category,
+          subcategory,
+          subcategory_id: subcategory,
           brand,
           price,
           oldPrice,
@@ -3644,6 +3774,7 @@
           id: itemToSave.id,
           title: itemToSave.title,
           category_id: itemToSave.category || itemToSave.category_id,
+          subcategory_id: itemToSave.subcategory || itemToSave.subcategory_id || null,
           brand: itemToSave.brand,
           price: itemToSave.price,
           old_price: itemToSave.oldPrice || itemToSave.old_price,

@@ -189,10 +189,14 @@ window.RALPHMART_TAXONOMY = window.NKEMMART_TAXONOMY = {
   }
 };
 
-// Aliases for Real Estate & Properties
+// Aliases for Real Estate & Properties and legacy keys
 window.RALPHMART_TAXONOMY['real-estate'] = window.RALPHMART_TAXONOMY.property;
 window.RALPHMART_TAXONOMY['realestate'] = window.RALPHMART_TAXONOMY.property;
 window.RALPHMART_TAXONOMY['properties'] = window.RALPHMART_TAXONOMY.property;
+window.RALPHMART_TAXONOMY['beauty'] = window.RALPHMART_TAXONOMY['health-beauty'];
+window.RALPHMART_TAXONOMY['home'] = window.RALPHMART_TAXONOMY['home-office'];
+window.RALPHMART_TAXONOMY['sports'] = window.RALPHMART_TAXONOMY['other'];
+window.RALPHMART_TAXONOMY['services'] = window.RALPHMART_TAXONOMY['other'];
 
 // ========================================================
 // RALPHMART VERIFIED MASTER CATALOG
@@ -225,10 +229,10 @@ window.NKEMMART_SEARCH = window.RALPHMART_SEARCH = function(rawQuery, catFilter,
 
   // If filtered by category / subcategory
   if (catFilter) {
-    pool = pool.filter(function(p) { return p.category === catFilter; });
+    pool = pool.filter(function(p) { return p.category === catFilter || p.category_id === catFilter; });
   }
   if (subFilter) {
-    pool = pool.filter(function(p) { return p.subcategory === subFilter; });
+    pool = pool.filter(function(p) { return p.subcategory === subFilter || p.subcategory_id === subFilter; });
   }
 
   // If no search query, return the pool as is
