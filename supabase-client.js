@@ -287,9 +287,6 @@ async function signInUser(email, password) {
   if (!client) throw new Error('Supabase client unavailable');
 
   let cleanEmail = (email || '').trim().toLowerCase();
-  if (cleanEmail === 'admin') {
-    cleanEmail = 'ralphmart.supercenter@gmail.com';
-  }
 
   const { data, error } = await client.auth.signInWithPassword({
     email: cleanEmail,
@@ -2355,25 +2352,9 @@ async function updateSiteAccountMenu() {
       });
 
       const initialChar = profile.full_name ? profile.full_name.trim().charAt(0).toUpperCase() : 'U';
-      const roleClass = profile.role === 'admin' ? 'admin' : 'customer';
-      const roleText = profile.role === 'admin' ? 'ADMIN' : 'CUSTOMER';
+      const roleClass = 'customer';
+      const roleText = 'CUSTOMER';
       const locationText = profile.state ? ((profile.lga ? profile.lga + ', ' : '') + profile.state) : '';
-
-      let adminLinkHtml = '';
-      if (profile.role === 'admin') {
-        adminLinkHtml = `
-          <a href="admin.html" class="site-account-modal-link">
-            <span class="site-account-modal-link-icon" style="color: #15803d; background: #f0fdf4;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-            </span>
-            <div class="site-account-modal-link-content">
-              <div class="site-account-modal-link-title" style="color: #15803d;">Admin Portal</div>
-              <div class="site-account-modal-link-sub">Manage products, inventory &amp; orders</div>
-            </div>
-            <svg class="site-account-modal-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </a>
-        `;
-      }
 
       modalOverlay.innerHTML = `
         <div class="site-account-modal-dialog">
@@ -2445,8 +2426,6 @@ async function updateSiteAccountMenu() {
                 </div>
                 <svg class="site-account-modal-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </a>
-
-              ${adminLinkHtml}
 
               <a href="orders.html" class="site-account-modal-link">
                 <span class="site-account-modal-link-icon">

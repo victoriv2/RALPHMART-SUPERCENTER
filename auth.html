@@ -897,7 +897,6 @@
             <span>Edit Profile &amp; Information</span>
           </a>
           <a href="index.html" class="auth-action-link btn-primary-action">Continue Shopping</a>
-          <a href="admin.html" class="auth-action-link btn-admin-action" id="activeAdminBtn" style="display: none;">Access Admin Portal</a>
           <button type="button" class="auth-action-link btn-signout-action" id="activeSignOutBtn">Sign Out of Account</button>
         </div>
       </div>
@@ -1362,12 +1361,8 @@
         document.getElementById('activeUserEmail').textContent = existingProfile.email;
         
         const rolePill = document.getElementById('activeUserRole');
-        rolePill.textContent = existingProfile.role.toUpperCase();
-        rolePill.className = 'auth-user-role-pill ' + (existingProfile.role === 'admin' ? 'role-admin' : 'role-customer');
-
-        if (existingProfile.role === 'admin') {
-          document.getElementById('activeAdminBtn').style.display = 'block';
-        }
+        rolePill.textContent = 'CUSTOMER';
+        rolePill.className = 'auth-user-role-pill role-customer';
 
         const activeUserLoc = document.getElementById('activeUserLocation');
         if (activeUserLoc && (existingProfile.state || existingProfile.lga)) {
@@ -1747,11 +1742,7 @@
           const prof = await getCurrentProfile();
           showAlert('Signed in successfully! Redirecting...', false);
           setTimeout(() => {
-            if (prof && prof.role === 'admin') {
-              window.location.href = 'admin.html';
-            } else {
-              window.location.href = redirectUrl;
-            }
+            window.location.href = redirectUrl;
           }, 600);
         } catch (err) {
           showAlert(err.message || 'Failed to sign in. Please check your credentials.');

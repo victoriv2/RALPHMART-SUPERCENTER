@@ -1611,16 +1611,16 @@
       }
 
       if (!activeProduct) {
-        document.title = 'Store Inventory Blank - RALPHMART SUPERCENTER';
+        document.title = 'Product Unavailable - RALPHMART SUPERCENTER';
         var mainEl = document.querySelector('.pdp-main-content') || document.body;
         if (mainEl) {
           mainEl.innerHTML = '<div style="max-width: 600px; margin: 80px auto; text-align: center; padding: 48px 24px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); font-family: inherit;">' +
             '<div style="margin-bottom: 16px; color: #512175;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>' +
-            '<h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Store Inventory Is Currently Blank</h2>' +
-            '<p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 24px;">All sample goods and test data have been wiped clean. Open the Admin Command Center to create your real products.</p>' +
+            '<h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Product Currently Unavailable</h2>' +
+            '<p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 24px;">The item you are looking for is currently being updated or has not been listed yet. Please explore our verified departments.</p>' +
             '<div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">' +
-            '<a href="admin.html" style="background: #512175; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Go to Admin Center</a>' +
-            '<a href="index.html" style="background: #f1f5f9; color: #0f172a; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Return to Home</a>' +
+            '<a href="index.html" style="background: #512175; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Return to Home</a>' +
+            '<a href="category.html" style="background: #f1f5f9; color: #0f172a; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">Browse All Departments</a>' +
             '</div></div>';
         }
         return;
