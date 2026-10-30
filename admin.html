@@ -2631,7 +2631,11 @@
           gateBtn.textContent = 'Verifying...';
           try {
             if (typeof signInUser === 'function') {
-              await signInUser(userInput, passInput);
+              let loginUser = userInput;
+              if (loginUser.toLowerCase() === 'admin') {
+                loginUser = 'ralphmart.supercenter@gmail.com';
+              }
+              await signInUser(loginUser, passInput);
               const prof = await getCurrentProfile();
               if (prof && prof.role === 'admin') {
                 gateOverlay.style.display = 'none';

@@ -283,7 +283,10 @@ async function signInUser(email, password) {
   const client = getSupabase();
   if (!client) throw new Error('Supabase client unavailable');
 
-  const cleanEmail = (email || '').trim().toLowerCase();
+  let cleanEmail = (email || '').trim().toLowerCase();
+  if (cleanEmail === 'admin') {
+    cleanEmail = 'ralphmart.supercenter@gmail.com';
+  }
 
   const { data, error } = await client.auth.signInWithPassword({
     email: cleanEmail,
