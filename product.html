@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>Product Details - RALPHMART SUPERCENTER</title>
-  <link rel="stylesheet" href="styles.css?v=22.0">
+  <link rel="stylesheet" href="styles.css?v=23.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js?v=6.0"></script>
+  <script src="supabase-client.js?v=7.0"></script>
   <script src="taxonomy.js?v=4.0"></script>
   <script src="modular-select-picker.js"></script>
 </head>
@@ -1491,24 +1491,27 @@
         if (foundAdmin) {
           var adminCat = foundAdmin.category || foundAdmin.category_id || 'phones';
           var adminTax = (window.RALPHMART_TAXONOMY || {})[adminCat] || {};
-          activeProduct = {
-            id: foundAdmin.id,
-            title: foundAdmin.title,
-            brand: foundAdmin.brand || 'Verified',
-            categoryKey: adminCat,
-            categoryName: adminTax.name || adminCat,
-            price: Number(foundAdmin.price) || 0,
-            originalPrice: Number(foundAdmin.oldPrice || foundAdmin.old_price) || (Number(foundAdmin.price) * 1.15),
-            discount: foundAdmin.discount ? ('-' + foundAdmin.discount + '%') : '',
-            image: foundAdmin.image || 'images/subcategories/sub_smartphones.jpg',
-            images: [foundAdmin.image || 'images/subcategories/sub_smartphones.jpg', foundAdmin.image || 'images/subcategories/sub_smartphones.jpg'],
-            rating: Number(foundAdmin.rating) || 4.8,
-            reviewCount: Number(foundAdmin.reviewsCount || foundAdmin.reviews_count) || 120,
-            description: foundAdmin.description || '',
-            overview_sections: foundAdmin.overview_sections,
-            specs: foundAdmin.specs,
-            features: foundAdmin.features
-          };
+            var pImgs = (Array.isArray(foundAdmin.images) && foundAdmin.images.length > 0)
+              ? foundAdmin.images.filter(Boolean)
+              : (foundAdmin.image ? [foundAdmin.image] : ['images/subcategories/sub_smartphones.jpg']);
+            activeProduct = {
+              id: foundAdmin.id,
+              title: foundAdmin.title,
+              brand: foundAdmin.brand || 'Verified',
+              categoryKey: adminCat,
+              categoryName: adminTax.name || adminCat,
+              price: Number(foundAdmin.price) || 0,
+              originalPrice: Number(foundAdmin.oldPrice || foundAdmin.old_price) || (Number(foundAdmin.price) * 1.15),
+              discount: foundAdmin.discount ? ('-' + foundAdmin.discount + '%') : '',
+              image: pImgs[0] || 'images/subcategories/sub_smartphones.jpg',
+              images: pImgs,
+              rating: Number(foundAdmin.rating) || 4.8,
+              reviewCount: Number(foundAdmin.reviewsCount || foundAdmin.reviews_count) || 120,
+              description: foundAdmin.description || '',
+              overview_sections: foundAdmin.overview_sections,
+              specs: foundAdmin.specs,
+              features: foundAdmin.features
+            };
         }
       } catch (e) {}
 
@@ -1603,14 +1606,11 @@
 
       var productImages = [];
       if (Array.isArray(activeProduct.images) && activeProduct.images.length > 0) {
-        productImages = activeProduct.images.slice();
+        productImages = activeProduct.images.filter(Boolean);
+      } else if (activeProduct.image) {
+        productImages = [activeProduct.image];
       } else {
-        productImages = [
-          activeProduct.image,
-          activeProduct.image,
-          activeProduct.image,
-          activeProduct.image
-        ];
+        productImages = ['images/subcategories/sub_smartphones.jpg'];
       }
 
       var currentImageIndex = 0;

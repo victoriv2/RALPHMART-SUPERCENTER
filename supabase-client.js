@@ -28,7 +28,12 @@ async function getCurrentUser() {
   if (!client) return null;
   try {
     const { data: { user }, error } = await client.auth.getUser();
-    if (error) return null;
+    if (error || !user) return null;
+    // Disallow legacy mock admin artifact
+    if (user.email === 'admin@ralphmart.ng' || (user.user_metadata && user.user_metadata.full_name === 'Master Admin')) {
+      try { await client.auth.signOut(); } catch (e) {}
+      return null;
+    }
     return user;
   } catch (err) {
     console.error('Error getting current user:', err);
@@ -41,7 +46,11 @@ async function getCurrentSession() {
   if (!client) return null;
   try {
     const { data: { session }, error } = await client.auth.getSession();
-    if (error) return null;
+    if (error || !session) return null;
+    if (session.user && (session.user.email === 'admin@ralphmart.ng' || (session.user.user_metadata && session.user.user_metadata.full_name === 'Master Admin'))) {
+      try { await client.auth.signOut(); } catch (e) {}
+      return null;
+    }
     return session;
   } catch (err) {
     console.error('Error getting session:', err);
@@ -49,17 +58,41 @@ async function getCurrentSession() {
   }
 }
 
-// Self-cleaning: Remove any legacy fake admin tokens or profiles from localStorage immediately
+// Self-cleaning: Deep-purge any legacy fake admin tokens, profiles or sessions from localStorage and sessionStorage immediately
 (function purgeLegacyMasterAdminArtifacts() {
   try {
     if (typeof localStorage !== 'undefined') {
-      const p = localStorage.getItem('nkemmart_profile');
-      if (p && (p.includes('admin@ralphmart.ng') || p.includes('Master Admin'))) {
-        localStorage.removeItem('nkemmart_profile');
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        const val = localStorage.getItem(k) || '';
+        if (
+          val.includes('admin@ralphmart.ng') ||
+          val.includes('Master Admin') ||
+          k.includes('admin@ralphmart.ng') ||
+          k === 'nkemmart_admin_auth'
+        ) {
+          keysToRemove.push(k);
+        }
       }
-      if (localStorage.getItem('nkemmart_admin_auth') === 'true') {
-        localStorage.removeItem('nkemmart_admin_auth');
+      keysToRemove.forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      const sKeys = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        if (!k) continue;
+        const val = sessionStorage.getItem(k) || '';
+        if (val.includes('admin@ralphmart.ng') || val.includes('Master Admin')) {
+          sKeys.push(k);
+        }
       }
+      sKeys.forEach(k => {
+        try { sessionStorage.removeItem(k); } catch (e) {}
+      });
     }
   } catch (e) {}
 })();
@@ -70,6 +103,11 @@ async function getCurrentProfile() {
   try {
     const user = await getCurrentUser();
     if (!user) {
+      return null;
+    }
+
+    if (user.email === 'admin@ralphmart.ng' || (user.user_metadata && user.user_metadata.full_name === 'Master Admin')) {
+      try { await client.auth.signOut(); } catch (e) {}
       return null;
     }
 
