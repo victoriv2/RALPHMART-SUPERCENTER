@@ -2685,6 +2685,29 @@
 
 
 
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderRatingStarsHtml(rating, size, fillCol, emptyCol) {
+        var s = size || 11;
+        var f = fillCol || '#f59e0b';
+        var e = emptyCol || '#cbd5e1';
+        var r = Math.round(Number(rating) || 5);
+        var html = '';
+        for (var i = 1; i <= 5; i++) {
+          var col = (i <= r) ? f : e;
+          html += '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="' + col + '"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+        }
+        return html;
+      }
+
       function renderHomePageProducts() {
         var grid = document.querySelector('.products-grid');
         if (!grid) return;
@@ -2701,7 +2724,10 @@
           prods = window.RALPHMART_CATALOG.filter(function(p) { return p && p.status !== 'hidden'; });
         }
 
+        var countText = document.getElementById('catalogCountText');
+
         if (prods.length === 0) {
+          if (countText) countText.textContent = '(0 products found)';
           grid.innerHTML = '<div class="empty-catalog-card" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; margin: 20px 0;">' +
             '<div style="margin-bottom: 14px; color: #512175;">' +
               '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>' +
@@ -2713,16 +2739,18 @@
           return;
         }
 
+        if (countText) countText.textContent = '(' + formatNumberWithCommas(prods.length) + ' products found)';
+
         grid.innerHTML = prods.map(function(p) {
           var priceNum = Number(p.price) || 0;
-          var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || Math.round(priceNum * 1.15);
+          var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || (priceNum > 0 ? Math.round(priceNum * 1.15) : 0);
           var disc = p.discount ? (String(p.discount).startsWith('-') ? p.discount : '-' + p.discount + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : '');
           var rating = Number(p.rating) || 5.0;
-          var img = p.image || 'images/subcategories/sub_smartphones.jpg';
+          var img = (Array.isArray(p.images) && p.images.length > 0) ? p.images[0] : (p.image || 'images/subcategories/sub_smartphones.jpg');
 
           return '<article class="product-card" data-id="' + escapeHtml(p.id) + '" data-rating="' + rating + '" data-title="' + escapeHtml(p.title) + '" data-price="' + priceNum + '" data-original="' + origNum + '" data-image="' + escapeHtml(img) + '" data-brand="' + escapeHtml(p.brand || 'Verified') + '">' +
             '<div class="card-media">' +
-              '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.title) + '" class="card-img">' +
+              '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.title) + '" class="card-img" loading="lazy">' +
               '<button class="wishlist-btn" aria-label="Add to wishlist" type="button">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
               '</button>' +
@@ -2730,8 +2758,8 @@
             '<div class="card-body">' +
               '<a href="product.html?id=' + encodeURIComponent(p.id) + '" class="product-title">' + escapeHtml(p.title) + '</a>' +
               '<div class="price-row">' +
-                '<span class="current-price">₦ ' + formatNumberWithCommas(priceNum) + '</span>' +
-                (origNum > priceNum ? '<span class="original-price">₦ ' + formatNumberWithCommas(origNum) + '</span>' : '') +
+                '<span class="current-price">' + formatNaira(priceNum) + '</span>' +
+                (origNum > priceNum ? '<span class="original-price">' + formatNaira(origNum) + '</span>' : '') +
                 (disc ? '<span class="discount-text">' + disc + '</span>' : '') +
               '</div>' +
               '<div class="rating-row">' +
@@ -2756,6 +2784,18 @@
 
       if (typeof renderRecentlyViewedShelf === 'function') {
         renderRecentlyViewedShelf('homeRecentlyViewedContainer');
+      }
+
+      // Listen for catalog cloud sync
+      window.addEventListener('ralphmart_catalog_loaded', function() {
+        renderHomePageProducts();
+        syncProductCardsUI();
+        syncWishlistButtons();
+      });
+
+      // Try loading from cloud immediately
+      if (typeof window.loadRalphmartCatalogFromCloud === 'function') {
+        window.loadRalphmartCatalogFromCloud();
       }
 
       // Listen for cross-device cloud sync events

@@ -204,22 +204,107 @@ window.RALPHMART_TAXONOMY['services'] = window.RALPHMART_TAXONOMY['other'];
 // ========================================================
 window.RALPHMART_CATALOG = window.NKEMMART_CATALOG = [];
 
+// Unified Cloud Catalog Synchronizer
+window.loadRalphmartCatalogFromCloud = async function() {
+  try {
+    var client = (typeof getSupabase === 'function') ? getSupabase() : (window.supabaseClient || null);
+    if (!client && typeof supabase !== 'undefined' && window.SUPABASE_CONFIG) {
+      client = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    }
+    if (!client) return [];
+
+    var res = await client.from('products').select('*').order('created_at', { ascending: false });
+    if (!res.error && Array.isArray(res.data)) {
+      var cloudProds = res.data.map(function(p) {
+        var pPrice = Number(p.price) || 0;
+        var pOld = Number(p.old_price || p.oldPrice) || (pPrice > 0 ? Math.round(pPrice * 1.15) : 0);
+        var pDisc = p.discount ? (String(p.discount).startsWith('-') ? String(p.discount) : '-' + p.discount + '%') : (pOld > pPrice ? '-' + Math.round((pOld - pPrice) / pOld * 100) + '%' : '');
+        var pImgs = (Array.isArray(p.images) && p.images.length > 0) ? p.images.filter(Boolean) : (p.image ? [p.image] : ['images/subcategories/sub_smartphones.jpg']);
+        
+        return {
+          id: p.id,
+          title: p.title,
+          category: p.category_id || p.category,
+          category_id: p.category_id || p.category,
+          subcategory: p.subcategory_id || p.subcategory || '',
+          subcategory_id: p.subcategory_id || p.subcategory || '',
+          brand: p.brand || '',
+          price: pPrice,
+          originalPrice: pOld,
+          oldPrice: pOld,
+          old_price: pOld,
+          stock: p.stock !== undefined ? p.stock : 25,
+          discount: pDisc,
+          status: p.status || 'active',
+          rating: Number(p.rating) || 4.8,
+          reviews: p.reviews_count || p.reviewsCount || 0,
+          reviewsCount: p.reviews_count || p.reviewsCount || 0,
+          verified: p.verified !== false,
+          image: pImgs[0] || 'images/subcategories/sub_smartphones.jpg',
+          images: pImgs,
+          description: p.description || '',
+          overview_sections: p.overview_sections || [],
+          specs: p.specs || [],
+          created_at: p.created_at,
+          updated_at: p.updated_at
+        };
+      });
+
+      window.RALPHMART_CATALOG = cloudProds;
+      window.NKEMMART_CATALOG = cloudProds;
+      try {
+        localStorage.setItem('nkemmart_admin_products', JSON.stringify(cloudProds));
+      } catch(e) {}
+      window.dispatchEvent(new CustomEvent('ralphmart_catalog_loaded', { detail: cloudProds }));
+      return cloudProds;
+    }
+  } catch (err) {
+    console.warn('Catalog cloud sync note:', err);
+  }
+  return [];
+};
+
+// Automatically attempt initial cloud sync
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      window.loadRalphmartCatalogFromCloud();
+    });
+  } else {
+    setTimeout(function() { window.loadRalphmartCatalogFromCloud(); }, 50);
+  }
+}
+
 // ========================================================
 // SMART ACCURATE SEARCH & RELEVANCE ENGINE
 // Multi-term token matching, brand scoring, zero hallucination
 // ========================================================
 window.NKEMMART_SEARCH = window.RALPHMART_SEARCH = function(rawQuery, catFilter, subFilter) {
-  var catalog = window.RALPHMART_CATALOG || [];
   var q = (rawQuery || '').trim().toLowerCase();
+
+  // Merge items from window.RALPHMART_CATALOG and localStorage admin products
+  var localProds = [];
+  try {
+    localProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+  } catch(e) {}
+
+  var mergedMap = {};
+  (window.RALPHMART_CATALOG || []).forEach(function(p) {
+    if (p && p.id) mergedMap[String(p.id)] = p;
+  });
+  localProds.forEach(function(p) {
+    if (p && p.id) {
+      mergedMap[String(p.id)] = Object.assign({}, mergedMap[String(p.id)] || {}, p);
+    }
+  });
+
+  var catalog = Object.keys(mergedMap).map(function(k) { return mergedMap[k]; });
 
   // Filter out hidden products set by store administrator
   var hiddenMap = {};
-  try {
-    var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
-    adminProds.forEach(function(ap) {
-      if (ap && ap.status === 'hidden') hiddenMap[String(ap.id)] = true;
-    });
-  } catch(e) {}
+  catalog.forEach(function(ap) {
+    if (ap && ap.status === 'hidden') hiddenMap[String(ap.id)] = true;
+  });
 
   var pool = catalog.filter(function(p) {
     if (!p) return false;
@@ -229,10 +314,20 @@ window.NKEMMART_SEARCH = window.RALPHMART_SEARCH = function(rawQuery, catFilter,
 
   // If filtered by category / subcategory
   if (catFilter) {
-    pool = pool.filter(function(p) { return p.category === catFilter || p.category_id === catFilter; });
+    var cf = String(catFilter).toLowerCase().trim();
+    pool = pool.filter(function(p) {
+      var c1 = String(p.category || '').toLowerCase().trim();
+      var c2 = String(p.category_id || '').toLowerCase().trim();
+      return c1 === cf || c2 === cf;
+    });
   }
   if (subFilter) {
-    pool = pool.filter(function(p) { return p.subcategory === subFilter || p.subcategory_id === subFilter; });
+    var sf = String(subFilter).toLowerCase().trim();
+    pool = pool.filter(function(p) {
+      var s1 = String(p.subcategory || '').toLowerCase().trim();
+      var s2 = String(p.subcategory_id || '').toLowerCase().trim();
+      return s1 === sf || s2 === sf;
+    });
   }
 
   // If no search query, return the pool as is

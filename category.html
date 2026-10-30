@@ -1151,131 +1151,158 @@
       }
 
       // Search and retrieve accurate products
-      var sampleProducts = [];
-      if (typeof window.RALPHMART_SEARCH === 'function') {
-        sampleProducts = window.RALPHMART_SEARCH(searchQuery, currentCatKey, currentSubKey);
-      } else {
-        sampleProducts = generateCategoryProducts(currentCatKey || 'vehicles', currentSubKey, catData || tax.vehicles);
-      }
+      function renderCategoryPageProducts() {
+        var sampleProducts = [];
+        if (typeof window.RALPHMART_SEARCH === 'function') {
+          sampleProducts = window.RALPHMART_SEARCH(searchQuery, currentCatKey, currentSubKey);
+        }
 
-      // If category view with no query returned empty, fallback to generated
-      if ((!sampleProducts || sampleProducts.length === 0) && !searchQuery) {
-        sampleProducts = generateCategoryProducts(currentCatKey || 'vehicles', currentSubKey, catData || tax.vehicles);
-      }
-
-      // Set search bar input value if query exists
-      if (searchQuery) {
-        var searchInput = document.querySelector('.search-input');
-        if (searchInput) searchInput.value = searchQuery;
-      }
-
-      // Update Listing Heading & Count
-      var listingHeading = document.getElementById('listingHeading');
-      var listingCount = document.getElementById('listingCountText');
-      if (listingHeading) {
+        // Set search bar input value if query exists
         if (searchQuery) {
-          listingHeading.textContent = 'Search results for "' + searchQuery + '"' + (catData ? ' in ' + catData.name : '');
-        } else {
-          listingHeading.textContent = currentSubKey ? (catData.subcategories.find(function(s) { return s.id === currentSubKey; }) || {}).name || catData.name : catData.name;
+          var searchInput = document.querySelector('.search-input');
+          if (searchInput) searchInput.value = searchQuery;
         }
-      }
-      if (listingCount) {
-        listingCount.textContent = '(' + sampleProducts.length + ' products found)';
-      }
 
-      // Render Products Grid
-      var prodGrid = document.getElementById('categoryProductsGrid');
-      if (prodGrid) {
-        prodGrid.innerHTML = '';
-        if (sampleProducts.length === 0) {
-          var safeQ = (searchQuery || 'your search').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-          prodGrid.innerHTML = 
-            '<div class="search-empty-state-card">' +
-              '<div class="search-empty-icon-wrap">' +
-                '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                  '<circle cx="11" cy="11" r="8"></circle>' +
-                  '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
-                  '<line x1="8" y1="11" x2="14" y2="11"></line>' +
-                '</svg>' +
-              '</div>' +
-              '<h2 class="search-empty-title">No verified products found for &ldquo;' + safeQ + '&rdquo;</h2>' +
-              '<p class="search-empty-desc">' +
-                'We could not find any products matching your search term. At RALPHMART, we never guess, hallucinate, or show unrelated items. Only genuine, verified products are listed.' +
-              '</p>' +
-              '<div class="search-empty-tips">' +
-                '<div class="search-empty-tips-title">Helpful search suggestions:</div>' +
-                '<ul>' +
-                  '<li>Check your spelling for any typos or missing letters.</li>' +
-                  '<li>Use simpler or broader words (e.g. <strong>phone</strong>, <strong>fan</strong>, <strong>generator</strong>, <strong>blender</strong>, <strong>shoes</strong>).</li>' +
-                  '<li>Try searching by brand name (e.g. <strong>Hansen</strong>, <strong>Silver Crest</strong>, <strong>Syinix</strong>, <strong>Samsung</strong>, <strong>Apple</strong>).</li>' +
-                '</ul>' +
-              '</div>' +
-              '<div class="search-empty-departments">' +
-                '<div class="search-empty-departments-title">Browse popular verified departments:</div>' +
-                '<div class="search-empty-chips-wrap">' +
-                  '<a href="category.html?cat=phones" class="search-category-chip">Phones &amp; Tablets</a>' +
-                  '<a href="category.html?cat=appliances" class="search-category-chip">Appliances</a>' +
-                  '<a href="category.html?cat=electronics" class="search-category-chip">Electronics</a>' +
-                  '<a href="category.html?cat=vehicles" class="search-category-chip">Vehicles</a>' +
-                  '<a href="category.html?cat=fashion" class="search-category-chip">Fashion</a>' +
-                  '<a href="category.html?cat=supermarket" class="search-category-chip">Groceries &amp; Supermarket</a>' +
-                  '<a href="category.html?cat=computing" class="search-category-chip">Computing</a>' +
-                  '<a href="category.html?cat=health-beauty" class="search-category-chip">Health &amp; Beauty</a>' +
-                '</div>' +
-              '</div>' +
-              '<div style="display: flex; gap: 12px; justify-content: center; align-items: center;">' +
-                '<a href="category.html" class="search-empty-btn">Browse All Products</a>' +
-              '</div>' +
-            '</div>';
-        } else {
-          sampleProducts.forEach(function(prod) {
-            var art = document.createElement('article');
-            art.className = 'product-card';
-            art.setAttribute('data-id', prod.id);
-            art.setAttribute('data-title', prod.title);
-            art.setAttribute('data-price', prod.price);
-            art.setAttribute('data-original', prod.originalPrice);
-            art.setAttribute('data-image', prod.image);
-            art.setAttribute('data-brand', prod.brand || 'Verified');
-            art.setAttribute('data-rating', prod.rating || 4.8);
+        // Update Listing Heading & Count
+        var listingHeading = document.getElementById('listingHeading');
+        var listingCount = document.getElementById('listingCountText');
+        if (listingHeading) {
+          if (searchQuery) {
+            listingHeading.textContent = 'Search results for "' + searchQuery + '"' + (catData ? ' in ' + catData.name : '');
+          } else {
+            listingHeading.textContent = currentSubKey ? (catData.subcategories.find(function(s) { return s.id === currentSubKey; }) || {}).name || catData.name : catData.name;
+          }
+        }
+        if (listingCount) {
+          listingCount.textContent = '(' + sampleProducts.length + ' products found)';
+        }
 
-            art.innerHTML = 
-              '<div class="card-media">' +
-                '<img src="' + prod.image + '" alt="' + prod.title + '" class="card-img" loading="lazy">' +
-                '<button class="wishlist-btn" aria-label="Add to wishlist" type="button">' +
-                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
-                '</button>' +
-              '</div>' +
-              '<div class="card-body">' +
-                '<a href="product.html?id=' + encodeURIComponent(prod.id) + '" class="product-title">' + prod.title + '</a>' +
-                '<div class="price-row">' +
-                  '<span class="current-price">' + formatNaira(prod.price) + '</span>' +
-                  '<span class="original-price">' + formatNaira(prod.originalPrice) + '</span>' +
-                  '<span class="discount-text">' + prod.discount + '</span>' +
-                '</div>' +
-                '<div class="rating-row">' +
-                  '<div class="stars-row">' +
-                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
-                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
-                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
-                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
-                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+        // Render Products Grid
+        var prodGrid = document.getElementById('categoryProductsGrid');
+        if (prodGrid) {
+          prodGrid.innerHTML = '';
+          if (sampleProducts.length === 0) {
+            if (searchQuery) {
+              var safeQ = (searchQuery || 'your search').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+              prodGrid.innerHTML = 
+                '<div class="search-empty-state-card">' +
+                  '<div class="search-empty-icon-wrap">' +
+                    '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                      '<circle cx="11" cy="11" r="8"></circle>' +
+                      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+                      '<line x1="8" y1="11" x2="14" y2="11"></line>' +
+                    '</svg>' +
                   '</div>' +
-                  '<span class="rating-count">(' + formatNumberWithCommas(prod.reviews || 100) + ')</span>' +
+                  '<h2 class="search-empty-title">No verified products found for &ldquo;' + safeQ + '&rdquo;</h2>' +
+                  '<p class="search-empty-desc">' +
+                    'We could not find any products matching your search term. At RALPHMART, we never guess, hallucinate, or show unrelated items. Only genuine, verified products are listed.' +
+                  '</p>' +
+                  '<div class="search-empty-tips">' +
+                    '<div class="search-empty-tips-title">Helpful search suggestions:</div>' +
+                    '<ul>' +
+                      '<li>Check your spelling for any typos or missing letters.</li>' +
+                      '<li>Use simpler or broader words.</li>' +
+                      '<li>Try searching by brand name or department.</li>' +
+                    '</ul>' +
+                  '</div>' +
+                  '<div class="search-empty-departments">' +
+                    '<div class="search-empty-departments-title">Browse popular verified departments:</div>' +
+                    '<div class="search-empty-chips-wrap">' +
+                      '<a href="category.html?cat=phones" class="search-category-chip">Phones &amp; Tablets</a>' +
+                      '<a href="category.html?cat=appliances" class="search-category-chip">Appliances</a>' +
+                      '<a href="category.html?cat=electronics" class="search-category-chip">Electronics</a>' +
+                      '<a href="category.html?cat=vehicles" class="search-category-chip">Vehicles</a>' +
+                      '<a href="category.html?cat=property" class="search-category-chip">Real Estate &amp; Properties</a>' +
+                      '<a href="category.html?cat=fashion" class="search-category-chip">Fashion</a>' +
+                      '<a href="category.html?cat=supermarket" class="search-category-chip">Groceries &amp; Supermarket</a>' +
+                      '<a href="category.html?cat=computing" class="search-category-chip">Computing</a>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div style="display: flex; gap: 12px; justify-content: center; align-items: center;">' +
+                    '<a href="category.html" class="search-empty-btn">Browse All Products</a>' +
+                  '</div>' +
+                '</div>';
+            } else {
+              var departmentName = catData ? catData.name : 'this category';
+              prodGrid.innerHTML = 
+                '<div class="search-empty-state-card" style="padding: 48px 24px;">' +
+                  '<div class="search-empty-icon-wrap">' +
+                    '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                      '<circle cx="11" cy="11" r="8"></circle>' +
+                      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+                    '</svg>' +
+                  '</div>' +
+                  '<h2 class="search-empty-title">No products in ' + departmentName + ' yet</h2>' +
+                  '<p class="search-empty-desc">' +
+                    'We are actively updating and stocking verified inventory for this department daily. Check back shortly or browse our other verified categories.' +
+                  '</p>' +
+                  '<div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 20px;">' +
+                    '<a href="index.html" class="search-empty-btn">Return to Storefront</a>' +
+                    '<a href="category.html" class="search-empty-btn" style="background: #f1f5f9; color: #0f172a;">Browse Other Departments</a>' +
+                  '</div>' +
+                '</div>';
+            }
+          } else {
+            sampleProducts.forEach(function(prod) {
+              var art = document.createElement('article');
+              art.className = 'product-card';
+              art.setAttribute('data-id', prod.id);
+              art.setAttribute('data-title', prod.title);
+              art.setAttribute('data-price', prod.price);
+              art.setAttribute('data-original', prod.originalPrice);
+              art.setAttribute('data-image', prod.image);
+              art.setAttribute('data-brand', prod.brand || 'Verified');
+              art.setAttribute('data-rating', prod.rating || 4.8);
+
+              art.innerHTML = 
+                '<div class="card-media">' +
+                  '<img src="' + prod.image + '" alt="' + prod.title + '" class="card-img" loading="lazy">' +
+                  '<button class="wishlist-btn" aria-label="Add to wishlist" type="button">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
+                  '</button>' +
                 '</div>' +
-                '<div class="card-action-wrap">' +
-                  '<button class="card-action-btn" type="button">Add to cart</button>' +
-                '</div>' +
-              '</div>';
-            prodGrid.appendChild(art);
-          });
+                '<div class="card-body">' +
+                  '<a href="product.html?id=' + encodeURIComponent(prod.id) + '" class="product-title">' + prod.title + '</a>' +
+                  '<div class="price-row">' +
+                    '<span class="current-price">' + formatNaira(prod.price) + '</span>' +
+                    (prod.originalPrice > prod.price ? '<span class="original-price">' + formatNaira(prod.originalPrice) + '</span>' : '') +
+                    (prod.discount ? '<span class="discount-text">' + prod.discount + '</span>' : '') +
+                  '</div>' +
+                  '<div class="rating-row">' +
+                    '<div class="stars-row">' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                      '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                    '</div>' +
+                    '<span class="rating-count">(' + formatNumberWithCommas(prod.reviews || 100) + ')</span>' +
+                  '</div>' +
+                  '<div class="card-action-wrap">' +
+                    '<button class="card-action-btn" type="button">Add to cart</button>' +
+                  '</div>' +
+                '</div>';
+              prodGrid.appendChild(art);
+            });
+          }
+          if (typeof syncProductCardsUI === 'function') {
+            syncProductCardsUI();
+          }
+          if (typeof syncAllProductCardsRating === 'function') {
+            syncAllProductCardsRating();
+          }
         }
-        if (typeof syncProductCardsUI === 'function') {
-          syncProductCardsUI();
-        }
-        if (typeof syncAllProductCardsRating === 'function') {
-          syncAllProductCardsRating();
-        }
+      }
+
+      renderCategoryPageProducts();
+
+      // Listen for cloud catalog sync
+      window.addEventListener('ralphmart_catalog_loaded', function() {
+        renderCategoryPageProducts();
+      });
+
+      if (typeof window.loadRalphmartCatalogFromCloud === 'function') {
+        window.loadRalphmartCatalogFromCloud();
       }
 
       function generateCategoryProducts(catKey, subKey, cData) {

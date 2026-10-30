@@ -1117,7 +1117,7 @@
 
   <!-- PDP Application Logic -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       // Body Scroll Lock for Modals & Drawers
       var modalScrollY = 0;
       function lockBodyScroll() {
@@ -1548,9 +1548,47 @@
         }
       }
 
-      // Fallback if id was not found
-      if (!activeProduct && typeof CATALOG_PRODUCTS !== 'undefined' && CATALOG_PRODUCTS.length > 0) {
-        activeProduct = CATALOG_PRODUCTS[0];
+      // Fallback: Query Supabase directly if activeProduct is not yet cached locally
+      if (!activeProduct && currentId) {
+        try {
+          var client = (typeof getSupabase === 'function') ? getSupabase() : (window.supabaseClient || null);
+          if (!client && typeof supabase !== 'undefined' && window.SUPABASE_CONFIG) {
+            client = supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+          }
+          if (client) {
+            var supaRes = await client.from('products').select('*').eq('id', currentId).maybeSingle();
+            if (supaRes && supaRes.data) {
+              var p = supaRes.data;
+              var taxCat = (window.RALPHMART_TAXONOMY || {})[p.category_id || p.category] || {};
+              var pPrice = Number(p.price) || 0;
+              var pOld = Number(p.old_price || p.oldPrice) || (pPrice > 0 ? Math.round(pPrice * 1.15) : 0);
+              var pDisc = p.discount ? (String(p.discount).startsWith('-') ? String(p.discount) : '-' + p.discount + '%') : (pOld > pPrice ? '-' + Math.round((pOld - pPrice) / pOld * 100) + '%' : '');
+              var pImgs = (Array.isArray(p.images) && p.images.length > 0) ? p.images.filter(Boolean) : (p.image ? [p.image] : ['images/subcategories/sub_smartphones.jpg']);
+
+              activeProduct = {
+                id: p.id,
+                title: p.title,
+                brand: p.brand || 'Verified',
+                categoryKey: p.category_id || p.category,
+                categoryName: taxCat.name || p.category_id || p.category,
+                subcategoryKey: p.subcategory_id || p.subcategory || '',
+                price: pPrice,
+                originalPrice: pOld,
+                discount: pDisc,
+                image: pImgs[0],
+                images: pImgs,
+                rating: Number(p.rating) || 4.8,
+                reviewCount: Number(p.reviews_count || p.reviewsCount) || 120,
+                description: p.description || '',
+                overview_sections: p.overview_sections,
+                specs: p.specs,
+                features: p.features
+              };
+            }
+          }
+        } catch (supaErr) {
+          console.warn('Supabase product direct fetch note:', supaErr);
+        }
       }
 
       // Track recently viewed and render shelf

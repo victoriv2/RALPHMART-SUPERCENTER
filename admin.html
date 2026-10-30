@@ -2961,6 +2961,9 @@
 
     function saveProductsLocal() {
       localStorage.setItem('nkemmart_admin_products', JSON.stringify(adminProducts));
+      try {
+        window.dispatchEvent(new CustomEvent('ralphmart_catalog_loaded', { detail: adminProducts }));
+      } catch (e) {}
     }
 
     function updateStats() {
@@ -3766,7 +3769,7 @@
       renderOverviewProductsTable();
       closeAdminModal('productModal');
 
-      // Sync to Supabase in background
+      // Sync to Supabase
       const client = getSupabase();
       if (client) {
         const itemToSave = currentEditingId ? adminProducts.find(p => p.id === currentEditingId) : adminProducts[0];
@@ -3789,7 +3792,11 @@
           specs: itemToSave.specs || null,
           verified: true
         }).then(({ error }) => {
-          if (error) console.warn('Supabase upsert note:', error.message);
+          if (error) {
+            console.warn('Supabase upsert note:', error.message);
+          } else {
+            console.log('Product registered in Supabase cloud successfully:', itemToSave.id);
+          }
         });
       }
     }
