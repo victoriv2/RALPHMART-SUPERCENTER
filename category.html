@@ -231,6 +231,8 @@
       <div class="cat-page-breadcrumbs">
         <a href="index.html">Home</a>
         <span class="breadcrumb-sep">/</span>
+        <a href="categories.html">All Categories</a>
+        <span class="breadcrumb-sep">/</span>
         <a href="#" id="breadcrumbCatLink"><span id="breadcrumbCatName">Category</span></a>
         <span id="breadcrumbSubSeparator" class="breadcrumb-sep" style="display: none;">/</span>
         <span id="breadcrumbSubName" class="breadcrumb-current" style="color: #38bdf8; display: none;"></span>
@@ -1036,7 +1038,14 @@
       var urlParams = new URLSearchParams(window.location.search);
       var rawCat = urlParams.get('cat');
       var searchQuery = (urlParams.get('q') || '').trim();
-      var currentCatKey = rawCat || (searchQuery ? '' : 'vehicles');
+
+      // If no category and no search query specified, redirect to All Categories directory
+      if (!rawCat && !searchQuery) {
+        window.location.replace('categories.html');
+        return;
+      }
+
+      var currentCatKey = rawCat || '';
       var currentSubKey = urlParams.get('sub') || '';
 
       if (currentCatKey && !tax[currentCatKey]) {
@@ -1219,7 +1228,7 @@
                     '</div>' +
                   '</div>' +
                   '<div style="display: flex; gap: 12px; justify-content: center; align-items: center;">' +
-                    '<a href="category.html" class="search-empty-btn">Browse All Products</a>' +
+                    '<a href="categories.html" class="search-empty-btn">All Categories Directory</a>' +
                   '</div>' +
                 '</div>';
             } else {
@@ -1238,7 +1247,7 @@
                   '</p>' +
                   '<div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 20px;">' +
                     '<a href="index.html" class="search-empty-btn">Return to Storefront</a>' +
-                    '<a href="category.html" class="search-empty-btn" style="background: #f1f5f9; color: #0f172a;">Browse Other Departments</a>' +
+                    '<a href="categories.html" class="search-empty-btn" style="background: #f1f5f9; color: #0f172a;">All Categories Directory</a>' +
                   '</div>' +
                 '</div>';
             }
