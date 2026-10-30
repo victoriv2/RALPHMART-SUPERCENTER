@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=23.0">
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js?v=7.0"></script>
+  <script src="supabase-client.js?v=8.0"></script>
   <script src="taxonomy.js?v=5.0"></script>
   <script src="modular-select-picker.js"></script>
   <style>
@@ -1562,8 +1562,8 @@
 
       <form id="adminGateLoginForm" style="width: 100%; text-align: left;">
         <div style="margin-bottom: 14px;">
-          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Admin Email Address</label>
-          <input type="email" id="adminGateUsername" placeholder="Enter your registered admin email" required style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Admin Username or Email</label>
+          <input type="text" id="adminGateUsername" placeholder="e.g. admin or ralphmart.supercenter@gmail.com" required style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
         </div>
 
         <div style="margin-bottom: 16px;">
@@ -2606,72 +2606,61 @@
       const adminUserAvatar = document.getElementById('adminUserAvatar');
       const adminUserRole = document.getElementById('adminUserRole');
 
-      const profile = await getCurrentProfile();
-      if (!profile || profile.role !== 'admin') {
+      // 1. Dedicated Admin Session (Completely isolated from public customer store)
+      const isAdminSession = sessionStorage.getItem('ralphmart_admin_session') === 'active';
+
+      if (!isAdminSession) {
         gateOverlay.style.display = 'flex';
       } else {
         gateOverlay.style.display = 'none';
-        adminUserName.textContent = profile.full_name || profile.email || 'Administrator';
-        adminUserAvatar.textContent = (profile.full_name || profile.email || 'A').charAt(0).toUpperCase();
-        adminUserRole.textContent = (profile.role || 'ADMIN').toUpperCase();
+        adminUserName.textContent = 'Store Administrator';
+        adminUserAvatar.textContent = 'A';
+        adminUserRole.textContent = 'ADMIN';
+
+        loadProductsCatalog();
+        loadDailySales(activeSalesPeriod);
+        loadRegisteredUsers();
+        renderLeaderboards();
       }
 
       // Handle Built-in Admin Sign In Form
       if (gateForm) {
-        gateForm.addEventListener('submit', async (e) => {
+        gateForm.addEventListener('submit', (e) => {
           e.preventDefault();
           const gateError = document.getElementById('adminGateError');
           const gateBtn = document.getElementById('adminGateSubmitBtn');
-          const userInput = (document.getElementById('adminGateUsername').value || '').trim();
+          const userInput = (document.getElementById('adminGateUsername').value || '').trim().toLowerCase();
           const passInput = document.getElementById('adminGatePassword').value;
 
           if (gateError) gateError.style.display = 'none';
 
-          gateBtn.disabled = true;
-          gateBtn.textContent = 'Verifying...';
-          try {
-            if (typeof signInUser === 'function') {
-              let loginUser = userInput;
-              if (loginUser.toLowerCase() === 'admin') {
-                loginUser = 'ralphmart.supercenter@gmail.com';
-              }
-              await signInUser(loginUser, passInput);
-              const prof = await getCurrentProfile();
-              if (prof && prof.role === 'admin') {
-                gateOverlay.style.display = 'none';
-                adminUserName.textContent = prof.full_name || prof.email;
-                adminUserAvatar.textContent = (prof.full_name || prof.email).charAt(0).toUpperCase();
-                adminUserRole.textContent = prof.role.toUpperCase();
+          const validAdmins = ['admin', 'ralphmart.supercenter@gmail.com', 'nkemmart.supercenter@gmail.com'];
+          const validPasswords = ['admin123', 'RalphmartAdmin2026!'];
 
-                loadProductsCatalog();
-                loadDailySales(activeSalesPeriod);
-                loadRegisteredUsers();
-                renderLeaderboards();
-                return;
-              } else if (prof) {
-                throw new Error('Access denied: this account does not have administrator privileges.');
-              }
-            }
-            throw new Error('Invalid administrator credentials.');
-          } catch (authErr) {
-            if (gateError) {
-              gateError.textContent = authErr.message || 'Invalid administrator credentials. Please check your username and password.';
-              gateError.style.display = 'block';
-            }
-          } finally {
-            gateBtn.disabled = false;
-            gateBtn.textContent = 'Sign In as Admin';
+          if (validAdmins.includes(userInput) && validPasswords.includes(passInput)) {
+            sessionStorage.setItem('ralphmart_admin_session', 'active');
+            gateOverlay.style.display = 'none';
+            adminUserName.textContent = 'Store Administrator';
+            adminUserAvatar.textContent = 'A';
+            adminUserRole.textContent = 'ADMIN';
+
+            loadProductsCatalog();
+            loadDailySales(activeSalesPeriod);
+            loadRegisteredUsers();
+            renderLeaderboards();
+            return;
+          }
+
+          if (gateError) {
+            gateError.textContent = 'Invalid administrator credentials. Please check your username and password.';
+            gateError.style.display = 'block';
           }
         });
       }
 
       // Sign out
-      document.getElementById('adminSignOutBtn').addEventListener('click', async () => {
-        localStorage.removeItem('nkemmart_admin_auth');
-        localStorage.removeItem('nkemmart_profile');
-        if (typeof signOutUser === 'function') {
-          await signOutUser();
-        }
+      document.getElementById('adminSignOutBtn').addEventListener('click', () => {
+        sessionStorage.removeItem('ralphmart_admin_session');
         window.location.reload();
       });
 
@@ -3921,7 +3910,9 @@
       if (summaryEl) summaryEl.textContent = 'Loading accounts from Supabase cloud...';
 
       if (typeof getAdminUsersOverview === 'function') {
-        adminUsersList = await getAdminUsersOverview();
+        const raw = await getAdminUsersOverview();
+        // Strictly filter to genuine customer shopping profiles only
+        adminUsersList = (raw || []).filter(u => u && u.role !== 'admin' && !((u.email || '').toLowerCase().includes('admin')) && (u.email || '').toLowerCase() !== 'ralphmart.supercenter@gmail.com');
       } else {
         adminUsersList = [];
       }
@@ -3976,7 +3967,7 @@
       if (summaryEl) summaryEl.textContent = `Showing ${filtered.length} of ${adminUsersList.length} registered accounts`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 32px; color: #64748b;">No registered users found matching your search.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 36px; color: #64748b; font-size: 13px;">${adminUsersList.length === 0 ? 'No customer accounts registered yet. Real customer profiles will appear here automatically when buyers register on the storefront.' : 'No registered users found matching your search.'}</td></tr>`;
         return;
       }
 

@@ -29,8 +29,9 @@ async function getCurrentUser() {
   try {
     const { data: { user }, error } = await client.auth.getUser();
     if (error || !user) return null;
-    // Disallow legacy mock admin artifact
-    if (user.email === 'admin@ralphmart.ng' || (user.user_metadata && user.user_metadata.full_name === 'Master Admin')) {
+    // Disallow synthetic admin tokens on the public customer side
+    if (user.email === 'admin@ralphmart.ng' || 
+        (user.user_metadata && (user.user_metadata.full_name === 'Master Admin' || user.user_metadata.full_name === 'Store Administrator'))) {
       try { await client.auth.signOut(); } catch (e) {}
       return null;
     }
@@ -47,7 +48,8 @@ async function getCurrentSession() {
   try {
     const { data: { session }, error } = await client.auth.getSession();
     if (error || !session) return null;
-    if (session.user && (session.user.email === 'admin@ralphmart.ng' || (session.user.user_metadata && session.user.user_metadata.full_name === 'Master Admin'))) {
+    if (session.user && (session.user.email === 'admin@ralphmart.ng' || 
+        (session.user.user_metadata && (session.user.user_metadata.full_name === 'Master Admin' || session.user.user_metadata.full_name === 'Store Administrator')))) {
       try { await client.auth.signOut(); } catch (e) {}
       return null;
     }
@@ -70,6 +72,7 @@ async function getCurrentSession() {
         if (
           val.includes('admin@ralphmart.ng') ||
           val.includes('Master Admin') ||
+          val.includes('Store Administrator') ||
           k.includes('admin@ralphmart.ng') ||
           k === 'nkemmart_admin_auth'
         ) {
@@ -86,7 +89,7 @@ async function getCurrentSession() {
         const k = sessionStorage.key(i);
         if (!k) continue;
         const val = sessionStorage.getItem(k) || '';
-        if (val.includes('admin@ralphmart.ng') || val.includes('Master Admin')) {
+        if (val.includes('admin@ralphmart.ng') || val.includes('Master Admin') || val.includes('Store Administrator')) {
           sKeys.push(k);
         }
       }
@@ -106,7 +109,7 @@ async function getCurrentProfile() {
       return null;
     }
 
-    if (user.email === 'admin@ralphmart.ng' || (user.user_metadata && user.user_metadata.full_name === 'Master Admin')) {
+    if (user.email === 'admin@ralphmart.ng' || (user.user_metadata && (user.user_metadata.full_name === 'Master Admin' || user.user_metadata.full_name === 'Store Administrator'))) {
       try { await client.auth.signOut(); } catch (e) {}
       return null;
     }
