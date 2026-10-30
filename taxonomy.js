@@ -1,4 +1,4 @@
-﻿if (!String.prototype.trim) {
+if (!String.prototype.trim) {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, '');
   };
@@ -46,7 +46,7 @@ window.RALPHMART_TAXONOMY = window.NKEMMART_TAXONOMY = {
   property: {
     id: "property",
     name: "Real Estate & Properties",
-    icon: "images/categories/cat_property.jpg?v=3",
+    icon: "images/categories/cat_property.jpg?v=4",
     count: "248 190",
     subcategories: [
       { id: "houses-apartments-rent", name: "Houses & Apartments for Rent", count: "98 420", icon: "images/subcategories/home_furniture.jpg?v=3", keywords: ["rent", "flat", "apartment", "duplex", "self contain", "mini flat", "2 bedroom", "3 bedroom", "house for rent", "lekki", "ikeja", "abuja"] },
