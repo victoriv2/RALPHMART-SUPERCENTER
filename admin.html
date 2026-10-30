@@ -3811,7 +3811,7 @@
     };
 
     window.wipeAllStoreData = function() {
-      if (!confirm('Are you sure you want to wipe all local store data (catalog, orders, cart, saved items, reviews cache, and session) to start completely blank?')) {
+      if (!confirm('Are you sure you want to wipe all local store data (catalog, orders, cart, saved items, reviews cache, and user activities) to start completely blank?')) {
         return;
       }
       localStorage.removeItem('nkemmart_admin_products');
@@ -3822,11 +3822,14 @@
       localStorage.removeItem('nkemmart_users');
       localStorage.removeItem('nkemmart_profile');
       localStorage.removeItem('nkemmart_admin_auth');
+      localStorage.removeItem('nkemmart_user_activities');
+      localStorage.removeItem('nkemmart_recent_searches');
+      localStorage.removeItem('nkemmart_recently_viewed');
       adminProducts = [];
       adminOrdersList = [];
       adminUsersList = [];
       loadProductsCatalog();
-      alert('Store data has been wiped clean. Reloading page...');
+      alert('All local store data has been wiped clean. The store is completely blank and ready for fresh input.');
       window.location.reload();
     };
 
