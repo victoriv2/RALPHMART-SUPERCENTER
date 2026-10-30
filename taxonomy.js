@@ -46,11 +46,11 @@ window.RALPHMART_TAXONOMY = window.NKEMMART_TAXONOMY = {
   property: {
     id: "property",
     name: "Real Estate & Properties",
-    icon: "images/categories/cat_property.jpg?v=4",
+    icon: "images/categories/cat_property.jpg?v=5",
     count: "248 190",
     subcategories: [
-      { id: "houses-apartments-rent", name: "Houses & Apartments for Rent", count: "98 420", icon: "images/subcategories/home_furniture.jpg?v=3", keywords: ["rent", "flat", "apartment", "duplex", "self contain", "mini flat", "2 bedroom", "3 bedroom", "house for rent", "lekki", "ikeja", "abuja"] },
-      { id: "houses-apartments-sale", name: "Houses & Apartments for Sale", count: "74 150", icon: "images/subcategories/home_decor.jpg?v=3", keywords: ["sale", "buy house", "duplex for sale", "mansion", "terrace", "bungalow", "detached duplex", "semi detached"] },
+      { id: "houses-apartments-rent", name: "Houses & Apartments for Rent", count: "98 420", icon: "images/subcategories/property_rent.jpg?v=5", keywords: ["rent", "flat", "apartment", "duplex", "self contain", "mini flat", "2 bedroom", "3 bedroom", "house for rent", "lekki", "ikeja", "abuja"] },
+      { id: "houses-apartments-sale", name: "Houses & Apartments for Sale", count: "74 150", icon: "images/subcategories/property_sale.jpg?v=5", keywords: ["sale", "buy house", "duplex for sale", "mansion", "terrace", "bungalow", "detached duplex", "semi detached"] },
       { id: "land-plots-sale", name: "Land & Plots for Sale", count: "48 900", icon: "images/subcategories/other_services.jpg?v=3", keywords: ["land", "plot", "dry land", "commercial land", "farmland", "estate land", "ibeju lekki", "epe", "hectares", "acres"] },
       { id: "commercial-property", name: "Commercial Property", count: "16 340", icon: "images/subcategories/home_office_furniture.jpg?v=3", keywords: ["commercial", "office space", "shop", "warehouse", "plaza", "showroom", "office for rent"] },
       { id: "short-let-apartments", name: "Short Let & Serviced Apartments", count: "10 380", icon: "images/subcategories/home_kitchen_dining.jpg?v=3", keywords: ["short let", "serviced apartment", "daily stay", "vacation rental", "airbnb", "luxury shortlet"] }
