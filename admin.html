@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1355,6 +1355,110 @@
       border-color: #512175;
     }
 
+    /* Restructured Sales Center Controls */
+    .sales-control-panel {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sales-period-chips-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sales-custom-date-strip {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .sales-picker-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .sales-picker-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+    }
+    .sales-input-control {
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #0f172a;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .sales-input-control:focus {
+      border-color: #512175;
+      box-shadow: 0 0 0 2px rgba(81, 33, 117, 0.1);
+    }
+    .sales-filter-sort-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+      border-top: 1px dashed #e2e8f0;
+    }
+    .sales-scope-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #faf5ff;
+      border: 1px solid #d8b4fe;
+      color: #512175;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sortable-ledger-th {
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .sortable-ledger-th:hover {
+      background: #e2e8f0;
+    }
+    .sortable-ledger-th svg {
+      margin-left: 4px;
+      vertical-align: middle;
+      display: inline-block;
+    }
+    .sales-summary-footer td {
+      background: #f8fafc;
+      font-weight: 800;
+      border-top: 2px solid #cbd5e1;
+      color: #0f172a;
+      padding: 12px 14px;
+    }
+    .ledger-row-clickable {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .ledger-row-clickable:hover {
+      background: #faf5ff !important;
+    }
+
     /* Leaderboard Grid */
     .admin-leaderboard-grid {
       display: grid;
@@ -1832,20 +1936,137 @@
         </section>
       </div>
 
-      <!-- ================= TAB: DAILY SALES ================= -->
+      <!-- ================= TAB: DAILY SALES & REVENUE ================= -->
       <div class="admin-tab-pane" id="tab-sales">
-        <!-- Date Filter Bar -->
-        <div class="date-filter-bar">
-          <span style="font-size: 12.5px; font-weight: 700; color: #091e3a; margin-right: 6px;">Filter Sales Period:</span>
-          <button type="button" class="date-chip-btn active" data-period="today">Today</button>
-          <button type="button" class="date-chip-btn" data-period="yesterday">Yesterday</button>
-          <button type="button" class="date-chip-btn" data-period="week">Last 7 Days</button>
-          <button type="button" class="date-chip-btn" data-period="month">This Month</button>
-          <button type="button" class="date-chip-btn" data-period="all">All Time</button>
-          <button type="button" class="admin-btn btn-secondary" id="salesRefreshBtn" style="margin-left: auto; padding: 5px 12px; font-size: 12px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            <span>Refresh Ledger</span>
-          </button>
+        <!-- Main Sales Controls Panel -->
+        <div class="sales-control-panel">
+          
+          <!-- Row 1: Period Presets & Quick Mode Chips -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div class="sales-period-chips-row">
+              <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">Time Period:</span>
+              <button type="button" class="date-chip-btn active" data-period="today">Today</button>
+              <button type="button" class="date-chip-btn" data-period="yesterday">Yesterday</button>
+              <button type="button" class="date-chip-btn" data-period="week">Last 7 Days</button>
+              <button type="button" class="date-chip-btn" data-period="month">This Month</button>
+              <button type="button" class="date-chip-btn" data-period="year">This Year</button>
+              <button type="button" class="date-chip-btn" data-period="all">All Time</button>
+              <button type="button" class="date-chip-btn" data-period="day">Choose Day</button>
+              <button type="button" class="date-chip-btn" data-period="month_year">Choose Month</button>
+              <button type="button" class="date-chip-btn" data-period="range">Custom Range</button>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="admin-btn btn-secondary" id="salesExportBtn" style="padding: 6px 12px; font-size: 12px;" title="Export sales transactions to CSV">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Export CSV</span>
+              </button>
+              <button type="button" class="admin-btn btn-secondary" id="salesRefreshBtn" style="padding: 6px 12px; font-size: 12px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Refresh Ledger</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: Interactive Day, Month, Year & Date Range Selectors -->
+          <div class="sales-custom-date-strip" id="salesDateCustomStrip">
+            <!-- Day Picker -->
+            <div class="sales-picker-group" id="salesGroupDay">
+              <label for="salesDayInput" class="sales-picker-label">Choose Exact Day:</label>
+              <input type="date" id="salesDayInput" class="sales-input-control">
+              <button type="button" class="admin-btn btn-secondary" id="salesApplyDayBtn" style="padding: 5px 10px; font-size: 11.5px;">View Day</button>
+            </div>
+
+            <!-- Month & Year Selector -->
+            <div class="sales-picker-group" id="salesGroupMonth" style="display: flex;">
+              <label for="salesMonthSelect" class="sales-picker-label">Choose Month &amp; Year:</label>
+              <select id="salesMonthSelect" class="sales-input-control">
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+              <select id="salesYearSelect" class="sales-input-control">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+              <button type="button" class="admin-btn btn-secondary" id="salesApplyMonthBtn" style="padding: 5px 10px; font-size: 11.5px;">View Month</button>
+            </div>
+
+            <!-- Custom Date Range -->
+            <div class="sales-picker-group" id="salesGroupRange" style="display: flex;">
+              <label for="salesRangeStart" class="sales-picker-label">From:</label>
+              <input type="date" id="salesRangeStart" class="sales-input-control">
+              <label for="salesRangeEnd" class="sales-picker-label">To:</label>
+              <input type="date" id="salesRangeEnd" class="sales-input-control">
+              <button type="button" class="admin-btn btn-secondary" id="salesApplyRangeBtn" style="padding: 5px 10px; font-size: 11.5px;">Apply Range</button>
+            </div>
+          </div>
+
+          <!-- Row 3: Filter & Sort Bar (Status, Payment, Sort by, Live Search) -->
+          <div class="sales-filter-sort-toolbar">
+            <div class="sales-scope-badge" id="salesActiveScopeBadge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span id="salesScopeText">Scope: Today</span>
+            </div>
+
+            <!-- Live Search -->
+            <div style="flex: 1; min-width: 200px;">
+              <input type="text" id="salesSearchInput" class="sales-input-control" style="width: 100%;" placeholder="Search orders by customer, Order ID, phone, destination...">
+            </div>
+
+            <!-- Status Filter -->
+            <div class="sales-picker-group">
+              <span class="sales-picker-label">Status:</span>
+              <select id="salesStatusFilter" class="sales-input-control">
+                <option value="all">All Statuses</option>
+                <option value="delivered">Delivered</option>
+                <option value="in_transit">In Transit</option>
+                <option value="processing">Processing</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <!-- Payment Filter -->
+            <div class="sales-picker-group">
+              <span class="sales-picker-label">Payment:</span>
+              <select id="salesPaymentFilter" class="sales-input-control">
+                <option value="all">All Payments</option>
+                <option value="card">Card / Paystack</option>
+                <option value="transfer">Bank Transfer</option>
+                <option value="delivery">Cash on Delivery</option>
+                <option value="pos">POS on Delivery</option>
+              </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="sales-picker-group">
+              <span class="sales-picker-label">Sort:</span>
+              <select id="salesSortBy" class="sales-input-control">
+                <option value="date_desc">Date (Newest First)</option>
+                <option value="date_asc">Date (Oldest First)</option>
+                <option value="rev_desc">Revenue (Highest First)</option>
+                <option value="rev_asc">Revenue (Lowest First)</option>
+                <option value="orders_desc">Orders Count (High to Low)</option>
+                <option value="units_desc">Units Sold (High to Low)</option>
+              </select>
+            </div>
+
+            <button type="button" class="admin-btn btn-secondary" id="salesResetFiltersBtn" style="padding: 6px 12px; font-size: 12px;" title="Reset all filters">
+              Reset Filters
+            </button>
+          </div>
+
         </div>
 
         <!-- Sales KPI Strip -->
@@ -1853,12 +2074,12 @@
           <div class="sales-kpi-card">
             <div class="sales-kpi-title">Gross Revenue</div>
             <div class="sales-kpi-val" id="salesKpiRevenue">&#8358;0</div>
-            <div class="sales-kpi-sub" id="salesKpiRevenueSub">Across selected dates</div>
+            <div class="sales-kpi-sub" id="salesKpiRevenueSub">Across selected period</div>
           </div>
           <div class="sales-kpi-card">
             <div class="sales-kpi-title">Total Orders Count</div>
             <div class="sales-kpi-val" id="salesKpiOrders">0</div>
-            <div class="sales-kpi-sub" style="color: #6366f1;">Verified checkouts</div>
+            <div class="sales-kpi-sub" id="salesKpiOrdersSub" style="color: #6366f1;">Verified checkouts</div>
           </div>
           <div class="sales-kpi-card">
             <div class="sales-kpi-title">Units / Items Sold</div>
@@ -1874,34 +2095,43 @@
 
         <!-- Daily Ledger Table -->
         <section class="admin-table-card" style="margin-bottom: 22px;">
-          <div class="admin-table-header">
-            <h2 class="admin-table-title">Daily Sales Breakdown Ledger</h2>
-            <span style="font-size: 12px; color: var(--admin-text-muted);">Aggregated sales, orders, and receipts by date</span>
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 class="admin-table-title">Daily Sales Breakdown Ledger</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);" id="salesLedgerSummaryText">Aggregated daily totals across selected period</span>
+            </div>
+            <span style="font-size: 12px; font-weight: 700; color: #512175;" id="salesLedgerDaysCount">0 active days</span>
           </div>
           <div class="admin-table-responsive">
-            <table class="admin-table">
+            <table class="admin-table" id="salesLedgerTable">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Orders Count</th>
-                  <th>Items Sold</th>
-                  <th>Gross Revenue (&#8358;)</th>
-                  <th>Average Basket</th>
+                  <th class="sortable-ledger-th" data-sort="date">Date</th>
+                  <th class="sortable-ledger-th" data-sort="orders">Orders Count</th>
+                  <th class="sortable-ledger-th" data-sort="units">Items Sold</th>
+                  <th class="sortable-ledger-th" data-sort="revenue">Gross Revenue (&#8358;)</th>
+                  <th class="sortable-ledger-th" data-sort="avg">Average Basket</th>
                   <th>Settlement Status</th>
                 </tr>
               </thead>
               <tbody id="salesLedgerTbody">
                 <!-- Dynamically populated -->
               </tbody>
+              <tfoot id="salesLedgerTfoot">
+                <!-- Summary totals -->
+              </tfoot>
             </table>
           </div>
         </section>
 
         <!-- Orders & Transactions Log Under Selected Period -->
         <section class="admin-table-card">
-          <div class="admin-table-header">
-            <h2 class="admin-table-title">Order Transactions Under Filtered Period</h2>
-            <span style="font-size: 12px; color: var(--admin-text-muted);" id="salesOrdersCountSummary">Showing transactions</span>
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 class="admin-table-title">Order Transactions Under Filtered Period</h2>
+              <span style="font-size: 12px; color: var(--admin-text-muted);" id="salesOrdersCountSummary">Showing transactions</span>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: #64748b;" id="salesTransactionsFilterNotice"></span>
           </div>
           <div class="admin-table-responsive">
             <table class="admin-table">
@@ -2763,18 +2993,8 @@
       const userSearchEl = document.getElementById('userSearchInput');
       if (userSearchEl) userSearchEl.addEventListener('input', renderRegisteredUsersTable);
 
-      // Date period filters on Daily Sales tab
-      document.querySelectorAll('.date-chip-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.date-chip-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          activeSalesPeriod = btn.getAttribute('data-period') || 'today';
-          loadDailySales(activeSalesPeriod);
-        });
-      });
-
-      const salesRefreshBtn = document.getElementById('salesRefreshBtn');
-      if (salesRefreshBtn) salesRefreshBtn.addEventListener('click', () => loadDailySales(activeSalesPeriod));
+      // Initialize Restructured Sales Center Controls
+      initSalesControls();
 
       const refreshUsersBtn = document.getElementById('refreshUsersBtn');
       if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', loadRegisteredUsers);
@@ -3888,11 +4108,249 @@
     }
 
     // ========================================================
-    // DAILY SALES MODULE
+    // RESTRUCTURED SALES & REVENUE INTELLIGENCE MODULE
     // ========================================================
+    let salesFilterState = {
+      period: 'today', // 'today', 'yesterday', 'week', 'month', 'year', 'all', 'day', 'month_year', 'range'
+      day: '',
+      month: '11',
+      year: '2026',
+      rangeStart: '',
+      rangeEnd: '',
+      status: 'all',
+      payment: 'all',
+      search: '',
+      sortBy: 'date_desc',
+      ledgerSortBy: 'date_desc',
+      ledgerSortAsc: false,
+      selectedLedgerDate: null
+    };
+
+    function initSalesControls() {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const curMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const curYear = String(now.getFullYear());
+
+      salesFilterState.day = todayStr;
+      salesFilterState.month = curMonth;
+      salesFilterState.year = curYear;
+      salesFilterState.rangeStart = new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0];
+      salesFilterState.rangeEnd = todayStr;
+
+      const dayInput = document.getElementById('salesDayInput');
+      if (dayInput) dayInput.value = todayStr;
+
+      const monthSelect = document.getElementById('salesMonthSelect');
+      if (monthSelect) monthSelect.value = curMonth;
+
+      const yearSelect = document.getElementById('salesYearSelect');
+      if (yearSelect) yearSelect.value = curYear;
+
+      const rangeStartInput = document.getElementById('salesRangeStart');
+      if (rangeStartInput) rangeStartInput.value = salesFilterState.rangeStart;
+
+      const rangeEndInput = document.getElementById('salesRangeEnd');
+      if (rangeEndInput) rangeEndInput.value = todayStr;
+
+      // Period preset chips
+      document.querySelectorAll('.date-chip-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.date-chip-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const p = btn.getAttribute('data-period') || 'today';
+          salesFilterState.period = p;
+          activeSalesPeriod = p;
+          salesFilterState.selectedLedgerDate = null;
+          updateSalesPickerVisibility(p);
+          renderDailySalesUI();
+        });
+      });
+
+      // Specific Day button & input
+      const applyDayBtn = document.getElementById('salesApplyDayBtn');
+      if (applyDayBtn) {
+        applyDayBtn.addEventListener('click', () => {
+          const val = (document.getElementById('salesDayInput').value || '').trim();
+          if (!val) { alert('Please select a valid day.'); return; }
+          salesFilterState.period = 'day';
+          salesFilterState.day = val;
+          salesFilterState.selectedLedgerDate = null;
+          setActivePeriodChip('day');
+          renderDailySalesUI();
+        });
+      }
+      if (dayInput) {
+        dayInput.addEventListener('change', () => {
+          if (salesFilterState.period === 'day') {
+            salesFilterState.day = dayInput.value;
+            salesFilterState.selectedLedgerDate = null;
+            renderDailySalesUI();
+          }
+        });
+      }
+
+      // Specific Month & Year button
+      const applyMonthBtn = document.getElementById('salesApplyMonthBtn');
+      if (applyMonthBtn) {
+        applyMonthBtn.addEventListener('click', () => {
+          salesFilterState.period = 'month_year';
+          salesFilterState.month = document.getElementById('salesMonthSelect').value;
+          salesFilterState.year = document.getElementById('salesYearSelect').value;
+          salesFilterState.selectedLedgerDate = null;
+          setActivePeriodChip('month_year');
+          renderDailySalesUI();
+        });
+      }
+
+      // Date Range button
+      const applyRangeBtn = document.getElementById('salesApplyRangeBtn');
+      if (applyRangeBtn) {
+        applyRangeBtn.addEventListener('click', () => {
+          const start = document.getElementById('salesRangeStart').value;
+          const end = document.getElementById('salesRangeEnd').value;
+          if (!start || !end) { alert('Please select both start and end dates.'); return; }
+          if (start > end) { alert('Start date cannot be after end date.'); return; }
+          salesFilterState.period = 'range';
+          salesFilterState.rangeStart = start;
+          salesFilterState.rangeEnd = end;
+          salesFilterState.selectedLedgerDate = null;
+          setActivePeriodChip('range');
+          renderDailySalesUI();
+        });
+      }
+
+      // Search input
+      const searchInput = document.getElementById('salesSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          salesFilterState.search = (searchInput.value || '').trim().toLowerCase();
+          renderDailySalesUI();
+        });
+      }
+
+      // Status filter
+      const statusSelect = document.getElementById('salesStatusFilter');
+      if (statusSelect) {
+        statusSelect.addEventListener('change', () => {
+          salesFilterState.status = statusSelect.value;
+          renderDailySalesUI();
+        });
+      }
+
+      // Payment filter
+      const paySelect = document.getElementById('salesPaymentFilter');
+      if (paySelect) {
+        paySelect.addEventListener('change', () => {
+          salesFilterState.payment = paySelect.value;
+          renderDailySalesUI();
+        });
+      }
+
+      // Sort By select
+      const sortSelect = document.getElementById('salesSortBy');
+      if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+          salesFilterState.sortBy = sortSelect.value;
+          renderDailySalesUI();
+        });
+      }
+
+      // Reset filters button
+      const resetBtn = document.getElementById('salesResetFiltersBtn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          salesFilterState.period = 'today';
+          salesFilterState.search = '';
+          salesFilterState.status = 'all';
+          salesFilterState.payment = 'all';
+          salesFilterState.sortBy = 'date_desc';
+          salesFilterState.selectedLedgerDate = null;
+
+          if (searchInput) searchInput.value = '';
+          if (statusSelect) statusSelect.value = 'all';
+          if (paySelect) paySelect.value = 'all';
+          if (sortSelect) sortSelect.value = 'date_desc';
+
+          setActivePeriodChip('today');
+          updateSalesPickerVisibility('today');
+          renderDailySalesUI();
+        });
+      }
+
+      // Export CSV button
+      const exportBtn = document.getElementById('salesExportBtn');
+      if (exportBtn) {
+        exportBtn.addEventListener('click', exportSalesCsv);
+      }
+
+      // Refresh Ledger button
+      const refreshBtn = document.getElementById('salesRefreshBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+          refreshBtn.disabled = true;
+          const orig = refreshBtn.innerHTML;
+          refreshBtn.innerHTML = '<span>Refreshing...</span>';
+          await loadDailySales(salesFilterState.period);
+          refreshBtn.disabled = false;
+          refreshBtn.innerHTML = orig;
+        });
+      }
+
+      // Sortable ledger table headers
+      document.querySelectorAll('.sortable-ledger-th').forEach(th => {
+        th.addEventListener('click', () => {
+          const col = th.getAttribute('data-sort');
+          if (salesFilterState.ledgerSortBy === col) {
+            salesFilterState.ledgerSortAsc = !salesFilterState.ledgerSortAsc;
+          } else {
+            salesFilterState.ledgerSortBy = col;
+            salesFilterState.ledgerSortAsc = false;
+          }
+          renderDailySalesUI();
+        });
+      });
+
+      updateSalesPickerVisibility('today');
+    }
+
+    function setActivePeriodChip(period) {
+      document.querySelectorAll('.date-chip-btn').forEach(b => {
+        if (b.getAttribute('data-period') === period) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+    }
+
+    function updateSalesPickerVisibility(period) {
+      const gDay = document.getElementById('salesGroupDay');
+      const gMonth = document.getElementById('salesGroupMonth');
+      const gRange = document.getElementById('salesGroupRange');
+      if (!gDay || !gMonth || !gRange) return;
+
+      if (period === 'day') {
+        gDay.style.display = 'inline-flex';
+        gMonth.style.display = 'none';
+        gRange.style.display = 'none';
+      } else if (period === 'month_year') {
+        gDay.style.display = 'none';
+        gMonth.style.display = 'inline-flex';
+        gRange.style.display = 'none';
+      } else if (period === 'range') {
+        gDay.style.display = 'none';
+        gMonth.style.display = 'none';
+        gRange.style.display = 'inline-flex';
+      } else {
+        gDay.style.display = 'inline-flex';
+        gMonth.style.display = 'inline-flex';
+        gRange.style.display = 'inline-flex';
+      }
+    }
+
     async function loadDailySales(period) {
-      if (!period) period = 'today';
-      activeSalesPeriod = period;
+      if (period) salesFilterState.period = period;
 
       if (typeof getAdminOrdersOverview === 'function') {
         adminOrdersList = await getAdminOrdersOverview();
@@ -3900,37 +4358,82 @@
         adminOrdersList = [];
       }
 
-      renderDailySalesUI(period);
+      renderDailySalesUI();
     }
 
-    function renderDailySalesUI(period) {
+    function renderDailySalesUI() {
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
       const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const weekStartStr = new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0];
-      const monthPrefix = todayStr.substring(0, 7); // e.g. "2026-10"
+      const monthPrefix = todayStr.substring(0, 7);
+      const yearPrefix = todayStr.substring(0, 4);
 
-      // Filter orders based on period
-      const filteredOrders = adminOrdersList.filter(o => {
+      const period = salesFilterState.period;
+      let scopeLabel = 'Today';
+
+      // 1. Filter by Time Scope
+      let timeFilteredOrders = adminOrdersList.filter(o => {
         const oDate = (o.created_at || '').split('T')[0];
-        if (period === 'today') return oDate === todayStr;
-        if (period === 'yesterday') return oDate === yesterdayStr;
-        if (period === 'week') return oDate >= weekStartStr;
-        if (period === 'month') return oDate.startsWith(monthPrefix);
-        return true; // 'all'
+        if (period === 'today') {
+          scopeLabel = `Today (${todayStr})`;
+          return oDate === todayStr;
+        }
+        if (period === 'yesterday') {
+          scopeLabel = `Yesterday (${yesterdayStr})`;
+          return oDate === yesterdayStr;
+        }
+        if (period === 'week') {
+          scopeLabel = `Last 7 Days (${weekStartStr} to ${todayStr})`;
+          return oDate >= weekStartStr;
+        }
+        if (period === 'month') {
+          const mName = now.toLocaleString('en-NG', { month: 'long', year: 'numeric' });
+          scopeLabel = `This Month (${mName})`;
+          return oDate.startsWith(monthPrefix);
+        }
+        if (period === 'year') {
+          scopeLabel = `This Year (${yearPrefix})`;
+          return oDate.startsWith(yearPrefix);
+        }
+        if (period === 'day') {
+          const targetDay = salesFilterState.day || todayStr;
+          const dayPretty = new Date(targetDay + 'T00:00:00Z').toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+          scopeLabel = `Day: ${dayPretty}`;
+          return oDate === targetDay;
+        }
+        if (period === 'month_year') {
+          const m = salesFilterState.month || '01';
+          const y = salesFilterState.year || yearPrefix;
+          const monthName = new Date(`${y}-${m}-01T00:00:00Z`).toLocaleString('en-NG', { month: 'long', year: 'numeric' });
+          scopeLabel = `Month: ${monthName}`;
+          return oDate.startsWith(`${y}-${m}`);
+        }
+        if (period === 'range') {
+          const rStart = salesFilterState.rangeStart;
+          const rEnd = salesFilterState.rangeEnd;
+          scopeLabel = `Range: ${rStart || 'Beginning'} to ${rEnd || 'Today'}`;
+          if (rStart && oDate < rStart) return false;
+          if (rEnd && oDate > rEnd) return false;
+          return true;
+        }
+        scopeLabel = 'All Time (Full Store History)';
+        return true;
       });
 
-      // Compute KPIs
+      // Update scope badge text
+      const scopeBadgeText = document.getElementById('salesScopeText');
+      if (scopeBadgeText) scopeBadgeText.textContent = `Scope: ${scopeLabel}`;
+
+      // 2. Compute KPIs for the selected time scope
       let grossRevenue = 0;
       let totalUnits = 0;
-      const ordersCount = filteredOrders.length;
+      const ordersCount = timeFilteredOrders.length;
 
-      filteredOrders.forEach(o => {
+      timeFilteredOrders.forEach(o => {
         grossRevenue += Number(o.total_amount || 0);
         if (Array.isArray(o.items)) {
-          o.items.forEach(it => {
-            totalUnits += Number(it.qty || 1);
-          });
+          o.items.forEach(it => { totalUnits += Number(it.qty || 1); });
         } else {
           totalUnits += 1;
         }
@@ -3938,7 +4441,6 @@
 
       const aov = ordersCount > 0 ? Math.round(grossRevenue / ordersCount) : 0;
 
-      // Update KPI strip
       const revEl = document.getElementById('salesKpiRevenue');
       const ordersEl = document.getElementById('salesKpiOrders');
       const unitsEl = document.getElementById('salesKpiUnits');
@@ -3956,7 +4458,7 @@
       if (unitsEl) unitsEl.textContent = formatNumberWithCommas(totalUnits);
       if (aovEl) aovEl.textContent = formatNaira(aov);
 
-      // Also update overview sales banner
+      // Also update overview banner if viewing today
       const overviewSalesEl = document.getElementById('overviewTodaySales');
       const overviewOrdersEl = document.getElementById('overviewTodayOrders');
       if (overviewSalesEl && period === 'today') {
@@ -3966,9 +4468,9 @@
         overviewOrdersEl.textContent = `${ordersCount} order${ordersCount === 1 ? '' : 's'} placed today across Nigeria`;
       }
 
-      // Group orders by date for the daily ledger table
+      // 3. Build Daily Sales Breakdown Ledger from timeFilteredOrders
       const byDate = {};
-      adminOrdersList.forEach(o => {
+      timeFilteredOrders.forEach(o => {
         const d = (o.created_at || '').split('T')[0] || 'Unknown';
         if (!byDate[d]) {
           byDate[d] = { date: d, orders: 0, units: 0, revenue: 0, status: 'Settled (Bank/Paystack)' };
@@ -3982,22 +4484,42 @@
         }
       });
 
-      const ledgerDates = Object.values(byDate).sort((a, b) => b.date.localeCompare(a.date));
+      let ledgerRows = Object.values(byDate);
+      const lSort = salesFilterState.ledgerSortBy;
+      const lAsc = salesFilterState.ledgerSortAsc;
+
+      ledgerRows.sort((a, b) => {
+        let diff = 0;
+        if (lSort === 'orders') diff = a.orders - b.orders;
+        else if (lSort === 'units') diff = a.units - b.units;
+        else if (lSort === 'revenue') diff = a.revenue - b.revenue;
+        else if (lSort === 'avg') diff = (a.revenue / (a.orders || 1)) - (b.revenue / (b.orders || 1));
+        else diff = a.date.localeCompare(b.date);
+        return lAsc ? diff : -diff;
+      });
+
       const ledgerTbody = document.getElementById('salesLedgerTbody');
+      const ledgerTfoot = document.getElementById('salesLedgerTfoot');
+      const ledgerDaysCountEl = document.getElementById('salesLedgerDaysCount');
+      if (ledgerDaysCountEl) ledgerDaysCountEl.textContent = `${ledgerRows.length} active day${ledgerRows.length === 1 ? '' : 's'}`;
+
       if (ledgerTbody) {
-        if (ledgerDates.length === 0) {
-          ledgerTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">No sales transactions recorded yet.</td></tr>`;
+        if (ledgerRows.length === 0) {
+          ledgerTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 32px 16px; color: #64748b; font-size: 13px;">No sales recorded for the selected period (${scopeLabel}).</td></tr>`;
+          if (ledgerTfoot) ledgerTfoot.innerHTML = '';
         } else {
-          ledgerTbody.innerHTML = ledgerDates.map(row => {
+          ledgerTbody.innerHTML = ledgerRows.map(row => {
             const avg = row.orders > 0 ? Math.round(row.revenue / row.orders) : 0;
             const displayDate = new Date(row.date + 'T00:00:00Z').toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
             const isToday = row.date === todayStr;
+            const isSelected = salesFilterState.selectedLedgerDate === row.date;
 
             return `
-              <tr>
+              <tr class="ledger-row-clickable ${isSelected ? 'selected-ledger-row' : ''}" style="${isSelected ? 'background: #faf5ff; border-left: 3px solid #512175;' : ''}" onclick="window.filterSalesByLedgerDate('${row.date}')" title="Click to view all transactions on this date">
                 <td>
                   <strong>${displayDate}</strong>
                   ${isToday ? `<span class="status-chip active" style="margin-left: 6px;">Today</span>` : ''}
+                  ${isSelected ? `<span class="status-chip" style="background:#512175; color:#fff; margin-left: 6px;">Active Day Filter</span>` : ''}
                 </td>
                 <td><span style="font-weight: 700; color: #091e3a;">${row.orders}</span> orders</td>
                 <td><span style="font-weight: 600; color: #334155;">${row.units}</span> units</td>
@@ -4007,20 +4529,87 @@
               </tr>
             `;
           }).join('');
+
+          if (ledgerTfoot) {
+            ledgerTfoot.innerHTML = `
+              <tr class="sales-summary-footer">
+                <td>Summary Total (${ledgerRows.length} Days)</td>
+                <td>${formatNumberWithCommas(ordersCount)} orders</td>
+                <td>${formatNumberWithCommas(totalUnits)} units</td>
+                <td style="color: #15803d; font-size: 15px;">${formatNaira(grossRevenue)}</td>
+                <td>${formatNaira(aov)}</td>
+                <td><span class="status-chip active">Total Settled</span></td>
+              </tr>
+            `;
+          }
         }
       }
 
-      // Render transactions log
+      // 4. Apply Secondary Filters (Ledger Date Drilldown, Search, Status, Payment) to Transactions Log
+      let displayTransactions = [...timeFilteredOrders];
+
+      if (salesFilterState.selectedLedgerDate) {
+        displayTransactions = displayTransactions.filter(o => (o.created_at || '').split('T')[0] === salesFilterState.selectedLedgerDate);
+      }
+
+      if (salesFilterState.status !== 'all') {
+        const sMatch = salesFilterState.status.toLowerCase();
+        displayTransactions = displayTransactions.filter(o => (o.status || 'completed').toLowerCase() === sMatch);
+      }
+
+      if (salesFilterState.payment !== 'all') {
+        const pMatch = salesFilterState.payment.toLowerCase();
+        displayTransactions = displayTransactions.filter(o => (o.payment_method || '').toLowerCase().includes(pMatch));
+      }
+
+      if (salesFilterState.search) {
+        const q = salesFilterState.search;
+        displayTransactions = displayTransactions.filter(o => {
+          return (o.id && String(o.id).toLowerCase().includes(q)) ||
+                 (o.full_name && o.full_name.toLowerCase().includes(q)) ||
+                 (o.email && o.email.toLowerCase().includes(q)) ||
+                 (o.phone && o.phone.toLowerCase().includes(q)) ||
+                 (o.state && o.state.toLowerCase().includes(q)) ||
+                 (o.city && o.city.toLowerCase().includes(q));
+        });
+      }
+
+      // 5. Sort Transactions
+      const sBy = salesFilterState.sortBy;
+      displayTransactions.sort((a, b) => {
+        if (sBy === 'date_asc') return (a.created_at || '').localeCompare(b.created_at || '');
+        if (sBy === 'rev_desc') return Number(b.total_amount || 0) - Number(a.total_amount || 0);
+        if (sBy === 'rev_asc') return Number(a.total_amount || 0) - Number(b.total_amount || 0);
+        if (sBy === 'orders_desc' || sBy === 'units_desc') {
+          const aCount = Array.isArray(a.items) ? a.items.reduce((s, it) => s + (it.qty || 1), 0) : 1;
+          const bCount = Array.isArray(b.items) ? b.items.reduce((s, it) => s + (it.qty || 1), 0) : 1;
+          return bCount - aCount;
+        }
+        return (b.created_at || '').localeCompare(a.created_at || ''); // date_desc
+      });
+
+      // 6. Render Transactions Table
       const transTbody = document.getElementById('salesTransactionsTbody');
       const transSummary = document.getElementById('salesOrdersCountSummary');
-      if (transSummary) transSummary.textContent = `Showing ${filteredOrders.length} transaction${filteredOrders.length === 1 ? '' : 's'}`;
+      const noticeEl = document.getElementById('salesTransactionsFilterNotice');
+
+      if (transSummary) {
+        transSummary.textContent = `Showing ${displayTransactions.length} of ${timeFilteredOrders.length} transaction${timeFilteredOrders.length === 1 ? '' : 's'}`;
+      }
+      if (noticeEl) {
+        if (salesFilterState.selectedLedgerDate) {
+          noticeEl.innerHTML = `Filtered by date: <strong>${salesFilterState.selectedLedgerDate}</strong> (<a href="javascript:void(0)" onclick="window.clearLedgerDateFilter()" style="color:#512175; text-decoration:underline;">Show all dates</a>)`;
+        } else {
+          noticeEl.textContent = '';
+        }
+      }
 
       if (transTbody) {
-        if (filteredOrders.length === 0) {
-          transTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 28px; color: #64748b;">No orders found for the selected period (${period}).</td></tr>`;
+        if (displayTransactions.length === 0) {
+          transTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 13px;">No transactions matching your active date, status, or search filters.</td></tr>`;
         } else {
-          transTbody.innerHTML = filteredOrders.map(o => {
-            const dateFmt = o.created_at ? new Date(o.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Recently';
+          transTbody.innerHTML = displayTransactions.map(o => {
+            const dateFmt = o.created_at ? new Date(o.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
             let itemsCount = 0;
             if (Array.isArray(o.items)) {
               itemsCount = o.items.reduce((s, it) => s + (it.qty || 1), 0);
@@ -4037,10 +4626,10 @@
                     ${(o.email || o.phone) ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(o.email || o.phone)})</span>` : ''}
                   </div>
                 </td>
-                <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
+                <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}${o.city ? ` &bull; ${escapeHtml(o.city)}` : ''}</span></td>
                 <td style="white-space: nowrap;">${itemsCount} item${itemsCount === 1 ? '' : 's'}</td>
-                <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
-                <td style="white-space: nowrap;"><strong style="color: #091e3a;">${formatNaira(o.total_amount)}</strong></td>
+                <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+                <td style="white-space: nowrap;"><strong style="color: #091e3a; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
                 <td style="white-space: nowrap;"><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
                 <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
               </tr>
@@ -4048,6 +4637,58 @@
           }).join('');
         }
       }
+    }
+
+    window.filterSalesByLedgerDate = function(dateStr) {
+      if (salesFilterState.selectedLedgerDate === dateStr) {
+        salesFilterState.selectedLedgerDate = null;
+      } else {
+        salesFilterState.selectedLedgerDate = dateStr;
+      }
+      renderDailySalesUI();
+    };
+
+    window.clearLedgerDateFilter = function() {
+      salesFilterState.selectedLedgerDate = null;
+      renderDailySalesUI();
+    };
+
+    function exportSalesCsv() {
+      const now = new Date().toISOString().split('T')[0];
+      const orders = adminOrdersList || [];
+      if (orders.length === 0) {
+        alert('There are no sales transactions to export.');
+        return;
+      }
+
+      const headers = ['Order ID', 'Customer Name', 'Email', 'Phone', 'State', 'City', 'Items Count', 'Payment Method', 'Total (NGN)', 'Status', 'Date'];
+      const rows = orders.map(o => {
+        let count = 1;
+        if (Array.isArray(o.items)) count = o.items.reduce((s, it) => s + (it.qty || 1), 0);
+        return [
+          `"${(o.id || '').replace(/"/g, '""')}"`,
+          `"${(o.full_name || '').replace(/"/g, '""')}"`,
+          `"${(o.email || '').replace(/"/g, '""')}"`,
+          `"${(o.phone || '').replace(/"/g, '""')}"`,
+          `"${(o.state || '').replace(/"/g, '""')}"`,
+          `"${(o.city || '').replace(/"/g, '""')}"`,
+          count,
+          `"${(o.payment_method || '').replace(/"/g, '""')}"`,
+          Number(o.total_amount || 0),
+          `"${(o.status || 'completed').replace(/"/g, '""')}"`,
+          `"${(o.created_at || '').replace(/"/g, '""')}"`
+        ].join(',');
+      });
+
+      const csvContent = [headers.join(','), ...rows].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `ralphmart_sales_ledger_${now}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     // ========================================================
