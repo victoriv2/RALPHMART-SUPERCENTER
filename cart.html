@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -27,7 +27,7 @@
           Doorstep Delivery
         </span>
         <span>We deliver all across Nigeria!</span>
-        <span class="top-bar-slogan" style="color: #c084fc !important;">"Everything Dey™"</span>
+        <span class="top-bar-slogan" style="color: #c084fc !important;">"Everything DeyÃ¢â€žÂ¢"</span>
       </div>
       <div class="top-bar-right">
         <a href="sell.html" class="top-bar-link">Sell on Ralphmart</a>
@@ -36,7 +36,7 @@
         <span class="top-bar-divider">|</span>
         <a href="https://wa.me/2347042087633" target="_blank" rel="noopener noreferrer" class="top-bar-link">WhatsApp: 07042087633</a>
         <span class="top-bar-divider">|</span>
-        <span class="top-bar-link" style="color: #fff; font-weight: 600;">₦ NGN</span>
+        <span class="top-bar-link" style="color: #fff; font-weight: 600;">Ã¢â€šÂ¦ NGN</span>
       </div>
     </div>
   </aside>
@@ -362,7 +362,7 @@
           <div class="summary-rows">
             <div class="summary-row">
               <span class="summary-row-label">Subtotal (<span id="summaryItemCount">0 items</span>)</span>
-              <span class="summary-row-val" id="summarySubtotalVal">₦ 0</span>
+              <span class="summary-row-val" id="summarySubtotalVal">Ã¢â€šÂ¦ 0</span>
             </div>
 
             <div class="summary-row">
@@ -375,7 +375,7 @@
 
           <div class="summary-total-row">
             <span class="summary-total-label">Total</span>
-            <span class="summary-total-val" id="summaryTotalVal">₦ 0</span>
+            <span class="summary-total-val" id="summaryTotalVal">Ã¢â€šÂ¦ 0</span>
           </div>
           <p class="summary-subtext">Excluding doorstep delivery fees</p>
 
@@ -385,7 +385,7 @@
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            CHECKOUT (<span id="btnCheckoutAmount">₦ 0</span>)
+            CHECKOUT (<span id="btnCheckoutAmount">Ã¢â€šÂ¦ 0</span>)
           </button>
 
           <a href="index.html" class="summary-continue-btn">Continue Shopping</a>
@@ -742,73 +742,23 @@
     document.addEventListener('DOMContentLoaded', function() {
       var CART_STORAGE_KEY = 'nkemmart_cart';
 
-      // Catalog products for cross-sell recommendations
-      var CATALOG_PRODUCTS = [
-        {
-          id: 'prod-1',
-          title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank - Type C Dual Input',
-          price: 7650,
-          originalPrice: 12000,
-          image: 'images/product_powerbank.jpg',
-          brand: 'Ace Elec'
-        },
-        {
-          id: 'prod-2',
-          title: 'SILVER CREST 2L Industrial 8500W Food Crusher Blender With 2 Jar',
-          price: 20954,
-          originalPrice: 26386,
-          image: 'images/product_blender.webp',
-          brand: 'Silver Crest'
-        },
-        {
-          id: 'prod-3',
-          title: 'HANSEN Electric Iron Pressing Clothes 1000W',
-          price: 5959,
-          originalPrice: 7117,
-          image: 'images/product_iron.jpg',
-          brand: 'Hansen'
-        },
-        {
-          id: 'prod-4',
-          title: 'HANSEN 18 inches industrial level standing fan',
-          price: 16998,
-          originalPrice: 20060,
-          image: 'images/product_fan.webp',
-          brand: 'Hansen'
-        },
-        {
-          id: 'prod-5',
-          title: 'Syinix 2.2L Electric Kettle - Food Grade Stainless Steel SKE22U1',
-          price: 6399,
-          originalPrice: 7229,
-          image: 'images/product_kettle.webp',
-          brand: 'Syinix'
-        },
-        {
-          id: 'prod-6',
-          title: 'SILVER CREST 8L Extra Large Digital Air Fryer 2400W',
-          price: 30999,
-          originalPrice: 44000,
-          image: 'images/product_airfryer.jpg',
-          brand: 'Silver Crest'
-        },
-        {
-          id: 'prod-7',
-          title: 'Maxi 20 Litres Manual Microwave Oven (MAXIMWO2021W) - 12 Months Warranty',
-          price: 55999,
-          originalPrice: 71550,
-          image: 'images/product_microwave.jpg',
-          brand: 'Maxi'
-        },
-        {
-          id: 'prod-8',
-          title: 'Hikers 32 Smart HD Frameless Panel Digital LED TV with Android',
-          price: 102246,
-          originalPrice: 171000,
-          image: 'images/product_tv.jpg',
-          brand: 'Hikers'
+      // Catalog products for cross-sell recommendations (loaded dynamically from cloud)
+      var CATALOG_PRODUCTS = [];
+
+      function loadRecommendationsCatalog() {
+        if (typeof window.loadRalphmartCatalogFromCloud === 'function') {
+          window.loadRalphmartCatalogFromCloud().then(function(prods) {
+            if (Array.isArray(prods) && prods.length > 0) {
+              CATALOG_PRODUCTS = prods;
+              renderRecommendations(getCart());
+            } else {
+              CATALOG_PRODUCTS = [];
+              renderRecommendations(getCart());
+            }
+          });
         }
-      ];
+      }
+      loadRecommendationsCatalog();
 
       function formatNumberWithCommas(num) {
         if (num === null || num === undefined || isNaN(num)) return '0';
@@ -1100,7 +1050,15 @@
 
       function renderRecommendations(cart) {
         var recGrid = document.getElementById('recommendationsGrid');
+        var recCard = document.querySelector('.cart-recommendations-card');
         if (!recGrid) return;
+
+        if (!CATALOG_PRODUCTS || CATALOG_PRODUCTS.length === 0) {
+          recGrid.innerHTML = '';
+          if (recCard) recCard.style.display = 'none';
+          return;
+        }
+        if (recCard) recCard.style.display = '';
 
         var savedList = [];
         try {
@@ -1150,7 +1108,7 @@
               '<a href="product.html?id=' + encodeURIComponent(p.id) + '" class="rec-card-title">' + p.title + '</a>' +
               '<div class="rating-row" style="display:flex; align-items:center; gap:4px; margin-bottom:4px;">' +
                 '<div class="stars-row">' + starsHtml + '</div>' +
-                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' ★)</span>' +
+                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' Ã¢Ëœâ€¦)</span>' +
               '</div>' +
               '<div class="rec-card-price-row">' +
                 '<span class="rec-card-price">' + formatNaira(p.price) + '</span>' +

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1738,7 +1738,7 @@
             </div>
             <div class="admin-stat-info">
               <span class="admin-stat-label">Catalog Value</span>
-              <span class="admin-stat-val" id="statCatalogValue">₦0</span>
+              <span class="admin-stat-val" id="statCatalogValue">&#8358;0</span>
             </div>
           </div>
 
@@ -1768,7 +1768,7 @@
           <div style="background: linear-gradient(135deg, #091e3a 0%, #1e293b 100%); color: #ffffff; padding: 22px 24px; border-radius: 12px; box-shadow: 0 4px 14px rgba(9, 30, 58, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8;">Today's Sales Performance</div>
-              <div style="font-size: 28px; font-weight: 800; color: #22c55e; margin: 8px 0 4px 0;" id="overviewTodaySales">₦0</div>
+              <div style="font-size: 28px; font-weight: 800; color: #22c55e; margin: 8px 0 4px 0;" id="overviewTodaySales">&#8358;0</div>
               <div style="font-size: 13px; color: #cbd5e1;" id="overviewTodayOrders">0 orders placed today across Nigeria</div>
             </div>
             <div style="margin-top: 18px; display: flex; gap: 10px;">
@@ -1784,10 +1784,12 @@
                 <span style="font-size: 11px; font-weight: 700; color: #512175; background: #faf5ff; padding: 2px 8px; border-radius: 10px;">Cart Leader</span>
               </div>
               <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;" id="overviewTopCartWrap">
-                <img src="images/product_powerbank.jpg" alt="Top Product" id="overviewTopCartImg" style="width: 48px; height: 48px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc;">
+                <div id="overviewTopCartImgWrap" style="width: 48px; height: 48px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </div>
                 <div>
-                  <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="overviewTopCartTitle">Ace Elec 20000 mAh Power Bank</div>
-                  <div style="font-size: 12px; color: #64748b; margin-top: 2px;" id="overviewTopCartMeta">48 active customer carts</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a;" id="overviewTopCartTitle">No Active Cart Demand Yet</div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 2px;" id="overviewTopCartMeta">0 items in customer carts</div>
                 </div>
               </div>
             </div>
@@ -1850,7 +1852,7 @@
         <section class="sales-kpi-grid">
           <div class="sales-kpi-card">
             <div class="sales-kpi-title">Gross Revenue</div>
-            <div class="sales-kpi-val" id="salesKpiRevenue">₦0</div>
+            <div class="sales-kpi-val" id="salesKpiRevenue">&#8358;0</div>
             <div class="sales-kpi-sub" id="salesKpiRevenueSub">Across selected dates</div>
           </div>
           <div class="sales-kpi-card">
@@ -1865,7 +1867,7 @@
           </div>
           <div class="sales-kpi-card">
             <div class="sales-kpi-title">Average Order Value (AOV)</div>
-            <div class="sales-kpi-val" id="salesKpiAov">₦0</div>
+            <div class="sales-kpi-val" id="salesKpiAov">&#8358;0</div>
             <div class="sales-kpi-sub" style="color: #d97706;">Per transaction</div>
           </div>
         </section>
@@ -1883,7 +1885,7 @@
                   <th>Date</th>
                   <th>Orders Count</th>
                   <th>Items Sold</th>
-                  <th>Gross Revenue (₦)</th>
+                  <th>Gross Revenue (&#8358;)</th>
                   <th>Average Basket</th>
                   <th>Settlement Status</th>
                 </tr>
@@ -2365,12 +2367,12 @@
 
           <div class="form-grid-2">
             <div class="form-field">
-              <label for="modalProductPrice">Selling Price (₦) <span style="color:#ef4444;">*</span></label>
+              <label for="modalProductPrice">Selling Price (&#8358;) <span style="color:#ef4444;">*</span></label>
               <input type="number" id="modalProductPrice" placeholder="e.g. 18500" required min="100">
             </div>
 
             <div class="form-field">
-              <label for="modalProductOldPrice">Original / Old Price (â‚¦)</label>
+              <label for="modalProductOldPrice">Original / Old Price (&#8358;)</label>
               <input type="number" id="modalProductOldPrice" placeholder="e.g. 24000">
             </div>
           </div>
@@ -2929,20 +2931,25 @@
       const client = getSupabase();
       if (client) {
         client.from('products').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-          if (!error && Array.isArray(data) && data.length > 0) {
-            adminProducts = data.map(p => ({
-              ...p,
-              category: p.category_id || p.category,
-              subcategory: p.subcategory_id || p.subcategory || '',
-              subcategory_id: p.subcategory_id || p.subcategory || '',
-              oldPrice: p.old_price || p.oldPrice,
-              reviewsCount: p.reviews_count || p.reviewsCount || 0,
-              images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image ? [p.image] : [])
-            }));
+          if (!error && Array.isArray(data)) {
+            if (data.length > 0) {
+              adminProducts = data.map(p => ({
+                ...p,
+                category: p.category_id || p.category,
+                subcategory: p.subcategory_id || p.subcategory || '',
+                subcategory_id: p.subcategory_id || p.subcategory || '',
+                oldPrice: p.old_price || p.oldPrice,
+                reviewsCount: p.reviews_count || p.reviewsCount || 0,
+                images: (Array.isArray(p.images) && p.images.length > 0) ? p.images : (p.image ? [p.image] : [])
+              }));
+            } else {
+              adminProducts = [];
+            }
             saveProductsLocal();
             updateStats();
             renderProductsTable();
             renderOverviewProductsTable();
+            renderLeaderboards();
           }
         });
       }
@@ -3238,7 +3245,7 @@
         <div class="admin-overview-card-row">
           <input type="text" class="overview-sec-title" value="${secTitle}" placeholder="Section Title (e.g. Key Features, Description, What is in the Box)" required>
           <select class="overview-sec-type" onchange="updateOverviewCardPlaceholder(this)">
-            <option value="bullets" ${secType === 'bullets' ? 'selected' : ''}>Bullet Points (• List)</option>
+            <option value="bullets" ${secType === 'bullets' ? 'selected' : ''}>Bullet Points (&bull; List)</option>
             <option value="numbered" ${secType === 'numbered' ? 'selected' : ''}>Numbered List (1, 2, 3, 4, 5...)</option>
             <option value="text" ${secType === 'text' ? 'selected' : ''}>Straight Text (Paragraph)</option>
           </select>
@@ -4183,7 +4190,7 @@
       const titleEl = document.getElementById('userActivityModalTitle');
       const subtitleEl = document.getElementById('userActivityModalSubtitle');
       if (titleEl) titleEl.textContent = `${activeUserForModal.full_name || 'Customer'} - Activity Drawer`;
-      if (subtitleEl) subtitleEl.textContent = `${activeUserForModal.email} • ${activeUserForModal.phone || 'No phone'} • ${activeUserForModal.city || ''} ${activeUserForModal.state || 'Nigeria'}`;
+      if (subtitleEl) subtitleEl.textContent = `${activeUserForModal.email} Ã¢â‚¬Â¢ ${activeUserForModal.phone || 'No phone'} Ã¢â‚¬Â¢ ${activeUserForModal.city || ''} ${activeUserForModal.state || 'Nigeria'}`;
 
       // Update badge counts on modal subtabs
       const cartItems = Array.isArray(activeUserForModal.cart_data) ? activeUserForModal.cart_data : [];
@@ -4280,7 +4287,7 @@
           <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(r.product_title || r.product_id)}</strong>
-              <span style="font-weight: 800; color: #f59e0b; font-size: 12px;">★ ${r.rating}.0</span>
+              <span style="font-weight: 800; color: #f59e0b; font-size: 12px;">Ã¢Ëœâ€¦ ${r.rating}.0</span>
             </div>
             <div style="font-size: 13px; color: #334155; margin-top: 6px; font-style: italic;">"${escapeHtml(r.comment)}"</div>
           </div>
@@ -4316,76 +4323,106 @@
       // 1. Most Carted
       const cartListEl = document.getElementById('leaderboardCartList');
       if (cartListEl) {
-        cartListEl.innerHTML = leaderboards.mostCarted.map((item, idx) => `
-          <li class="leaderboard-item">
-            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
-            <div class="leaderboard-info">
-              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
-              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
-            </div>
-            <span class="leaderboard-metric-badge">${item.cartCount} in carts</span>
-          </li>
-        `).join('');
+        if (!leaderboards.mostCarted || leaderboards.mostCarted.length === 0 || leaderboards.mostCarted.every(i => i.cartCount === 0)) {
+          cartListEl.innerHTML = '<li style="padding: 24px 16px; text-align: center; color: #94a3b8; font-size: 13px;">No items added to cart yet</li>';
+        } else {
+          cartListEl.innerHTML = leaderboards.mostCarted.filter(i => i.cartCount > 0).map((item, idx) => `
+            <li class="leaderboard-item">
+              <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div class="leaderboard-info">
+                <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+                <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
+              </div>
+              <span class="leaderboard-metric-badge">${item.cartCount} in carts</span>
+            </li>
+          `).join('');
+        }
 
         // Overview Snapshot
-        if (leaderboards.mostCarted[0]) {
-          const top = leaderboards.mostCarted[0];
-          const topImg = document.getElementById('overviewTopCartImg');
-          const topTitle = document.getElementById('overviewTopCartTitle');
-          const topMeta = document.getElementById('overviewTopCartMeta');
-          if (topImg) topImg.src = top.image;
-          if (topTitle) topTitle.textContent = top.title;
-          if (topMeta) topMeta.textContent = `${top.cartCount} active customer carts • ${formatNaira(top.price)}`;
+        const topWrap = document.getElementById('overviewTopCartWrap');
+        if (topWrap) {
+          if (leaderboards.mostCarted && leaderboards.mostCarted[0] && leaderboards.mostCarted[0].cartCount > 0) {
+            const top = leaderboards.mostCarted[0];
+            topWrap.innerHTML = `
+              <img src="${escapeHtml(top.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(top.title)}" style="width: 48px; height: 48px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc;" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #0f172a;">${escapeHtml(top.title)}</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${top.cartCount} active customer carts â€¢ ${formatNaira(top.price)}</div>
+              </div>
+            `;
+          } else {
+            topWrap.innerHTML = `
+              <div style="width: 48px; height: 48px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #0f172a;">No Active Cart Demand Yet</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">0 items in customer carts</div>
+              </div>
+            `;
+          }
         }
       }
 
       // 2. Most Saved
       const savedListEl = document.getElementById('leaderboardSavedList');
       if (savedListEl) {
-        savedListEl.innerHTML = leaderboards.mostSaved.map((item, idx) => `
-          <li class="leaderboard-item">
-            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
-            <div class="leaderboard-info">
-              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
-              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
-            </div>
-            <span class="leaderboard-metric-badge" style="color: #dc2626; background: #fef2f2; border-color: #fecaca;">${item.savedCount} saved</span>
-          </li>
-        `).join('');
+        if (!leaderboards.mostSaved || leaderboards.mostSaved.length === 0 || leaderboards.mostSaved.every(i => i.savedCount === 0)) {
+          savedListEl.innerHTML = '<li style="padding: 24px 16px; text-align: center; color: #94a3b8; font-size: 13px;">No saved items yet</li>';
+        } else {
+          savedListEl.innerHTML = leaderboards.mostSaved.filter(i => i.savedCount > 0).map((item, idx) => `
+            <li class="leaderboard-item">
+              <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div class="leaderboard-info">
+                <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+                <div class="leaderboard-meta">${formatNaira(item.price)} &bull; <span style="text-transform: capitalize;">${escapeHtml(item.category)}</span></div>
+              </div>
+              <span class="leaderboard-metric-badge" style="color: #dc2626; background: #fef2f2; border-color: #fecaca;">${item.savedCount} saved</span>
+            </li>
+          `).join('');
+        }
       }
 
       // 3. Most Reviewed
       const revListEl = document.getElementById('leaderboardReviewsList');
       if (revListEl) {
-        revListEl.innerHTML = leaderboards.mostReviewed.map((item, idx) => `
-          <li class="leaderboard-item">
-            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
-            <div class="leaderboard-info">
-              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
-              <div class="leaderboard-meta">${formatNaira(item.price)} &bull; ${item.ratingInfo.formatted} ★</div>
-            </div>
-            <span class="leaderboard-metric-badge" style="color: #d97706; background: #fffbeb; border-color: #fde68a;">${item.reviewsCount} reviews</span>
-          </li>
-        `).join('');
+        if (!leaderboards.mostReviewed || leaderboards.mostReviewed.length === 0 || leaderboards.mostReviewed.every(i => i.reviewsCount === 0)) {
+          revListEl.innerHTML = '<li style="padding: 24px 16px; text-align: center; color: #94a3b8; font-size: 13px;">No reviewed products yet</li>';
+        } else {
+          revListEl.innerHTML = leaderboards.mostReviewed.filter(i => i.reviewsCount > 0).map((item, idx) => `
+            <li class="leaderboard-item">
+              <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div class="leaderboard-info">
+                <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+                <div class="leaderboard-meta">${formatNaira(item.price)} &bull; ${item.ratingInfo.formatted} â˜…</div>
+              </div>
+              <span class="leaderboard-metric-badge" style="color: #d97706; background: #fffbeb; border-color: #fde68a;">${item.reviewsCount} reviews</span>
+            </li>
+          `).join('');
+        }
       }
 
       // 4. Highest Rated (Voting Champions)
       const rateListEl = document.getElementById('leaderboardRatingsList');
       if (rateListEl) {
-        rateListEl.innerHTML = leaderboards.highestRated.map((item, idx) => `
-          <li class="leaderboard-item">
-            <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
-            <div class="leaderboard-info">
-              <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
-              <div class="leaderboard-meta">${item.ratingInfo.isUserRated ? (item.ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : 'Highest User Vote') : 'Admin Rated'}</div>
-            </div>
-            <span class="leaderboard-metric-badge" style="color: #059669; background: #ecfdf5; border-color: #a7f3d0;">★ ${item.ratingInfo.formatted}</span>
-          </li>
-        `).join('');
+        if (!leaderboards.highestRated || leaderboards.highestRated.length === 0) {
+          rateListEl.innerHTML = '<li style="padding: 24px 16px; text-align: center; color: #94a3b8; font-size: 13px;">No rated products yet</li>';
+        } else {
+          rateListEl.innerHTML = leaderboards.highestRated.map((item, idx) => `
+            <li class="leaderboard-item">
+              <span class="leaderboard-rank ${idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : 'rank-other'))}">#${idx + 1}</span>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="leaderboard-thumb" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+              <div class="leaderboard-info">
+                <span class="leaderboard-prod-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+                <div class="leaderboard-meta">${item.ratingInfo.isUserRated ? (item.ratingInfo.ruleApplied === 'plurality_voting' ? 'Voting Winner' : 'Highest User Vote') : 'Admin Rated'}</div>
+              </div>
+              <span class="leaderboard-metric-badge" style="color: #059669; background: #ecfdf5; border-color: #a7f3d0;">â˜… ${item.ratingInfo.formatted}</span>
+            </li>
+          `).join('');
+        }
       }
     }
 

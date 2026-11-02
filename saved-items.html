@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=21.0">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=8.0"></script>
+  <script src="taxonomy.js?v=3.3"></script>
 </head>
 <body>
 
@@ -26,7 +27,7 @@
           Doorstep Delivery
         </span>
         <span>We deliver all across Nigeria!</span>
-        <span class="top-bar-slogan" style="color: #c084fc !important;">"Everything Dey™"</span>
+        <span class="top-bar-slogan" style="color: #c084fc !important;">"Everything DeyÃ¢â€žÂ¢"</span>
       </div>
       <div class="top-bar-right">
         <a href="sell.html" class="top-bar-link">Sell on Ralphmart</a>
@@ -35,7 +36,7 @@
         <span class="top-bar-divider">|</span>
         <a href="https://wa.me/2347042087633" target="_blank" rel="noopener noreferrer" class="top-bar-link">WhatsApp: 07042087633</a>
         <span class="top-bar-divider">|</span>
-        <span class="top-bar-link" style="color: #fff; font-weight: 600;">₦ NGN</span>
+        <span class="top-bar-link" style="color: #fff; font-weight: 600;">Ã¢â€šÂ¦ NGN</span>
       </div>
     </div>
   </aside>
@@ -384,19 +385,19 @@
 
             <div class="summary-row" id="summaryOriginalRow">
               <span class="summary-row-label">Original Value</span>
-              <span class="summary-row-val" id="summaryOriginalValue" style="text-decoration: line-through; color: var(--text-muted);">₦ 0</span>
+              <span class="summary-row-val" id="summaryOriginalValue" style="text-decoration: line-through; color: var(--text-muted);">Ã¢â€šÂ¦ 0</span>
             </div>
 
             <div class="summary-row" id="summarySavingsRow">
               <span class="summary-row-label">Total Savings</span>
-              <span class="summary-row-val" id="summarySavingsValue" style="color: var(--primary-green); font-weight: 700;">- ₦ 0</span>
+              <span class="summary-row-val" id="summarySavingsValue" style="color: var(--primary-green); font-weight: 700;">- Ã¢â€šÂ¦ 0</span>
             </div>
 
             <div class="summary-divider"></div>
 
             <div class="summary-total-row">
               <span class="summary-total-label">Estimated Subtotal</span>
-              <span class="summary-total-val" id="summarySavedValue">₦ 0</span>
+              <span class="summary-total-val" id="summarySavedValue">Ã¢â€šÂ¦ 0</span>
             </div>
 
             <!-- Move All to Cart CTA Button -->
@@ -751,73 +752,23 @@
       var SAVED_STORAGE_KEY = 'nkemmart_saved_items';
       var CART_STORAGE_KEY = 'nkemmart_cart';
 
-      // Catalog products for cross-sell recommendations
-      var CATALOG_PRODUCTS = [
-        {
-          id: 'prod-1',
-          title: 'Ace Elec 20000 mAh Ultra Slim Portable Power Bank - Type C Dual Input',
-          price: 7650,
-          originalPrice: 12000,
-          image: 'images/product_powerbank.jpg',
-          brand: 'Ace Elec'
-        },
-        {
-          id: 'prod-2',
-          title: 'SILVER CREST 2L Industrial 8500W Food Crusher Blender With 2 Jar',
-          price: 20954,
-          originalPrice: 26386,
-          image: 'images/product_blender.webp',
-          brand: 'Silver Crest'
-        },
-        {
-          id: 'prod-3',
-          title: 'HANSEN Electric Iron Pressing Clothes 1000W',
-          price: 5959,
-          originalPrice: 7117,
-          image: 'images/product_iron.jpg',
-          brand: 'Hansen'
-        },
-        {
-          id: 'prod-4',
-          title: 'HANSEN 18 inches industrial level standing fan',
-          price: 16998,
-          originalPrice: 20060,
-          image: 'images/product_fan.webp',
-          brand: 'Hansen'
-        },
-        {
-          id: 'prod-5',
-          title: 'Syinix 2.2L Electric Kettle - Food Grade Stainless Steel SKE22U1',
-          price: 6399,
-          originalPrice: 7229,
-          image: 'images/product_kettle.webp',
-          brand: 'Syinix'
-        },
-        {
-          id: 'prod-6',
-          title: 'SILVER CREST 8L Extra Large Digital Air Fryer 2400W',
-          price: 30999,
-          originalPrice: 44000,
-          image: 'images/product_airfryer.jpg',
-          brand: 'Silver Crest'
-        },
-        {
-          id: 'prod-7',
-          title: 'Maxi 20 Litres Manual Microwave Oven (MAXIMWO2021W) - 12 Months Warranty',
-          price: 55999,
-          originalPrice: 71550,
-          image: 'images/product_microwave.jpg',
-          brand: 'Maxi'
-        },
-        {
-          id: 'prod-8',
-          title: 'Hikers 32 Smart HD Frameless Panel Digital LED TV with Android',
-          price: 102246,
-          originalPrice: 171000,
-          image: 'images/product_tv.jpg',
-          brand: 'Hikers'
+      // Catalog products for cross-sell recommendations (loaded dynamically from cloud)
+      var CATALOG_PRODUCTS = [];
+
+      function loadRecommendationsCatalog() {
+        if (typeof window.loadRalphmartCatalogFromCloud === 'function') {
+          window.loadRalphmartCatalogFromCloud().then(function(prods) {
+            if (Array.isArray(prods) && prods.length > 0) {
+              CATALOG_PRODUCTS = prods;
+              renderRecommendations();
+            } else {
+              CATALOG_PRODUCTS = [];
+              renderRecommendations();
+            }
+          });
         }
-      ];
+      }
+      loadRecommendationsCatalog();
 
       function formatNumberWithCommas(num) {
         if (num === null || num === undefined || isNaN(num)) return '0';
@@ -1122,7 +1073,15 @@
 
       function renderRecommendations() {
         var recGrid = document.getElementById('recommendationsGrid');
+        var recSection = document.getElementById('recSectionCard');
         if (!recGrid) return;
+
+        if (!CATALOG_PRODUCTS || CATALOG_PRODUCTS.length === 0) {
+          recGrid.innerHTML = '';
+          if (recSection) recSection.style.display = 'none';
+          return;
+        }
+        if (recSection) recSection.style.display = '';
 
         var cart = getCart();
         var saved = getSaved();
@@ -1170,7 +1129,7 @@
               '<a href="product.html?id=' + encodeURIComponent(p.id) + '" class="rec-card-title">' + p.title + '</a>' +
               '<div class="rating-row" style="display:flex; align-items:center; gap:4px; margin-bottom:4px;">' +
                 '<div class="stars-row">' + starsHtml + '</div>' +
-                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' ★)</span>' +
+                '<span class="rating-count" style="font-size:11px; color:#64748b;">(' + recRatingInfo.formatted + ' Ã¢Ëœâ€¦)</span>' +
               '</div>' +
               '<div class="rec-card-price-row">' +
                 '<span class="rec-card-price">' + formatNaira(p.price) + '</span>' +

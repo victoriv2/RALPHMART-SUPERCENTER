@@ -3022,13 +3022,6 @@ function calculateStoreLeaderboards(productsList, reviewsList, usersList) {
     }
   });
 
-  // Seed baseline demand if fresh
-  if (pMap['prod-1']) { pMap['prod-1'].cartCount += 48; pMap['prod-1'].savedCount += 86; }
-  if (pMap['prod-2']) { pMap['prod-2'].cartCount += 35; pMap['prod-2'].savedCount += 64; }
-  if (pMap['prod-3']) { pMap['prod-3'].cartCount += 29; pMap['prod-3'].savedCount += 52; }
-  if (pMap['prod-8']) { pMap['prod-8'].cartCount += 22; pMap['prod-8'].savedCount += 41; }
-  if (pMap['prod-5']) { pMap['prod-5'].cartCount += 18; pMap['prod-5'].savedCount += 38; }
-
   // 2. Aggregate reviews & community voting rating
   const revByProd = {};
   (reviewsList || []).forEach(r => {
