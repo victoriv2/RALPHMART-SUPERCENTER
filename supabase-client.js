@@ -2926,38 +2926,134 @@ async function getAdminUsersOverview() {
 
 async function getAdminOrdersOverview() {
   const client = getSupabase();
+  let orders = [];
+
   if (client) {
     try {
       const { data, error } = await client.rpc('get_admin_orders_overview');
       if (!error && Array.isArray(data)) {
-        return data;
+        orders = data;
       }
     } catch (err) {
       console.warn('RPC get_admin_orders_overview note:', err);
     }
 
-    try {
-      const { data, error } = await client
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+    if (orders.length === 0) {
+      try {
+        const { data, error } = await client
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (!error && Array.isArray(data)) {
-        return data;
+        if (!error && Array.isArray(data)) {
+          orders = data;
+        }
+      } catch (err) {
+        console.warn('Orders query error:', err);
       }
-    } catch (err) {
-      console.warn('Orders query error:', err);
     }
   }
 
+  // Merge with local storage orders (avoiding duplicates)
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(k) {
+    try {
+      const local = JSON.parse(localStorage.getItem(k) || '[]');
+      if (Array.isArray(local)) {
+        local.forEach(function(lo) {
+          if (!lo || !lo.id) return;
+          const exists = orders.find(function(o) { return String(o.id) === String(lo.id); });
+          if (!exists) {
+            orders.push(lo);
+          }
+        });
+      }
+    } catch(e) {}
+  });
+
+  // Normalize every order so all expected fields exist reliably
+  return orders.map(function(o) {
+    const name = o.customer_name || o.full_name || o.name || 'Valued Customer';
+    const email = o.customer_email || o.email || '';
+    const phone = o.customer_phone || o.phone || '';
+    const status = (o.order_status || o.status || 'confirmed').toLowerCase();
+    const total = Number(o.total_amount != null ? o.total_amount : (o.total != null ? o.total : (o.subtotal || 0)));
+
+    return Object.assign({}, o, {
+      customer_name: name,
+      full_name: name,
+      customer_email: email,
+      email: email,
+      customer_phone: phone,
+      phone: phone,
+      order_status: status,
+      status: status,
+      total_amount: total
+    });
+  });
+}
+
+async function updateAdminOrderStatus(orderId, newStatus, notes) {
+  if (!orderId) throw new Error('Order ID required');
+  const cleanStatus = String(newStatus || 'confirmed').toLowerCase();
+  const now = new Date().toISOString();
+  const client = getSupabase();
+
+  if (client) {
+    try {
+      const updatePayload = {
+        order_status: cleanStatus,
+        updated_at: now
+      };
+      if (notes) updatePayload.admin_notes = notes;
+      const { error } = await client.from('orders').update(updatePayload).eq('id', orderId);
+      if (error) console.warn('Supabase updateAdminOrderStatus note:', error);
+    } catch (err) {
+      console.warn('Update order status error:', err);
+    }
+  }
+
+  // Update in localStorage
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const orders = JSON.parse(localStorage.getItem(key) || '[]');
+      const target = orders.find(function(o) { return String(o.id) === String(orderId); });
+      if (target) {
+        target.order_status = cleanStatus;
+        target.status = cleanStatus;
+        target.updated_at = now;
+        if (notes) target.admin_notes = notes;
+        localStorage.setItem(key, JSON.stringify(orders));
+      }
+    } catch(e) {}
+  });
+
+  // Notify customer if registered
   try {
-    const localOrders = JSON.parse(localStorage.getItem('nkemmart_orders')) || [];
-    if (Array.isArray(localOrders) && localOrders.length > 0) {
-      return localOrders;
+    const orders = JSON.parse(localStorage.getItem('nkemmart_user_orders') || '[]');
+    const target = orders.find(function(o) { return String(o.id) === String(orderId); });
+    if (target && (target.customer_email || target.email)) {
+      if (typeof addUserNotification === 'function') {
+        const statusLabels = {
+          confirmed: 'Order Confirmed',
+          processing: 'Order in Processing',
+          shipped: 'Order Dispatched & Out for Delivery',
+          delivered: 'Order Delivered Successfully',
+          cancelled: 'Order Cancelled'
+        };
+        await addUserNotification({
+          type: 'order',
+          title: statusLabels[cleanStatus] || 'Order Status Updated',
+          message: 'Your order #' + orderId + ' status has been updated to "' + (statusLabels[cleanStatus] || cleanStatus).toUpperCase() + '".',
+          link: 'orders.html?orderId=' + encodeURIComponent(orderId)
+        });
+      }
     }
   } catch(e) {}
 
-  return [];
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: cleanStatus } }));
+  }
+  return true;
 }
 
 async function updateProductVisibility(productId, newStatus) {
@@ -3052,6 +3148,7 @@ function calculateStoreLeaderboards(productsList, reviewsList, usersList) {
 if (typeof window !== 'undefined') {
   window.getAdminUsersOverview = getAdminUsersOverview;
   window.getAdminOrdersOverview = getAdminOrdersOverview;
+  window.updateAdminOrderStatus = updateAdminOrderStatus;
   window.updateProductVisibility = updateProductVisibility;
   window.calculateStoreLeaderboards = calculateStoreLeaderboards;
 }

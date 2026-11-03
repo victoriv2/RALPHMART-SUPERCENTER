@@ -1285,6 +1285,81 @@
     .status-chip.hidden { background: #fef3c7; color: #b45309; }
     .status-chip.pending { background: #fef9c3; color: #854d0e; }
     .status-chip.completed { background: #ecfdf5; color: #047857; }
+    .status-chip.confirmed { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-chip.processing { background: #fefce8; color: #a16207; border: 1px solid #fef08a; }
+    .status-chip.shipped { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+    .status-chip.delivered { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .status-chip.cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    .admin-order-filter-chip {
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .admin-order-filter-chip:hover {
+      border-color: #512175;
+      color: #512175;
+      background: #faf5ff;
+    }
+    .admin-order-filter-chip.active {
+      background: #512175;
+      color: #ffffff;
+      border-color: #512175;
+    }
+
+    .admin-order-status-select {
+      padding: 4px 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .admin-order-status-select:focus {
+      border-color: #512175;
+    }
+
+    /* Admin Toast Notification */
+    .admin-toast-container {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .admin-toast {
+      pointer-events: auto;
+      background: #091e3a;
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid #22c55e;
+      animation: adminToastSlideIn 0.25s ease forwards;
+    }
+    @keyframes adminToastSlideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
 
     /* Sales KPI Strip */
     .sales-kpi-grid {
@@ -2405,15 +2480,29 @@
       <!-- ================= TAB: ORDERS ================= -->
       <div class="admin-tab-pane" id="tab-orders">
         <section class="admin-table-card">
-          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between;">
+          <div class="admin-table-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
             <div>
               <h2 class="admin-table-title">Customer Store Orders</h2>
-              <span style="font-size: 12px; color: var(--admin-text-muted);">Realtime order processing and status fulfillment</span>
+              <span style="font-size: 12px; color: var(--admin-text-muted);" id="ordersTabSubtitle">Realtime order processing and status fulfillment</span>
             </div>
-            <button type="button" class="admin-btn btn-secondary" id="refreshOrdersTabBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-              <span>Refresh Orders</span>
-            </button>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="adminOrdersSearchInput" placeholder="Search order ID, customer, phone, state..." style="padding: 7px 12px; border-radius: 7px; border: 1px solid var(--admin-border); font-size: 12.5px; width: 250px; outline: none;">
+              <button type="button" class="admin-btn btn-secondary" id="refreshOrdersTabBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Refresh Orders</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Filter Pills -->
+          <div style="padding: 10px 20px; background: #f8fafc; border-bottom: 1px solid var(--admin-border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;" id="adminOrdersFilterGroup">
+            <span style="font-size: 12px; font-weight: 700; color: #64748b; margin-right: 4px;">Status Filter:</span>
+            <button type="button" class="admin-order-filter-chip active" data-status="all">All Orders</button>
+            <button type="button" class="admin-order-filter-chip" data-status="confirmed">Confirmed</button>
+            <button type="button" class="admin-order-filter-chip" data-status="processing">Processing</button>
+            <button type="button" class="admin-order-filter-chip" data-status="shipped">Out for Delivery</button>
+            <button type="button" class="admin-order-filter-chip" data-status="delivered">Delivered</button>
+            <button type="button" class="admin-order-filter-chip" data-status="cancelled">Cancelled</button>
           </div>
 
           <div class="admin-table-responsive">
@@ -2424,10 +2513,11 @@
                   <th>Customer Name &amp; Contact</th>
                   <th>Destination</th>
                   <th>Order Items Summary</th>
-                  <th>Payment Method</th>
+                  <th>Payment</th>
                   <th>Total Amount</th>
                   <th>Status</th>
-                  <th>Date</th>
+                  <th>Date Placed</th>
+                  <th style="text-align: right;">Fulfillment &amp; Actions</th>
                 </tr>
               </thead>
               <tbody id="tabOrdersTbody">
@@ -2771,6 +2861,112 @@
     </div>
   </div>
 
+  <!-- ORDER DETAILS & FULFILLMENT MODAL -->
+  <div class="admin-modal" id="adminOrderDetailsModal" role="dialog" aria-modal="true" aria-labelledby="adminOrderModalTitle">
+    <div class="admin-modal-card" style="max-width: 780px;">
+      <div class="admin-modal-header" style="background: linear-gradient(135deg, #091e3a 0%, #1e293b 100%);">
+        <div>
+          <h3 class="admin-modal-title" id="adminOrderModalTitle" style="color: #ffffff;">Order Details &amp; Fulfillment</h3>
+          <span style="font-size: 11.5px; color: #94a3b8;" id="adminOrderModalSubtitle">Tracking ID: NKM-000000</span>
+        </div>
+        <button type="button" class="admin-modal-close" id="closeAdminOrderModal" style="color: #ffffff;">&times;</button>
+      </div>
+
+      <div class="admin-modal-body" style="padding: 20px 24px; max-height: calc(85vh - 120px); overflow-y: auto;">
+        <!-- Two Column Meta Card -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+          <!-- Customer Info -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px;">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Customer &amp; Delivery Destination</div>
+            <div style="font-size: 14px; font-weight: 800; color: #0f172a;" id="modalOrderCustomerName">Customer Name</div>
+            <div style="font-size: 12.5px; color: #334155; margin-top: 4px;" id="modalOrderCustomerPhone">Phone: -</div>
+            <div style="font-size: 12.5px; color: #334155; margin-top: 2px;" id="modalOrderCustomerEmail">Email: -</div>
+            <div style="font-size: 12.5px; color: #475569; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1;" id="modalOrderAddress">Address: -</div>
+          </div>
+
+          <!-- Order Status & Payment -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Order &amp; Payment Status</div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 12px; color: #64748b;">Current Status:</span>
+                <span class="status-chip active" id="modalOrderStatusBadge">CONFIRMED</span>
+              </div>
+              <div style="font-size: 12.5px; color: #334155;">Payment Method: <strong id="modalOrderPaymentMethod">Pay on Delivery</strong></div>
+              <div style="font-size: 12.5px; color: #334155; margin-top: 2px;">Payment Status: <strong id="modalOrderPaymentStatus">Pending Verification</strong></div>
+              <div style="font-size: 11.5px; color: #64748b; margin-top: 6px;" id="modalOrderDate">Placed: -</div>
+            </div>
+            <div style="font-size: 16px; font-weight: 800; color: #15803d; margin-top: 8px;" id="modalOrderGrandTotal">&#8358;0</div>
+          </div>
+        </div>
+
+        <!-- Fulfillment Status Changer Box -->
+        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+            <div style="font-size: 13px; font-weight: 800; color: #091e3a;">Change Fulfillment Status</div>
+            <span style="font-size: 11.5px; color: #64748b;">Syncs instantly to cloud and customer order tracking</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <select id="modalOrderStatusSelect" class="admin-select" style="flex: 1; min-width: 180px; padding: 8px 12px; font-weight: 700; font-size: 13px; border-radius: 8px; border: 1.5px solid #cbd5e1;">
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing (Preparing for Dispatch)</option>
+              <option value="shipped">Out for Delivery (Shipped)</option>
+              <option value="delivered">Delivered Successfully</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button type="button" class="admin-btn btn-green" id="modalUpdateStatusBtn" style="padding: 8px 18px; font-size: 13px;">Update Status Now</button>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
+          <div style="padding: 10px 16px; background: #f1f5f9; font-size: 12px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #e2e8f0;">Purchased Items</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="background: #fafafa; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 11.5px; color: #64748b;">
+                <th style="padding: 8px 14px;">Item</th>
+                <th style="padding: 8px 14px; text-align: center;">Qty</th>
+                <th style="padding: 8px 14px; text-align: right;">Unit Price</th>
+                <th style="padding: 8px 14px; text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="modalOrderItemsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pricing Summary -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; width: 280px; margin-left: auto;">
+          <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: #475569; margin-bottom: 6px;">
+            <span>Subtotal:</span>
+            <strong id="modalOrderSubtotal">&#8358;0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: #475569; margin-bottom: 6px;">
+            <span>Delivery Fee:</span>
+            <strong id="modalOrderDeliveryFee">&#8358;0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; color: #091e3a; padding-top: 6px; border-top: 1px solid #e2e8f0;">
+            <span>Total Payable:</span>
+            <span style="color: #15803d;" id="modalOrderPayable">&#8358;0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-modal-footer" style="display: flex; justify-content: space-between;">
+        <button type="button" class="admin-btn btn-secondary" onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span>Print Order Slip</span>
+        </button>
+        <button type="button" class="admin-btn btn-secondary" id="closeAdminOrderModalBtn">Close Window</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ADMIN TOAST CONTAINER -->
+  <div class="admin-toast-container" id="adminToastContainer"></div>
+
   <script>
     // State
     let adminProducts = [];
@@ -3022,6 +3218,57 @@
 
       const refreshOrdersTabBtn = document.getElementById('refreshOrdersTabBtn');
       if (refreshOrdersTabBtn) refreshOrdersTabBtn.addEventListener('click', loadOrdersTab);
+
+      // Orders Tab Search & Filter Listeners
+      const ordersSearchInput = document.getElementById('adminOrdersSearchInput');
+      if (ordersSearchInput) {
+        ordersSearchInput.addEventListener('input', (e) => {
+          adminOrdersFilterState.search = e.target.value.trim();
+          loadOrdersTab();
+        });
+      }
+
+      const ordersFilterGroup = document.getElementById('adminOrdersFilterGroup');
+      if (ordersFilterGroup) {
+        ordersFilterGroup.addEventListener('click', (e) => {
+          const btn = e.target.closest('.admin-order-filter-chip');
+          if (!btn) return;
+          ordersFilterGroup.querySelectorAll('.admin-order-filter-chip').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          adminOrdersFilterState.status = btn.getAttribute('data-status') || 'all';
+          loadOrdersTab();
+        });
+      }
+
+      // Order Details Modal Actions
+      const closeOrderModalBtn = document.getElementById('closeAdminOrderModal');
+      const closeOrderModalBtn2 = document.getElementById('closeAdminOrderModalBtn');
+      if (closeOrderModalBtn) closeOrderModalBtn.addEventListener('click', closeOrderDetailsModal);
+      if (closeOrderModalBtn2) closeOrderModalBtn2.addEventListener('click', closeOrderDetailsModal);
+
+      const modalUpdateStatusBtn = document.getElementById('modalUpdateStatusBtn');
+      if (modalUpdateStatusBtn) {
+        modalUpdateStatusBtn.addEventListener('click', async () => {
+          if (!activeOrderForModal) return;
+          const statusSelect = document.getElementById('modalOrderStatusSelect');
+          const newStatus = statusSelect ? statusSelect.value : 'confirmed';
+          await window.changeAdminOrderStatus(activeOrderForModal.id, newStatus);
+          closeOrderDetailsModal();
+        });
+      }
+
+      window.addEventListener('click', (e) => {
+        const orderModal = document.getElementById('adminOrderDetailsModal');
+        if (e.target === orderModal) {
+          closeOrderDetailsModal();
+        }
+      });
+
+      // Realtime listener for order updates
+      window.addEventListener('nkemmart_order_updated', () => {
+        loadOrdersTab();
+        renderDailySalesUI();
+      });
 
       // Product Modal Actions & Live Image Preview
       const productModal = document.getElementById('productModal');
@@ -4572,7 +4819,7 @@
 
       if (salesFilterState.status !== 'all') {
         const sMatch = salesFilterState.status.toLowerCase();
-        displayTransactions = displayTransactions.filter(o => (o.status || 'completed').toLowerCase() === sMatch);
+        displayTransactions = displayTransactions.filter(o => (o.order_status || o.status || 'confirmed').toLowerCase() === sMatch);
       }
 
       if (salesFilterState.payment !== 'all') {
@@ -4581,14 +4828,15 @@
       }
 
       if (salesFilterState.search) {
-        const q = salesFilterState.search;
+        const q = salesFilterState.search.toLowerCase();
         displayTransactions = displayTransactions.filter(o => {
-          return (o.id && String(o.id).toLowerCase().includes(q)) ||
-                 (o.full_name && o.full_name.toLowerCase().includes(q)) ||
-                 (o.email && o.email.toLowerCase().includes(q)) ||
-                 (o.phone && o.phone.toLowerCase().includes(q)) ||
-                 (o.state && o.state.toLowerCase().includes(q)) ||
-                 (o.city && o.city.toLowerCase().includes(q));
+          const name = (o.customer_name || o.full_name || '').toLowerCase();
+          const email = (o.customer_email || o.email || '').toLowerCase();
+          const phone = (o.customer_phone || o.phone || '').toLowerCase();
+          const state = (o.state || '').toLowerCase();
+          const city = (o.city || '').toLowerCase();
+          const id = (String(o.id) || '').toLowerCase();
+          return id.includes(q) || name.includes(q) || email.includes(q) || phone.includes(q) || state.includes(q) || city.includes(q);
         });
       }
 
@@ -4635,20 +4883,28 @@
               itemsCount = 1;
             }
 
+            const buyerName = o.customer_name || o.full_name || 'Valued Customer';
+            const buyerContact = o.customer_email || o.email || o.customer_phone || o.phone || '';
+            const statusKey = (o.order_status || o.status || 'confirmed').toLowerCase();
+
             return `
               <tr>
-                <td style="white-space: nowrap;"><strong>${escapeHtml(o.id)}</strong></td>
+                <td style="white-space: nowrap;">
+                  <a href="javascript:void(0)" onclick="window.openOrderDetailsModal('${escapeHtml(o.id)}')" style="color: #512175; font-weight: 800; text-decoration: none;" title="View order details">
+                    ${escapeHtml(o.id)}
+                  </a>
+                </td>
                 <td style="white-space: nowrap;">
                   <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-                    <strong style="color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</strong>
-                    ${(o.email || o.phone) ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(o.email || o.phone)})</span>` : ''}
+                    <strong style="color: #0f172a;">${escapeHtml(buyerName)}</strong>
+                    ${buyerContact ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(buyerContact)})</span>` : ''}
                   </div>
                 </td>
                 <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}${o.city ? ` &bull; ${escapeHtml(o.city)}` : ''}</span></td>
                 <td style="white-space: nowrap;">${itemsCount} item${itemsCount === 1 ? '' : 's'}</td>
-                <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+                <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; text-transform: capitalize;">${escapeHtml((o.payment_method || 'Verified Pay').replace(/_/g, ' '))}</span></td>
                 <td style="white-space: nowrap;"><strong style="color: #091e3a; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
-                <td style="white-space: nowrap;"><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+                <td style="white-space: nowrap;"><span class="status-chip ${statusKey}">${escapeHtml(statusKey.toUpperCase())}</span></td>
                 <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
               </tr>
             `;
@@ -4685,15 +4941,15 @@
         if (Array.isArray(o.items)) count = o.items.reduce((s, it) => s + (it.qty || 1), 0);
         return [
           `"${(o.id || '').replace(/"/g, '""')}"`,
-          `"${(o.full_name || '').replace(/"/g, '""')}"`,
-          `"${(o.email || '').replace(/"/g, '""')}"`,
-          `"${(o.phone || '').replace(/"/g, '""')}"`,
+          `"${(o.customer_name || o.full_name || 'Customer').replace(/"/g, '""')}"`,
+          `"${(o.customer_email || o.email || '').replace(/"/g, '""')}"`,
+          `"${(o.customer_phone || o.phone || '').replace(/"/g, '""')}"`,
           `"${(o.state || '').replace(/"/g, '""')}"`,
           `"${(o.city || '').replace(/"/g, '""')}"`,
           count,
           `"${(o.payment_method || '').replace(/"/g, '""')}"`,
           Number(o.total_amount || 0),
-          `"${(o.status || 'completed').replace(/"/g, '""')}"`,
+          `"${(o.order_status || o.status || 'confirmed').replace(/"/g, '""')}"`,
           `"${(o.created_at || '').replace(/"/g, '""')}"`
         ].join(',');
       });
@@ -4952,22 +5208,54 @@
           </div>
         `).join('');
       } else if (subtabName === 'orders') {
-        const ordersItems = Array.isArray(activeUserForModal.orders_data) ? activeUserForModal.orders_data : [];
-        if (ordersItems.length === 0) {
-          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">No prior completed order records found for this user account.</div>`;
+        const uId = activeUserForModal.id;
+        const uEmail = (activeUserForModal.email || '').toLowerCase();
+        const matchedOrders = (adminOrdersList || []).filter(o => {
+          if (uId && o.user_id && String(o.user_id) === String(uId)) return true;
+          if (uEmail) {
+            const oEmail = (o.customer_email || o.email || '').toLowerCase();
+            if (oEmail && oEmail === uEmail) return true;
+          }
+          return false;
+        });
+
+        // Also check activeUserForModal.orders_data as fallback
+        const fallbackOrders = Array.isArray(activeUserForModal.orders_data) ? activeUserForModal.orders_data : [];
+        const combined = [...matchedOrders];
+        fallbackOrders.forEach(fo => {
+          if (!combined.find(c => c.id === fo.id)) combined.push(fo);
+        });
+
+        if (combined.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 36px; color: #64748b;">No prior order records found for this user account.</div>`;
           return;
         }
 
-        container.innerHTML = ordersItems.map(o => `
-          <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(o.id)} &bull; ${escapeHtml(o.date)}</strong>
-              <span class="status-chip active">${escapeHtml(o.status)}</span>
+        container.innerHTML = combined.map(o => {
+          const dateFmt = o.created_at ? new Date(o.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : (o.date || 'Recently');
+          const st = (o.order_status || o.status || 'confirmed').toLowerCase();
+          let itemsText = '';
+          if (Array.isArray(o.items)) {
+            itemsText = o.items.map(it => `${it.qty || 1}x ${it.title}`).join(', ');
+          } else {
+            itemsText = o.items || 'General store items';
+          }
+          const tot = Number(o.total_amount != null ? o.total_amount : (o.total || 0));
+
+          return `
+            <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <strong style="font-size: 13px; color: #0f172a;">${escapeHtml(o.id)} &bull; ${escapeHtml(dateFmt)}</strong>
+                <span class="status-chip ${st}">${escapeHtml(st.toUpperCase())}</span>
+              </div>
+              <div style="font-size: 12.5px; color: #475569; margin-top: 4px;">Items: ${escapeHtml(itemsText)}</div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e1;">
+                <div style="font-size: 13px; font-weight: 700; color: #15803d;">Total: ${formatNaira(tot)}</div>
+                <button type="button" class="admin-btn btn-secondary" onclick="openOrderDetailsModal('${escapeHtml(o.id)}')" style="font-size: 11px; padding: 4px 8px;">View Full Order</button>
+              </div>
             </div>
-            <div style="font-size: 12.5px; color: #475569; margin-top: 4px;">Items: ${escapeHtml(o.items)}</div>
-            <div style="font-size: 13px; font-weight: 700; color: #15803d; margin-top: 4px;">Total: ${formatNaira(o.total)}</div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     }
 
@@ -5086,8 +5374,37 @@
     }
 
     // ========================================================
-    // ORDERS TAB MODULE
+    // ORDERS TAB MODULE & REALTIME FULFILLMENT
     // ========================================================
+    let adminOrdersFilterState = {
+      status: 'all',
+      search: ''
+    };
+
+    let activeOrderForModal = null;
+
+    function showAdminToast(message, type = 'success') {
+      const container = document.getElementById('adminToastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast';
+      if (type === 'error') {
+        toast.style.borderLeftColor = '#ef4444';
+      }
+      toast.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${type === 'error' ? '#ef4444' : '#22c55e'}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+    window.showAdminToast = showAdminToast;
+
     async function loadOrdersTab() {
       const tbody = document.getElementById('tabOrdersTbody');
       if (!tbody) return;
@@ -5102,12 +5419,37 @@
       const sideOrdersBadge = document.getElementById('sidebarOrdersBadge');
       if (sideOrdersBadge) sideOrdersBadge.textContent = adminOrdersList.length;
 
-      if (adminOrdersList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 32px; color: #64748b;">No customer orders placed yet.</td></tr>`;
+      // Filter orders based on active status and search query
+      let filtered = [...adminOrdersList];
+      if (adminOrdersFilterState.status !== 'all') {
+        const sMatch = adminOrdersFilterState.status.toLowerCase();
+        filtered = filtered.filter(o => (o.order_status || o.status || 'confirmed').toLowerCase() === sMatch);
+      }
+
+      if (adminOrdersFilterState.search) {
+        const q = adminOrdersFilterState.search.toLowerCase();
+        filtered = filtered.filter(o => {
+          const name = (o.customer_name || o.full_name || '').toLowerCase();
+          const email = (o.customer_email || o.email || '').toLowerCase();
+          const phone = (o.customer_phone || o.phone || '').toLowerCase();
+          const state = (o.state || '').toLowerCase();
+          const city = (o.city || '').toLowerCase();
+          const id = (String(o.id) || '').toLowerCase();
+          return id.includes(q) || name.includes(q) || email.includes(q) || phone.includes(q) || state.includes(q) || city.includes(q);
+        });
+      }
+
+      const subtitleEl = document.getElementById('ordersTabSubtitle');
+      if (subtitleEl) {
+        subtitleEl.textContent = `Showing ${filtered.length} of ${adminOrdersList.length} store order${adminOrdersList.length === 1 ? '' : 's'}`;
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 36px 16px; color: #64748b; font-size: 13px;">${adminOrdersList.length === 0 ? 'No customer orders placed yet. Orders placed by storefront buyers will appear here in realtime.' : 'No orders found matching your search or status filter.'}</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = adminOrdersList.map(o => {
+      tbody.innerHTML = filtered.map(o => {
         const dateFmt = o.created_at ? new Date(o.created_at).toLocaleString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
         let itemsSummary = '';
         if (Array.isArray(o.items)) {
@@ -5117,24 +5459,149 @@
           itemsSummary = 'General store items';
         }
 
+        const buyerName = o.customer_name || o.full_name || 'Valued Customer';
+        const buyerContact = o.customer_email || o.email || o.customer_phone || o.phone || '';
+        const statusKey = (o.order_status || o.status || 'confirmed').toLowerCase();
+
         return `
           <tr>
-            <td style="white-space: nowrap;"><strong>${escapeHtml(o.id)}</strong></td>
+            <td style="white-space: nowrap;">
+              <a href="javascript:void(0)" onclick="window.openOrderDetailsModal('${escapeHtml(o.id)}')" style="color: #512175; font-weight: 800; text-decoration: none;" title="View order details">
+                ${escapeHtml(o.id)}
+              </a>
+            </td>
             <td style="white-space: nowrap;">
               <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-                <strong style="color: #0f172a;">${escapeHtml(o.full_name || 'Customer')}</strong>
-                ${(o.email || o.phone) ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(o.email || o.phone)})</span>` : ''}
+                <strong style="color: #0f172a;">${escapeHtml(buyerName)}</strong>
+                ${buyerContact ? `<span style="font-size: 11.5px; color: #64748b;">(${escapeHtml(buyerContact)})</span>` : ''}
               </div>
             </td>
-            <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}</span></td>
-            <td style="max-width: 260px; font-size: 12.5px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(itemsSummary)}">${escapeHtml(itemsSummary)}</td>
-            <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569;">${escapeHtml(o.payment_method || 'Verified Pay')}</span></td>
+            <td style="white-space: nowrap;"><span style="font-weight: 600; color: #334155;">${escapeHtml(o.state || 'Nigeria')}${o.city ? ` &bull; ${escapeHtml(o.city)}` : ''}</span></td>
+            <td style="max-width: 240px; font-size: 12.5px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(itemsSummary)}">${escapeHtml(itemsSummary)}</td>
+            <td style="white-space: nowrap;"><span style="font-size: 12px; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; text-transform: capitalize;">${escapeHtml((o.payment_method || 'Verified Pay').replace(/_/g, ' '))}</span></td>
             <td style="white-space: nowrap;"><strong style="color: #15803d; font-size: 13.5px;">${formatNaira(o.total_amount)}</strong></td>
-            <td style="white-space: nowrap;"><span class="status-chip active">${escapeHtml(o.status || 'completed')}</span></td>
+            <td style="white-space: nowrap;"><span class="status-chip ${statusKey}">${escapeHtml(statusKey.toUpperCase())}</span></td>
             <td style="font-size: 12px; color: #64748b; white-space: nowrap;">${dateFmt}</td>
+            <td style="white-space: nowrap; text-align: right;">
+              <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <select class="admin-order-status-select" onchange="window.changeAdminOrderStatus('${escapeHtml(o.id)}', this.value)" title="Change fulfillment status">
+                  <option value="confirmed" ${statusKey === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                  <option value="processing" ${statusKey === 'processing' ? 'selected' : ''}>Processing</option>
+                  <option value="shipped" ${statusKey === 'shipped' ? 'selected' : ''}>Out for Delivery</option>
+                  <option value="delivered" ${statusKey === 'delivered' ? 'selected' : ''}>Delivered</option>
+                  <option value="cancelled" ${statusKey === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                </select>
+                <button type="button" class="admin-btn btn-secondary" onclick="window.openOrderDetailsModal('${escapeHtml(o.id)}')" style="padding: 5px 9px; font-size: 11px;">Details</button>
+              </div>
+            </td>
           </tr>
         `;
       }).join('');
+    }
+
+    window.changeAdminOrderStatus = async function(orderId, newStatus) {
+      if (!orderId || !newStatus) return;
+      try {
+        if (typeof updateAdminOrderStatus === 'function') {
+          await updateAdminOrderStatus(orderId, newStatus);
+        }
+
+        // Update in active memory
+        const target = adminOrdersList.find(o => String(o.id) === String(orderId));
+        if (target) {
+          target.order_status = newStatus;
+          target.status = newStatus;
+        }
+
+        // Refresh UI
+        loadOrdersTab();
+        renderDailySalesUI();
+        showAdminToast(`Order #${orderId} status updated to ${newStatus.toUpperCase()}`);
+      } catch (err) {
+        alert('Could not update status: ' + err.message);
+      }
+    };
+
+    window.openOrderDetailsModal = function(orderId) {
+      const order = adminOrdersList.find(o => String(o.id) === String(orderId));
+      if (!order) {
+        alert('Order record not found.');
+        return;
+      }
+
+      activeOrderForModal = order;
+      const modal = document.getElementById('adminOrderDetailsModal');
+      if (!modal) return;
+
+      const dateFmt = order.created_at ? new Date(order.created_at).toLocaleString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent';
+      const buyerName = order.customer_name || order.full_name || 'Valued Customer';
+      const statusKey = (order.order_status || order.status || 'confirmed').toLowerCase();
+
+      document.getElementById('adminOrderModalTitle').textContent = `Order Details — #${order.id}`;
+      document.getElementById('adminOrderModalSubtitle').textContent = `Placed on ${dateFmt}`;
+      document.getElementById('modalOrderCustomerName').textContent = buyerName;
+      document.getElementById('modalOrderCustomerPhone').textContent = `Phone: ${order.customer_phone || order.phone || 'Not provided'}`;
+      document.getElementById('modalOrderCustomerEmail').textContent = `Email: ${order.customer_email || order.email || 'Not provided'}`;
+      document.getElementById('modalOrderAddress').textContent = `Delivery Address: ${order.delivery_address || 'Standard Address'}, ${order.city || ''}, ${order.state || 'Nigeria'}`;
+
+      const badge = document.getElementById('modalOrderStatusBadge');
+      badge.className = `status-chip ${statusKey}`;
+      badge.textContent = statusKey.toUpperCase();
+
+      document.getElementById('modalOrderPaymentMethod').textContent = (order.payment_method || 'Verified Pay').replace(/_/g, ' ').toUpperCase();
+      document.getElementById('modalOrderPaymentStatus').textContent = (order.payment_status || 'Paid / Verified').replace(/_/g, ' ').toUpperCase();
+      document.getElementById('modalOrderDate').textContent = `Placed: ${dateFmt}`;
+      document.getElementById('modalOrderGrandTotal').textContent = formatNaira(order.total_amount);
+
+      const statusSelect = document.getElementById('modalOrderStatusSelect');
+      if (statusSelect) statusSelect.value = statusKey;
+
+      // Populate items table
+      const itemsTbody = document.getElementById('modalOrderItemsTbody');
+      const items = Array.isArray(order.items) ? order.items : [];
+      let calcSubtotal = 0;
+
+      if (items.length === 0) {
+        itemsTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 18px; color: #64748b;">No individual item details stored.</td></tr>`;
+      } else {
+        itemsTbody.innerHTML = items.map(it => {
+          const qty = Number(it.qty || 1);
+          const price = Number(it.price || 0);
+          const lineTotal = price * qty;
+          calcSubtotal += lineTotal;
+          const imgUrl = it.image || 'images/subcategories/sub_smartphones.jpg';
+
+          return `
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
+                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(it.title)}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff;" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
+                <div>
+                  <div style="font-weight: 700; color: #0f172a; font-size: 12.5px;">${escapeHtml(it.title || 'Product Item')}</div>
+                  <div style="font-size: 11px; color: #64748b; text-transform: capitalize;">${escapeHtml(it.category || 'General')}</div>
+                </div>
+              </td>
+              <td style="padding: 10px 14px; text-align: center; font-weight: 700; color: #0f172a;">${qty}</td>
+              <td style="padding: 10px 14px; text-align: right; color: #475569;">${formatNaira(price)}</td>
+              <td style="padding: 10px 14px; text-align: right; font-weight: 700; color: #0f172a;">${formatNaira(lineTotal)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const deliveryFee = Number(order.delivery_fee || 0);
+      const grandTotal = Number(order.total_amount || (calcSubtotal + deliveryFee));
+
+      document.getElementById('modalOrderSubtotal').textContent = formatNaira(calcSubtotal || (grandTotal - deliveryFee));
+      document.getElementById('modalOrderDeliveryFee').textContent = formatNaira(deliveryFee);
+      document.getElementById('modalOrderPayable').textContent = formatNaira(grandTotal);
+
+      modal.classList.add('open');
+    };
+
+    function closeOrderDetailsModal() {
+      const modal = document.getElementById('adminOrderDetailsModal');
+      if (modal) modal.classList.remove('open');
+      activeOrderForModal = null;
     }
 
     // ========================================================

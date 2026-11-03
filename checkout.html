@@ -1494,12 +1494,16 @@
 
         const orderId = 'NKM-' + Math.floor(100000 + Math.random() * 900000);
         const grandTotal = subtotal + deliveryFee;
+        const nowIso = new Date().toISOString();
 
         const orderData = {
           id: orderId,
           customer_name: fullName,
+          full_name: fullName,
           customer_phone: phone,
+          phone: phone,
           customer_email: email,
+          email: email,
           delivery_address: street,
           city: lgaName,
           state: stateName,
@@ -1510,16 +1514,37 @@
           payment_method: selectedPaymentMethod,
           payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : 'pending_verification',
           order_status: 'confirmed',
-          created_at: new Date().toISOString()
+          status: 'confirmed',
+          created_at: nowIso
         };
 
-        // 1. Save to Supabase
+        // 1. Save to Supabase (only send valid table columns)
         const client = getSupabase();
         if (client) {
           try {
             const user = await getCurrentUser();
-            if (user) orderData.user_id = user.id;
-            await client.from('orders').insert([orderData]);
+            const supabasePayload = {
+              id: orderId,
+              customer_name: fullName,
+              customer_phone: phone,
+              customer_email: email,
+              delivery_address: street,
+              city: lgaName,
+              state: stateName,
+              items: cart,
+              subtotal: subtotal,
+              delivery_fee: deliveryFee,
+              total_amount: grandTotal,
+              payment_method: selectedPaymentMethod,
+              payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : 'pending_verification',
+              order_status: 'confirmed',
+              created_at: nowIso
+            };
+            if (user) {
+              orderData.user_id = user.id;
+              supabasePayload.user_id = user.id;
+            }
+            await client.from('orders').insert([supabasePayload]);
 
             // Log order placement activity in user account
             if (typeof logUserActivity === 'function') {
@@ -1532,19 +1557,31 @@
                 state: stateName
               });
             }
+
+            // Send notification to user account
+            if (typeof addUserNotification === 'function') {
+              await addUserNotification({
+                type: 'order',
+                title: 'Order Placed Successfully',
+                message: 'Your order #' + orderId + ' (Total: ' + formatNaira(grandTotal) + ') has been confirmed and is being processed.',
+                link: 'orders.html?orderId=' + encodeURIComponent(orderId)
+              });
+            }
           } catch (err) {
             console.warn('Supabase order insert note:', err);
           }
         }
 
-        // 2. Save to local storage orders history
-        try {
-          const userOrders = JSON.parse(localStorage.getItem('nkemmart_user_orders') || '[]');
-          userOrders.unshift(orderData);
-          localStorage.setItem('nkemmart_user_orders', JSON.stringify(userOrders));
-        } catch (e) {
-          console.warn('Local storage order save error:', e);
-        }
+        // 2. Save to both user and admin local storage histories
+        ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(storageKey) {
+          try {
+            const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            list.unshift(orderData);
+            localStorage.setItem(storageKey, JSON.stringify(list));
+          } catch (e) {
+            console.warn('Local storage order save error:', e);
+          }
+        });
 
         // 3. Clear cart both locally and in cloud
         if (typeof syncCartToCloud === 'function') {
@@ -1553,6 +1590,9 @@
           localStorage.removeItem('nkemmart_cart');
         }
         window.dispatchEvent(new Event('cartUpdated'));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'confirmed' } }));
+        }
 
         // 4. Redirect to order confirmation page
         window.location.href = `orders.html?orderId=${orderId}&placed=true`;
