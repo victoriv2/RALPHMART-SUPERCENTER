@@ -2048,9 +2048,9 @@
               return it.id === id ? sum + (it.qty || 1) : sum;
             }, 0);
             if (inCartCount > 0) {
-              wrap.innerHTML = '<button class="card-action-btn select-options-btn has-in-cart" type="button" data-has-variants="true">Select Options (' + inCartCount + ' in cart)</button>';
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn has-in-cart" type="button" data-has-variants="true">Add to cart (' + inCartCount + ' in cart)</button>';
             } else {
-              wrap.innerHTML = '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>';
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Add to cart</button>';
             }
             return;
           }
@@ -2808,7 +2808,7 @@
               '</div>' +
               '<div class="card-action-wrap">' +
                 (pHasVar
-                  ? '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>'
+                  ? '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Add to cart</button>'
                   : '<button class="card-action-btn" type="button">Add to cart</button>') +
               '</div>' +
             '</div>' +

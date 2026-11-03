@@ -3864,7 +3864,7 @@
           var actionHtml = '';
           var pHasVar = (typeof window.productHasVariants === 'function') && window.productHasVariants(prod);
           if (pHasVar) {
-            actionHtml = '<button type="button" class="rec-card-btn select-options-btn" data-rec-id="' + prod.id + '">Select Options</button>';
+            actionHtml = '<button type="button" class="rec-card-btn select-options-btn" data-rec-id="' + prod.id + '">Add to cart</button>';
           } else if (inCartQty > 0) {
             actionHtml = 
               '<div class="card-qty-stepper" data-rec-id="' + prod.id + '">' +
