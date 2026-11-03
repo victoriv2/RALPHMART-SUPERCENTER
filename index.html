@@ -2042,6 +2042,19 @@
           var wrap = card.querySelector('.card-action-wrap');
           if (!wrap) return;
 
+          var hasVar = card.getAttribute('data-has-variants') === 'true';
+          if (hasVar) {
+            var inCartCount = cart.reduce(function(sum, it) {
+              return it.id === id ? sum + (it.qty || 1) : sum;
+            }, 0);
+            if (inCartCount > 0) {
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn has-in-cart" type="button" data-has-variants="true">Select Options (' + inCartCount + ' in cart)</button>';
+            } else {
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>';
+            }
+            return;
+          }
+
           var cartItem = cart.find(function(it) { return it.id === id; });
           var qty = (cartItem && cartItem.qty) ? cartItem.qty : 0;
 
@@ -2098,7 +2111,7 @@
           }
         }
 
-        // 1. Click "Add to cart"
+        // 1. Click "Add to cart" / "Select Options"
         var addBtn = e.target.closest('.card-action-btn');
         if (addBtn) {
           var card = addBtn.closest('.product-card');
@@ -2106,6 +2119,19 @@
           e.preventDefault();
 
           var id = card.getAttribute('data-id') || 'prod-' + Date.now();
+          var prod = (typeof window.getCatalogProduct === 'function') ? window.getCatalogProduct(id) : null;
+          var hasVar = (card.getAttribute('data-has-variants') === 'true') || (prod && typeof window.productHasVariants === 'function' && window.productHasVariants(prod));
+
+          // If product has variants, ALWAYS prompt customer to pick options
+          if (hasVar) {
+            if (typeof window.openQuickOptionsModal === 'function' && prod) {
+              window.openQuickOptionsModal(prod);
+            } else {
+              window.location.href = 'product.html?id=' + encodeURIComponent(id);
+            }
+            return;
+          }
+
           var title = card.getAttribute('data-title') || card.querySelector('.product-title').textContent.trim();
           var price = parseInt(card.getAttribute('data-price'), 10) || 0;
           var originalPrice = parseInt(card.getAttribute('data-original'), 10) || 0;
@@ -2113,7 +2139,7 @@
           var brand = card.getAttribute('data-brand') || 'Verified';
 
           var cart = getCart();
-          var existingIndex = cart.findIndex(function(item) { return item.id === id; });
+          var existingIndex = cart.findIndex(function(item) { return item.id === id && !item.variant_id; });
 
           if (existingIndex > -1) {
             cart[existingIndex].qty = (cart[existingIndex].qty || 1) + 1;
@@ -2756,7 +2782,11 @@
           var rating = Number(p.rating) || 5.0;
           var img = (Array.isArray(p.images) && p.images.length > 0) ? p.images[0] : (p.image || 'images/subcategories/sub_smartphones.jpg');
 
-          return '<article class="product-card" data-id="' + escapeHtml(p.id) + '" data-rating="' + rating + '" data-title="' + escapeHtml(p.title) + '" data-price="' + priceNum + '" data-original="' + origNum + '" data-image="' + escapeHtml(img) + '" data-brand="' + escapeHtml(p.brand || 'Verified') + '">' +
+          var pHasVar = (typeof window.productHasVariants === 'function')
+            ? window.productHasVariants(p)
+            : Boolean(p.has_variants || (p.variants && p.variants.length > 0) || (p.specs && p.specs.variants_data && p.specs.variants_data.has_variants));
+
+          return '<article class="product-card" data-id="' + escapeHtml(p.id) + '" data-has-variants="' + (pHasVar ? 'true' : 'false') + '" data-rating="' + rating + '" data-title="' + escapeHtml(p.title) + '" data-price="' + priceNum + '" data-original="' + origNum + '" data-image="' + escapeHtml(img) + '" data-brand="' + escapeHtml(p.brand || 'Verified') + '">' +
             '<div class="card-media">' +
               '<img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.title) + '" class="card-img" loading="lazy">' +
               '<button class="wishlist-btn" aria-label="Add to wishlist" type="button">' +
@@ -2777,7 +2807,9 @@
                 '<span class="rating-count">(' + (p.reviewsCount || p.reviews || 0) + ')</span>' +
               '</div>' +
               '<div class="card-action-wrap">' +
-                '<button class="card-action-btn" type="button">Add to cart</button>' +
+                (pHasVar
+                  ? '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>'
+                  : '<button class="card-action-btn" type="button">Add to cart</button>') +
               '</div>' +
             '</div>' +
           '</article>';

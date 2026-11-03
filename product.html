@@ -3862,7 +3862,10 @@
           card.setAttribute('data-id', prod.id);
 
           var actionHtml = '';
-          if (inCartQty > 0) {
+          var pHasVar = (typeof window.productHasVariants === 'function') && window.productHasVariants(prod);
+          if (pHasVar) {
+            actionHtml = '<button type="button" class="rec-card-btn select-options-btn" data-rec-id="' + prod.id + '">Select Options</button>';
+          } else if (inCartQty > 0) {
             actionHtml = 
               '<div class="card-qty-stepper" data-rec-id="' + prod.id + '">' +
                 '<button type="button" class="card-qty-btn rec-qty-dec" data-rec-id="' + prod.id + '" aria-label="Decrease quantity">' +
@@ -3919,10 +3922,21 @@
           var addBtn = e.target.closest('.rec-card-btn');
           if (addBtn) {
             var pid = addBtn.getAttribute('data-rec-id');
-            var target = CATALOG_PRODUCTS.find(function(p) { return p.id === pid; });
+            var target = (typeof window.getCatalogProduct === 'function' ? window.getCatalogProduct(pid) : null) || (typeof CATALOG_PRODUCTS !== 'undefined' ? CATALOG_PRODUCTS.find(function(p) { return p.id === pid; }) : null);
             if (!target) return;
+
+            // If product has variants, prompt to pick options
+            if (typeof window.productHasVariants === 'function' && window.productHasVariants(target)) {
+              if (typeof window.openQuickOptionsModal === 'function') {
+                window.openQuickOptionsModal(target);
+              } else {
+                window.location.href = 'product.html?id=' + encodeURIComponent(pid);
+              }
+              return;
+            }
+
             var cart = getCart();
-            var ex = cart.find(function(it) { return it.id === target.id; });
+            var ex = cart.find(function(it) { return it.id === target.id && !it.variant_id; });
             if (ex) {
               ex.qty = (ex.qty || 1) + 1;
             } else {

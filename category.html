@@ -1263,6 +1263,11 @@
               art.setAttribute('data-brand', prod.brand || 'Verified');
               art.setAttribute('data-rating', prod.rating || 4.8);
 
+              var pHasVar = (typeof window.productHasVariants === 'function')
+                ? window.productHasVariants(prod)
+                : Boolean(prod.has_variants || (prod.variants && prod.variants.length > 0) || (prod.specs && prod.specs.variants_data && prod.specs.variants_data.has_variants));
+              art.setAttribute('data-has-variants', pHasVar ? 'true' : 'false');
+
               var cardDisc = (typeof window.formatDiscountBadge === 'function')
                 ? window.formatDiscountBadge(prod.discount, prod.price, prod.originalPrice)
                 : (prod.discount ? ('-' + Math.round(parseFloat(String(prod.discount).replace(/[^0-9.]/g, '')) || 0) + '%') : '');
@@ -1294,7 +1299,9 @@
                     '<span class="rating-count">(' + formatNumberWithCommas(prod.reviews || 100) + ')</span>' +
                   '</div>' +
                   '<div class="card-action-wrap">' +
-                    '<button class="card-action-btn" type="button">Add to cart</button>' +
+                    (pHasVar
+                      ? '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>'
+                      : '<button class="card-action-btn" type="button">Add to cart</button>') +
                   '</div>' +
                 '</div>';
               prodGrid.appendChild(art);
@@ -2562,6 +2569,19 @@
           var wrap = card.querySelector('.card-action-wrap');
           if (!wrap) return;
 
+          var hasVar = card.getAttribute('data-has-variants') === 'true';
+          if (hasVar) {
+            var inCartCount = cart.reduce(function(sum, it) {
+              return it.id === id ? sum + (it.qty || 1) : sum;
+            }, 0);
+            if (inCartCount > 0) {
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn has-in-cart" type="button" data-has-variants="true">Select Options (' + inCartCount + ' in cart)</button>';
+            } else {
+              wrap.innerHTML = '<button class="card-action-btn select-options-btn" type="button" data-has-variants="true">Select Options</button>';
+            }
+            return;
+          }
+
           var cartItem = cart.find(function(it) { return it.id === id; });
           var qty = (cartItem && cartItem.qty) ? cartItem.qty : 0;
 
@@ -2631,7 +2651,7 @@
           }
         }
 
-        // 1. Click "Add to cart"
+        // 1. Click "Add to cart" / "Select Options"
         var addBtn = e.target.closest('.card-action-btn');
         if (addBtn) {
           var card = addBtn.closest('.product-card');
@@ -2639,6 +2659,19 @@
           e.preventDefault();
 
           var id = card.getAttribute('data-id') || 'prod-' + Date.now();
+          var prod = (typeof window.getCatalogProduct === 'function') ? window.getCatalogProduct(id) : null;
+          var hasVar = (card.getAttribute('data-has-variants') === 'true') || (prod && typeof window.productHasVariants === 'function' && window.productHasVariants(prod));
+
+          // If product has variants, ALWAYS prompt customer to pick options
+          if (hasVar) {
+            if (typeof window.openQuickOptionsModal === 'function' && prod) {
+              window.openQuickOptionsModal(prod);
+            } else {
+              window.location.href = 'product.html?id=' + encodeURIComponent(id);
+            }
+            return;
+          }
+
           var title = card.getAttribute('data-title') || (card.querySelector('.product-title') ? card.querySelector('.product-title').textContent.trim() : 'Product');
           var price = parseInt(card.getAttribute('data-price'), 10) || 0;
           var originalPrice = parseInt(card.getAttribute('data-original'), 10) || 0;
@@ -2646,7 +2679,7 @@
           var brand = card.getAttribute('data-brand') || 'Verified';
 
           var cart = getCart();
-          var existingIndex = cart.findIndex(function(item) { return item.id === id; });
+          var existingIndex = cart.findIndex(function(item) { return item.id === id && !item.variant_id; });
 
           if (existingIndex > -1) {
             cart[existingIndex].qty = (cart[existingIndex].qty || 1) + 1;

@@ -1080,7 +1080,10 @@
           var isSaved = savedIds.indexOf(p.id) > -1;
 
           var btnAreaHtml = '';
-          if (qty > 0) {
+          var pHasVar = (typeof window.productHasVariants === 'function') && window.productHasVariants(p);
+          if (pHasVar) {
+            btnAreaHtml = '<button type="button" class="rec-card-btn select-options-btn" data-rec-id="' + p.id + '">Select Options</button>';
+          } else if (qty > 0) {
             btnAreaHtml = 
               '<div class="card-qty-stepper" style="height: 32px; margin-top: auto; background-color: var(--white);">' +
                 '<button class="card-qty-btn rec-qty-dec" type="button" data-rec-id="' + p.id + '" style="width: 32px; height: 32px;" aria-label="Decrease quantity">' +
@@ -1218,11 +1221,21 @@
           var addBtn = e.target.closest('.rec-card-btn');
           if (addBtn) {
             var prodId = addBtn.getAttribute('data-rec-id');
-            var product = CATALOG_PRODUCTS.find(function(p) { return p.id === prodId; });
+            var product = (typeof window.getCatalogProduct === 'function' ? window.getCatalogProduct(prodId) : null) || (typeof CATALOG_PRODUCTS !== 'undefined' ? CATALOG_PRODUCTS.find(function(p) { return p.id === prodId; }) : null);
             if (!product) return;
 
+            // If product has variants, ask customer to select options
+            if (typeof window.productHasVariants === 'function' && window.productHasVariants(product)) {
+              if (typeof window.openQuickOptionsModal === 'function') {
+                window.openQuickOptionsModal(product);
+              } else {
+                window.location.href = 'product.html?id=' + encodeURIComponent(prodId);
+              }
+              return;
+            }
+
             var cart = getCart();
-            var existing = cart.find(function(p) { return p.id === prodId; });
+            var existing = cart.find(function(p) { return p.id === prodId && !p.variant_id; });
             if (existing) {
               existing.qty = (existing.qty || 1) + 1;
             } else {

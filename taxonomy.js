@@ -682,3 +682,444 @@ window.NIGERIA_LOCATIONS = {
     lgas: ["Anka", "Bakura", "Birnin Magaji/Kiyaw", "Bukkuyum", "Bungudu", "Gummi", "Gusau", "Kaura Namoda", "Maradun", "Maru", "Shinkafi", "Talata Mafara", "Tsafe", "Zurmi"]
   }
 };
+
+// ========================================================
+// PRODUCT VARIANTS & QUICK OPTIONS SELECTOR SYSTEM
+// ========================================================
+
+window.productHasVariants = function(p) {
+  if (!p) return false;
+  if (p.has_variants) return true;
+  var varData = (p.specs && p.specs.variants_data) ? p.specs.variants_data : (p.variants_data || null);
+  if (varData && varData.has_variants) return true;
+  if (varData && Array.isArray(varData.variants) && varData.variants.length > 0) return true;
+  if (Array.isArray(p.variants) && p.variants.length > 0) return true;
+  if (Array.isArray(p.variant_options) && p.variant_options.length > 0) return true;
+  return false;
+};
+
+window.getProductVariantsData = function(p) {
+  if (!p) return { hasVariants: false, optionGroups: [], variants: [] };
+  var varData = (p.specs && p.specs.variants_data) ? p.specs.variants_data : (p.variants_data || null);
+  var has = (varData && varData.has_variants) || (Array.isArray(p.variants) && p.variants.length > 0) || p.has_variants || false;
+  var groups = (varData && Array.isArray(varData.variant_options)) ? varData.variant_options : (Array.isArray(p.variant_options) ? p.variant_options : []);
+  var vars = (varData && Array.isArray(varData.variants)) ? varData.variants : (Array.isArray(p.variants) ? p.variants : []);
+  return {
+    hasVariants: Boolean(has && vars.length > 0),
+    optionGroups: groups,
+    variants: vars
+  };
+};
+
+window.getCatalogProduct = function(id) {
+  if (!id) return null;
+  try {
+    var adminProds = JSON.parse(localStorage.getItem('nkemmart_admin_products')) || [];
+    var match = adminProds.find(function(p) { return String(p.id) === String(id); });
+    if (match) return match;
+  } catch(e) {}
+  if (typeof window.RALPHMART_CATALOG !== 'undefined' && Array.isArray(window.RALPHMART_CATALOG)) {
+    var matchCat = window.RALPHMART_CATALOG.find(function(p) { return String(p.id) === String(id); });
+    if (matchCat) return matchCat;
+  }
+  if (typeof CATALOG_PRODUCTS !== 'undefined' && Array.isArray(CATALOG_PRODUCTS)) {
+    var matchOld = CATALOG_PRODUCTS.find(function(p) { return String(p.id) === String(id); });
+    if (matchOld) return matchOld;
+  }
+  return null;
+};
+
+// Global Quick Options Modal
+(function() {
+  var activeQuickProd = null;
+  var selectedOptions = {};
+  var selectedQty = 1;
+  var currentMatchedVariant = null;
+
+  function ensureModalDOM() {
+    var existing = document.getElementById('quickOptionsModal');
+    if (existing) return existing;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'quick-options-modal-overlay';
+    overlay.id = 'quickOptionsModal';
+    overlay.innerHTML =
+      '<div class="quick-options-modal-dialog">' +
+        '<div class="quick-opt-header">' +
+          '<h3 class="quick-opt-title">Select Product Options</h3>' +
+          '<button type="button" class="quick-opt-close-btn" id="quickOptCloseBtn" aria-label="Close modal">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="quick-opt-body" id="quickOptBody"></div>' +
+        '<div class="quick-opt-footer">' +
+          '<button type="button" class="quick-opt-add-btn" id="quickOptAddBtn">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>' +
+            '<span>Add to Cart</span>' +
+          '</button>' +
+          '<a href="#" class="quick-opt-detail-link" id="quickOptDetailLink">View full product details &rarr;</a>' +
+        '</div>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay || e.target.closest('#quickOptCloseBtn')) {
+        closeQuickOptionsModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        closeQuickOptionsModal();
+      }
+    });
+
+    return overlay;
+  }
+
+  function formatNaira(num) {
+    var val = Number(num) || 0;
+    return '\u20A6 ' + val.toLocaleString('en-NG');
+  }
+
+  window.closeQuickOptionsModal = function() {
+    var overlay = document.getElementById('quickOptionsModal');
+    if (overlay) {
+      overlay.classList.remove('open');
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
+    }
+    activeQuickProd = null;
+    selectedOptions = {};
+    selectedQty = 1;
+    currentMatchedVariant = null;
+  };
+
+  window.openQuickOptionsModal = function(prod) {
+    if (!prod) return;
+    activeQuickProd = prod;
+    selectedOptions = {};
+    selectedQty = 1;
+    currentMatchedVariant = null;
+
+    var vData = window.getProductVariantsData(prod);
+    if (!vData.hasVariants) {
+      window.location.href = 'product.html?id=' + encodeURIComponent(prod.id);
+      return;
+    }
+
+    var overlay = ensureModalDOM();
+    var body = document.getElementById('quickOptBody');
+    var detailLink = document.getElementById('quickOptDetailLink');
+    if (detailLink) detailLink.href = 'product.html?id=' + encodeURIComponent(prod.id);
+
+    var priceNum = Number(prod.price) || 0;
+    var origNum = Number(prod.originalPrice || prod.oldPrice || prod.old_price) || 0;
+    var discText = (typeof window.formatDiscountBadge === 'function')
+      ? window.formatDiscountBadge(prod.discount, priceNum, origNum)
+      : '';
+    var pImgs = (Array.isArray(prod.images) && prod.images.length > 0) ? prod.images : (prod.image ? [prod.image] : ['images/subcategories/sub_smartphones.jpg']);
+    var curImg = pImgs[0];
+
+    // Build modal body
+    body.innerHTML =
+      '<div class="quick-opt-product-summary">' +
+        '<div class="quick-opt-thumb-wrap">' +
+          '<img src="' + curImg + '" alt="' + (prod.title || 'Product') + '" class="quick-opt-thumb" id="quickOptThumb">' +
+        '</div>' +
+        '<div class="quick-opt-prod-details">' +
+          '<h4 class="quick-opt-prod-title">' + (prod.title || 'Product') + '</h4>' +
+          '<div class="quick-opt-price-row">' +
+            '<span class="quick-opt-current-price" id="quickOptPrice">' + formatNaira(priceNum) + '</span>' +
+            (origNum > priceNum ? '<span class="quick-opt-orig-price">' + formatNaira(origNum) + '</span>' : '') +
+            (discText ? '<span class="quick-opt-discount">' + discText + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="quick-opt-groups-container" id="quickOptGroupsContainer"></div>' +
+      '<div class="quick-opt-stock-strip prompt" id="quickOptStockStrip">' +
+        '<span>Please select your ' + vData.optionGroups.map(function(g){ return g.name; }).join(' &amp; ') + '</span>' +
+      '</div>' +
+      '<div class="quick-opt-qty-row">' +
+        '<span class="quick-opt-qty-label">Quantity:</span>' +
+        '<div class="quick-opt-qty-stepper">' +
+          '<button type="button" class="quick-opt-qty-btn" id="quickOptDecBtn" aria-label="Decrease quantity">&minus;</button>' +
+          '<input type="text" class="quick-opt-qty-input" id="quickOptQtyInput" value="1" readonly>' +
+          '<button type="button" class="quick-opt-qty-btn" id="quickOptIncBtn" aria-label="Increase quantity">&#43;</button>' +
+        '</div>' +
+      '</div>';
+
+    var groupsContainer = document.getElementById('quickOptGroupsContainer');
+
+    // Render option groups
+    vData.optionGroups.forEach(function(grp, gIdx) {
+      var grpEl = document.createElement('div');
+      grpEl.className = 'quick-opt-group';
+      grpEl.setAttribute('data-group-name', grp.name);
+
+      var grpHeader = document.createElement('div');
+      grpHeader.className = 'quick-opt-group-header';
+      grpHeader.innerHTML = '<span class="quick-opt-group-label">' + grp.name + ':</span> <span class="quick-opt-group-chosen" id="quickOptChosen_' + gIdx + '">Select ' + grp.name + '</span>';
+      grpEl.appendChild(grpHeader);
+
+      var pillsWrap = document.createElement('div');
+      pillsWrap.className = 'quick-opt-pills';
+
+      (grp.values || []).forEach(function(val) {
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'quick-opt-pill';
+        pill.setAttribute('data-group', grp.name);
+        pill.setAttribute('data-value', val);
+        pill.textContent = val;
+
+        pill.addEventListener('click', function() {
+          pillsWrap.querySelectorAll('.quick-opt-pill').forEach(function(p) { p.classList.remove('active'); });
+          pill.classList.add('active');
+
+          selectedOptions[grp.name] = val;
+          var label = document.getElementById('quickOptChosen_' + gIdx);
+          if (label) label.textContent = val;
+
+          // If Color, switch modal photo
+          if (grp.name.toLowerCase() === 'color') {
+            var colorMatch = vData.variants.find(function(v) {
+              var c = v.attributes ? (v.attributes['Color'] || v.attributes['color']) : '';
+              return String(c).trim().toLowerCase() === String(val).trim().toLowerCase() && v.image;
+            });
+            var thumb = document.getElementById('quickOptThumb');
+            if (thumb) {
+              if (colorMatch && colorMatch.image) {
+                thumb.src = colorMatch.image;
+              } else {
+                var cleanSlug = String(val).toLowerCase().replace(/[^a-z0-9]/g, '-');
+                var foundImg = pImgs.find(function(img) { return img.toLowerCase().indexOf(cleanSlug) !== -1; });
+                if (foundImg) thumb.src = foundImg;
+              }
+            }
+          }
+
+          refreshQuickPillsAvailability(vData);
+          updateQuickVariantMatch(vData);
+        });
+
+        pillsWrap.appendChild(pill);
+      });
+
+      grpEl.appendChild(pillsWrap);
+      groupsContainer.appendChild(grpEl);
+    });
+
+    // Stepper events
+    var qtyInput = document.getElementById('quickOptQtyInput');
+    var decBtn = document.getElementById('quickOptDecBtn');
+    var incBtn = document.getElementById('quickOptIncBtn');
+
+    if (decBtn && incBtn && qtyInput) {
+      decBtn.onclick = function() {
+        if (selectedQty > 1) {
+          selectedQty--;
+          qtyInput.value = selectedQty;
+        }
+      };
+      incBtn.onclick = function() {
+        var maxStock = (currentMatchedVariant && Number(currentMatchedVariant.stock) > 0) ? Number(currentMatchedVariant.stock) : 99;
+        if (selectedQty < maxStock) {
+          selectedQty++;
+          qtyInput.value = selectedQty;
+        } else {
+          if (typeof showToast === 'function') showToast('Maximum available stock is ' + maxStock);
+        }
+      };
+    }
+
+    // Add to Cart event
+    var addBtn = document.getElementById('quickOptAddBtn');
+    if (addBtn) {
+      addBtn.onclick = function() {
+        var missing = [];
+        vData.optionGroups.forEach(function(g) {
+          if (!selectedOptions[g.name]) missing.push(g.name);
+        });
+
+        if (missing.length > 0) {
+          body.classList.remove('shake-warning-anim');
+          void body.offsetWidth;
+          body.classList.add('shake-warning-anim');
+          if (typeof showToast === 'function') {
+            showToast('Please select your ' + missing.join(' and ') + ' before adding to cart');
+          }
+          return;
+        }
+
+        if (!currentMatchedVariant) {
+          if (typeof showToast === 'function') showToast('Selected combination is unavailable');
+          return;
+        }
+
+        var vStock = Number(currentMatchedVariant.stock !== undefined ? currentMatchedVariant.stock : 1);
+        if (vStock <= 0) {
+          if (typeof showToast === 'function') showToast('Sorry, this option is currently out of stock');
+          return;
+        }
+
+        var cart = [];
+        try { cart = JSON.parse(localStorage.getItem('nkemmart_cart')) || []; } catch(e) {}
+
+        var lineKey = prod.id + '_' + currentMatchedVariant.id;
+        var existing = cart.find(function(it) {
+          return (it.cartLineId && it.cartLineId === lineKey) || (it.id === prod.id && (it.variant_id === currentMatchedVariant.id || it.variant_name === currentMatchedVariant.name));
+        });
+
+        if (existing) {
+          if (existing.qty + selectedQty > vStock) {
+            if (typeof showToast === 'function') showToast('Only ' + vStock + ' units available in stock for ' + currentMatchedVariant.name);
+            return;
+          }
+          existing.qty += selectedQty;
+        } else {
+          cart.push({
+            id: prod.id,
+            cartLineId: lineKey,
+            title: prod.title,
+            variant_id: currentMatchedVariant.id,
+            variant_name: currentMatchedVariant.name,
+            selected_options: Object.assign({}, selectedOptions),
+            variant_stock: vStock,
+            price: (currentMatchedVariant.price && Number(currentMatchedVariant.price) > 0) ? currentMatchedVariant.price : prod.price,
+            originalPrice: prod.originalPrice || prod.oldPrice || prod.old_price || 0,
+            image: currentMatchedVariant.image || (Array.isArray(prod.images) ? prod.images[0] : prod.image),
+            brand: prod.brand || 'Verified',
+            qty: selectedQty
+          });
+        }
+
+        localStorage.setItem('nkemmart_cart', JSON.stringify(cart));
+        if (typeof updateCartBadges === 'function') updateCartBadges();
+        if (typeof syncProductCardsUI === 'function') syncProductCardsUI();
+
+        if (typeof showToast === 'function') {
+          var sTitle = prod.title.length > 20 ? prod.title.substring(0, 20) + '...' : prod.title;
+          showToast(sTitle + ' (' + currentMatchedVariant.name + ') added to cart', 'VIEW CART', 'cart.html');
+        }
+
+        closeQuickOptionsModal();
+      };
+    }
+
+    refreshQuickPillsAvailability(vData);
+
+    overlay.classList.add('open');
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+  };
+
+  function refreshQuickPillsAvailability(vData) {
+    var selectedColor = selectedOptions['Color'] || selectedOptions['color'] || '';
+    var groups = document.querySelectorAll('#quickOptGroupsContainer .quick-opt-group');
+
+    groups.forEach(function(grpEl) {
+      var gName = grpEl.getAttribute('data-group-name');
+      if (!gName || gName.toLowerCase() === 'color') return;
+
+      var pills = grpEl.querySelectorAll('.quick-opt-pill');
+      pills.forEach(function(pill) {
+        var val = pill.getAttribute('data-value');
+
+        if (!selectedColor) {
+          var existsAnywhere = vData.variants.some(function(v) {
+            var vVal = v.attributes ? (v.attributes[gName] || v.attributes[gName.toLowerCase()]) : '';
+            return String(vVal).trim().toLowerCase() === String(val).trim().toLowerCase();
+          });
+          if (existsAnywhere) {
+            pill.classList.remove('unavailable');
+            pill.disabled = false;
+          } else {
+            pill.classList.add('unavailable');
+            pill.disabled = true;
+          }
+        } else {
+          var match = vData.variants.find(function(v) {
+            if (!v.attributes) return false;
+            var vCol = v.attributes['Color'] || v.attributes['color'] || '';
+            var vVal = v.attributes[gName] || v.attributes[gName.toLowerCase()] || '';
+            return String(vCol).trim().toLowerCase() === String(selectedColor).trim().toLowerCase() &&
+                   String(vVal).trim().toLowerCase() === String(val).trim().toLowerCase();
+          });
+
+          if (match && Number(match.stock) > 0) {
+            pill.classList.remove('unavailable', 'out-of-stock');
+            pill.disabled = false;
+          } else if (match && Number(match.stock) <= 0) {
+            pill.classList.remove('unavailable');
+            pill.classList.add('out-of-stock');
+            pill.disabled = false;
+          } else {
+            // Not available in this color
+            pill.classList.add('unavailable');
+            pill.classList.remove('out-of-stock', 'active');
+            pill.disabled = true;
+
+            if (selectedOptions[gName] === val) {
+              delete selectedOptions[gName];
+              var label = grpEl.querySelector('.quick-opt-group-chosen');
+              if (label) label.textContent = 'Select ' + gName;
+            }
+          }
+        }
+      });
+    });
+  }
+
+  function updateQuickVariantMatch(vData) {
+    var strip = document.getElementById('quickOptStockStrip');
+    var priceEl = document.getElementById('quickOptPrice');
+    var missing = [];
+
+    vData.optionGroups.forEach(function(g) {
+      if (!selectedOptions[g.name]) missing.push(g.name);
+    });
+
+    if (missing.length > 0) {
+      currentMatchedVariant = null;
+      if (strip) {
+        strip.className = 'quick-opt-stock-strip prompt';
+        strip.innerHTML = '<span>Please select your ' + missing.join(' &amp; ') + '</span>';
+      }
+      return;
+    }
+
+    // Match variant
+    var matched = vData.variants.find(function(v) {
+      if (!v.attributes) return false;
+      return Object.keys(selectedOptions).every(function(k) {
+        var vVal = v.attributes[k] || v.attributes[k.toLowerCase()] || '';
+        return String(vVal).trim().toLowerCase() === String(selectedOptions[k]).trim().toLowerCase();
+      });
+    });
+
+    currentMatchedVariant = matched || null;
+
+    if (currentMatchedVariant) {
+      var stockNum = Number(currentMatchedVariant.stock !== undefined ? currentMatchedVariant.stock : 1);
+      if (strip) {
+        if (stockNum > 0) {
+          strip.className = 'quick-opt-stock-strip in-stock';
+          strip.innerHTML = '<span>&#10003; In Stock: <strong>' + stockNum + '</strong> unit' + (stockNum === 1 ? '' : 's') + ' available for ' + currentMatchedVariant.name + '</span>';
+        } else {
+          strip.className = 'quick-opt-stock-strip out-stock';
+          strip.innerHTML = '<span>&#9888; Out of Stock for ' + currentMatchedVariant.name + '</span>';
+        }
+      }
+      if (currentMatchedVariant.price && Number(currentMatchedVariant.price) > 0 && priceEl) {
+        priceEl.textContent = formatNaira(currentMatchedVariant.price);
+      }
+    } else {
+      if (strip) {
+        strip.className = 'quick-opt-stock-strip out-stock';
+        strip.textContent = 'Selected combination is unavailable';
+      }
+    }
+  }
+})();
