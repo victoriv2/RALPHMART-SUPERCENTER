@@ -1265,7 +1265,7 @@
 
               var cardDisc = (typeof window.formatDiscountBadge === 'function')
                 ? window.formatDiscountBadge(prod.discount, prod.price, prod.originalPrice)
-                : (prod.discount ? (String(prod.discount).startsWith('-') ? prod.discount : '-' + prod.discount + '%') : '');
+                : (prod.discount ? ('-' + Math.round(parseFloat(String(prod.discount).replace(/[^0-9.]/g, '')) || 0) + '%') : '');
               var cardOrig = (prod.originalPrice > prod.price) ? '<span class="original-price">' + formatNaira(prod.originalPrice) + '</span>' : '';
               var cardDiscHtml = cardDisc ? '<span class="discount-text">' + cardDisc + '</span>' : '';
 

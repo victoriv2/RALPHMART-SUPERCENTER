@@ -2746,7 +2746,7 @@
           var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || 0;
           var disc = (typeof window.formatDiscountBadge === 'function')
             ? window.formatDiscountBadge(p.discount, priceNum, origNum)
-            : (p.discount ? (String(p.discount).startsWith('-') ? p.discount : '-' + p.discount + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : ''));
+            : (p.discount ? ('-' + Math.round(parseFloat(String(p.discount).replace(/[^0-9.]/g, '')) || 0) + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : ''));
           if (!origNum && disc) {
             var dVal = parseFloat(disc.replace(/[^0-9.]/g, ''));
             if (dVal > 0 && dVal < 100 && priceNum > 0) {

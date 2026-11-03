@@ -83,6 +83,16 @@
       text-decoration: line-through;
       border-style: dashed;
     }
+    .pdp-option-pill.unavailable, .pdp-option-pill:disabled {
+      opacity: 0.3 !important;
+      text-decoration: line-through !important;
+      border-style: dashed !important;
+      background: #f1f5f9 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+    }
     .pdp-variant-stock-strip {
       display: flex;
       align-items: center;
@@ -2325,6 +2335,7 @@
                 }
               }
 
+              refreshPillsAvailability();
               onVariantSelectionChanged();
             });
 
@@ -2341,6 +2352,68 @@
         strip.id = 'pdpVariantStockStrip';
         strip.innerHTML = '<span class="pdp-variant-stock-badge select-prompt" id="pdpVariantStockBadge">Please select your ' + vData.optionGroups.map(function(g) { return escapeHtml(g.name); }).join(' &amp; ') + '</span>';
         container.appendChild(strip);
+
+        refreshPillsAvailability();
+      }
+
+      function refreshPillsAvailability() {
+        var vData = getProductVariantsData();
+        if (!vData.hasVariants || !vData.variants || vData.variants.length === 0) return;
+
+        var selectedColor = selectedVariantOptions['Color'] || selectedVariantOptions['color'] || '';
+
+        var otherGroups = document.querySelectorAll('.pdp-option-group');
+        otherGroups.forEach(function(grpEl) {
+          var gName = grpEl.getAttribute('data-group-name');
+          if (!gName || gName.toLowerCase() === 'color') return;
+
+          var pills = grpEl.querySelectorAll('.pdp-option-pill');
+          pills.forEach(function(pill) {
+            var val = pill.getAttribute('data-value');
+
+            if (!selectedColor) {
+              var existsAnywhere = vData.variants.some(function(v) {
+                var vVal = v.attributes ? (v.attributes[gName] || v.attributes[gName.toLowerCase()]) : '';
+                return String(vVal).trim().toLowerCase() === String(val).trim().toLowerCase();
+              });
+              if (existsAnywhere) {
+                pill.classList.remove('unavailable');
+                pill.disabled = false;
+              } else {
+                pill.classList.add('unavailable');
+                pill.disabled = true;
+              }
+            } else {
+              var match = vData.variants.find(function(v) {
+                if (!v.attributes) return false;
+                var vCol = v.attributes['Color'] || v.attributes['color'] || '';
+                var vVal = v.attributes[gName] || v.attributes[gName.toLowerCase()] || '';
+                return String(vCol).trim().toLowerCase() === String(selectedColor).trim().toLowerCase() &&
+                       String(vVal).trim().toLowerCase() === String(val).trim().toLowerCase();
+              });
+
+              if (match && Number(match.stock) > 0) {
+                pill.classList.remove('unavailable', 'out-of-stock');
+                pill.disabled = false;
+              } else if (match && Number(match.stock) <= 0) {
+                pill.classList.remove('unavailable');
+                pill.classList.add('out-of-stock');
+                pill.disabled = false;
+              } else {
+                // Not available in this color at all (e.g. Size 4 in Red)
+                pill.classList.add('unavailable');
+                pill.classList.remove('out-of-stock', 'active');
+                pill.disabled = true;
+
+                if (selectedVariantOptions[gName] === val) {
+                  delete selectedVariantOptions[gName];
+                  var selLabel = grpEl.querySelector('.pdp-selected-val');
+                  if (selLabel) selLabel.textContent = 'Select ' + gName;
+                }
+              }
+            }
+          });
+        });
       }
 
       function onVariantSelectionChanged() {
