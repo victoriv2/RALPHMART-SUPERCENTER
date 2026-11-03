@@ -2743,8 +2743,16 @@
 
         grid.innerHTML = prods.map(function(p) {
           var priceNum = Number(p.price) || 0;
-          var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || (priceNum > 0 ? Math.round(priceNum * 1.15) : 0);
-          var disc = p.discount ? (String(p.discount).startsWith('-') ? p.discount : '-' + p.discount + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : '');
+          var origNum = Number(p.originalPrice || p.oldPrice || p.old_price) || 0;
+          var disc = (typeof window.formatDiscountBadge === 'function')
+            ? window.formatDiscountBadge(p.discount, priceNum, origNum)
+            : (p.discount ? (String(p.discount).startsWith('-') ? p.discount : '-' + p.discount + '%') : (origNum > priceNum ? '-' + Math.round((origNum - priceNum) / origNum * 100) + '%' : ''));
+          if (!origNum && disc) {
+            var dVal = parseFloat(disc.replace(/[^0-9.]/g, ''));
+            if (dVal > 0 && dVal < 100 && priceNum > 0) {
+              origNum = Math.round(priceNum / (1 - dVal / 100));
+            }
+          }
           var rating = Number(p.rating) || 5.0;
           var img = (Array.isArray(p.images) && p.images.length > 0) ? p.images[0] : (p.image || 'images/subcategories/sub_smartphones.jpg');
 

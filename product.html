@@ -357,7 +357,7 @@
       <!-- 1. Left Gallery Card -->
       <div class="pdp-gallery-card">
         <div class="pdp-main-image-wrap" id="pdpMainImageWrap" title="Click to view full-size image">
-          <span class="pdp-discount-badge" id="pdpDiscountBadge">-20%</span>
+          <span class="pdp-discount-badge" id="pdpDiscountBadge" style="display: none;"></span>
 
           <img src="images/product_kettle.webp" alt="Product Image" class="pdp-main-image" id="pdpMainImg">
 
@@ -404,8 +404,8 @@
         <div class="pdp-pricing-box">
           <div class="pdp-price-row">
             <span class="pdp-current-price" id="pdpCurrentPrice">₦ 0</span>
-            <span class="pdp-original-price" id="pdpOriginalPrice">₦ 0</span>
-            <span class="pdp-save-percent" id="pdpSavePercent">-0%</span>
+            <span class="pdp-original-price" id="pdpOriginalPrice" style="display: none;"></span>
+            <span class="pdp-save-percent" id="pdpSavePercent" style="display: none;"></span>
           </div>
           <div class="pdp-stock-status-row">
             <span class="pdp-stock-dot"></span>
@@ -1324,6 +1324,24 @@
         return '\u20A6 ' + formatNumberWithCommas(amount);
       }
 
+      function formatDiscountBadge(rawDisc, price, oldPrice) {
+        if (typeof window.formatDiscountBadge === 'function') {
+          return window.formatDiscountBadge(rawDisc, price, oldPrice);
+        }
+        if (rawDisc !== undefined && rawDisc !== null && rawDisc !== '') {
+          var num = parseFloat(String(rawDisc).replace(/[^0-9.]/g, ''));
+          if (!isNaN(num) && num > 0) {
+            return '-' + Math.round(num) + '%';
+          }
+        }
+        var p = Number(price) || 0;
+        var orig = Number(oldPrice) || 0;
+        if (orig > p && orig > 0) {
+          return '-' + Math.round(((orig - p) / orig) * 100) + '%';
+        }
+        return '';
+      }
+
       function getCart() {
         try {
           var d = localStorage.getItem(CART_KEY);
@@ -1616,8 +1634,8 @@
               categoryKey: adminCat,
               categoryName: adminTax.name || adminCat,
               price: Number(foundAdmin.price) || 0,
-              originalPrice: Number(foundAdmin.oldPrice || foundAdmin.old_price) || (Number(foundAdmin.price) * 1.15),
-              discount: foundAdmin.discount ? ('-' + foundAdmin.discount + '%') : '',
+              originalPrice: Number(foundAdmin.oldPrice || foundAdmin.old_price) || 0,
+              discount: formatDiscountBadge(foundAdmin.discount, foundAdmin.price, foundAdmin.oldPrice || foundAdmin.old_price),
               image: pImgs[0] || 'images/subcategories/sub_smartphones.jpg',
               images: pImgs,
               rating: Number(foundAdmin.rating) || 4.8,
@@ -1627,6 +1645,12 @@
               specs: foundAdmin.specs,
               features: foundAdmin.features
             };
+            if (!activeProduct.originalPrice && activeProduct.discount) {
+              var dVal = parseFloat(activeProduct.discount.replace(/[^0-9.]/g, ''));
+              if (dVal > 0 && dVal < 100 && activeProduct.price > 0) {
+                activeProduct.originalPrice = Math.round(activeProduct.price / (1 - dVal / 100));
+              }
+            }
         }
       } catch (e) {}
 
@@ -1676,8 +1700,14 @@
               var p = supaRes.data;
               var taxCat = (window.RALPHMART_TAXONOMY || {})[p.category_id || p.category] || {};
               var pPrice = Number(p.price) || 0;
-              var pOld = Number(p.old_price || p.oldPrice) || (pPrice > 0 ? Math.round(pPrice * 1.15) : 0);
-              var pDisc = p.discount ? (String(p.discount).startsWith('-') ? String(p.discount) : '-' + p.discount + '%') : (pOld > pPrice ? '-' + Math.round((pOld - pPrice) / pOld * 100) + '%' : '');
+              var pOld = Number(p.old_price || p.oldPrice) || 0;
+              var pDisc = formatDiscountBadge(p.discount, pPrice, pOld);
+              if (!pOld && pDisc) {
+                var dVal = parseFloat(pDisc.replace(/[^0-9.]/g, ''));
+                if (dVal > 0 && dVal < 100 && pPrice > 0) {
+                  pOld = Math.round(pPrice / (1 - dVal / 100));
+                }
+              }
               var pImgs = (Array.isArray(p.images) && p.images.length > 0) ? p.images.filter(Boolean) : (p.image ? [p.image] : ['images/subcategories/sub_smartphones.jpg']);
 
               activeProduct = {
@@ -1755,7 +1785,16 @@
 
       // Update Media Gallery
       var discBadge = document.getElementById('pdpDiscountBadge');
-      if (discBadge) discBadge.textContent = activeProduct.discount || '-20%';
+      if (discBadge) {
+        var dText = formatDiscountBadge(activeProduct.discount, activeProduct.price, activeProduct.originalPrice);
+        if (dText) {
+          discBadge.textContent = dText;
+          discBadge.style.display = 'inline-block';
+        } else {
+          discBadge.textContent = '';
+          discBadge.style.display = 'none';
+        }
+      }
 
       var productImages = [];
       if (Array.isArray(activeProduct.images) && activeProduct.images.length > 0) {
@@ -2049,10 +2088,27 @@
       if (curPriceEl) curPriceEl.textContent = formatNaira(activeProduct.price);
 
       var origPriceEl = document.getElementById('pdpOriginalPrice');
-      if (origPriceEl) origPriceEl.textContent = formatNaira(activeProduct.originalPrice);
+      if (origPriceEl) {
+        if (activeProduct.originalPrice && Number(activeProduct.originalPrice) > Number(activeProduct.price)) {
+          origPriceEl.textContent = formatNaira(activeProduct.originalPrice);
+          origPriceEl.style.display = 'inline-block';
+        } else {
+          origPriceEl.textContent = '';
+          origPriceEl.style.display = 'none';
+        }
+      }
 
       var savePctEl = document.getElementById('pdpSavePercent');
-      if (savePctEl) savePctEl.textContent = activeProduct.discount || '-20%';
+      if (savePctEl) {
+        var dText = formatDiscountBadge(activeProduct.discount, activeProduct.price, activeProduct.originalPrice);
+        if (dText) {
+          savePctEl.textContent = dText;
+          savePctEl.style.display = 'inline-block';
+        } else {
+          savePctEl.textContent = '';
+          savePctEl.style.display = 'none';
+        }
+      }
 
       if (typeof calculateProductRating === 'function' && typeof updateProductRatingUI === 'function') {
         updateProductRatingUI(calculateProductRating(activeProduct.rating, []));
@@ -2321,6 +2377,19 @@
           if (currentMatchedVariant.price && Number(currentMatchedVariant.price) > 0) {
             var curPriceEl = document.getElementById('pdpCurrentPrice');
             if (curPriceEl) curPriceEl.textContent = formatNaira(currentMatchedVariant.price);
+
+            var varOrig = activeProduct.originalPrice;
+            var varDisc = formatDiscountBadge(activeProduct.discount, currentMatchedVariant.price, varOrig);
+            var varDiscBadge = document.getElementById('pdpDiscountBadge');
+            var varSavePctEl = document.getElementById('pdpSavePercent');
+            if (varDiscBadge) {
+              varDiscBadge.textContent = varDisc;
+              varDiscBadge.style.display = varDisc ? 'inline-block' : 'none';
+            }
+            if (varSavePctEl) {
+              varSavePctEl.textContent = varDisc;
+              varSavePctEl.style.display = varDisc ? 'inline-block' : 'none';
+            }
           }
         } else {
           if (badge) {
@@ -3738,12 +3807,16 @@
           var recRatingInfo = typeof calculateProductRating === 'function' ? calculateProductRating(prod.rating || 4.8, []) : { formatted: Number(prod.rating || 4.8).toFixed(1), rating: (prod.rating || 4.8) };
           var starsHtml = typeof renderRatingStarsHtml === 'function' ? renderRatingStarsHtml(recRatingInfo.rating, 11) : '';
 
+          var recDiscText = formatDiscountBadge(prod.discount, prod.price, prod.originalPrice);
+          var recDiscBadgeHtml = recDiscText ? '<span class="rec-discount-badge">' + recDiscText + '</span>' : '';
+          var recOrigPriceHtml = (prod.originalPrice && Number(prod.originalPrice) > Number(prod.price)) ? '<span class="rec-card-orig-price">' + formatNaira(prod.originalPrice) + '</span>' : '';
+
           card.innerHTML = 
             '<div class="rec-card-media">' +
               '<a href="product.html?id=' + encodeURIComponent(prod.id) + '">' +
                 '<img src="' + prod.image + '" alt="' + prod.title + '" class="rec-card-img" loading="lazy">' +
               '</a>' +
-              '<span class="rec-discount-badge">' + (prod.discount || '-20%') + '</span>' +
+              recDiscBadgeHtml +
               '<button type="button" class="rec-wishlist-btn' + (isSaved ? ' active' : '') + '" data-wish-id="' + prod.id + '" aria-label="Save item">' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="' + (isSaved ? '#ef4444' : 'none') + '" stroke="' + (isSaved ? '#ef4444' : 'currentColor') + '" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
               '</button>' +
@@ -3756,7 +3829,7 @@
               '</div>' +
               '<div class="rec-card-price-row">' +
                 '<span class="rec-card-price">' + formatNaira(prod.price) + '</span>' +
-                '<span class="rec-card-orig-price">' + formatNaira(prod.originalPrice) + '</span>' +
+                recOrigPriceHtml +
               '</div>' +
               actionHtml +
             '</div>';

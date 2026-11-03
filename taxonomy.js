@@ -204,6 +204,22 @@ window.RALPHMART_TAXONOMY['services'] = window.RALPHMART_TAXONOMY['other'];
 // ========================================================
 window.RALPHMART_CATALOG = window.NKEMMART_CATALOG = [];
 
+// Helper: Normalize & Format Discount Badge cleanly (-X% or empty string)
+window.formatDiscountBadge = function(rawDisc, price, oldPrice) {
+  if (rawDisc !== undefined && rawDisc !== null && rawDisc !== '') {
+    var num = parseFloat(String(rawDisc).replace(/[^0-9.]/g, ''));
+    if (!isNaN(num) && num > 0) {
+      return '-' + Math.round(num) + '%';
+    }
+  }
+  var p = Number(price) || 0;
+  var orig = Number(oldPrice) || 0;
+  if (orig > p && orig > 0) {
+    return '-' + Math.round(((orig - p) / orig) * 100) + '%';
+  }
+  return '';
+};
+
 // Unified Cloud Catalog Synchronizer
 window.loadRalphmartCatalogFromCloud = async function() {
   try {
@@ -217,8 +233,14 @@ window.loadRalphmartCatalogFromCloud = async function() {
     if (!res.error && Array.isArray(res.data)) {
       var cloudProds = res.data.map(function(p) {
         var pPrice = Number(p.price) || 0;
-        var pOld = Number(p.old_price || p.oldPrice) || (pPrice > 0 ? Math.round(pPrice * 1.15) : 0);
-        var pDisc = p.discount ? (String(p.discount).startsWith('-') ? String(p.discount) : '-' + p.discount + '%') : (pOld > pPrice ? '-' + Math.round((pOld - pPrice) / pOld * 100) + '%' : '');
+        var pOld = Number(p.old_price || p.oldPrice) || 0;
+        var pDisc = window.formatDiscountBadge(p.discount, pPrice, pOld);
+        if (!pOld && pDisc) {
+          var dVal = parseFloat(pDisc.replace(/[^0-9.]/g, ''));
+          if (dVal > 0 && dVal < 100 && pPrice > 0) {
+            pOld = Math.round(pPrice / (1 - dVal / 100));
+          }
+        }
         var pImgs = (Array.isArray(p.images) && p.images.length > 0) ? p.images.filter(Boolean) : (p.image ? [p.image] : ['images/subcategories/sub_smartphones.jpg']);
         
         var varData = (p.specs && p.specs.variants_data) ? p.specs.variants_data : (p.variants_data || null);

@@ -1263,6 +1263,12 @@
               art.setAttribute('data-brand', prod.brand || 'Verified');
               art.setAttribute('data-rating', prod.rating || 4.8);
 
+              var cardDisc = (typeof window.formatDiscountBadge === 'function')
+                ? window.formatDiscountBadge(prod.discount, prod.price, prod.originalPrice)
+                : (prod.discount ? (String(prod.discount).startsWith('-') ? prod.discount : '-' + prod.discount + '%') : '');
+              var cardOrig = (prod.originalPrice > prod.price) ? '<span class="original-price">' + formatNaira(prod.originalPrice) + '</span>' : '';
+              var cardDiscHtml = cardDisc ? '<span class="discount-text">' + cardDisc + '</span>' : '';
+
               art.innerHTML = 
                 '<div class="card-media">' +
                   '<img src="' + prod.image + '" alt="' + prod.title + '" class="card-img" loading="lazy">' +
@@ -1274,8 +1280,8 @@
                   '<a href="product.html?id=' + encodeURIComponent(prod.id) + '" class="product-title">' + prod.title + '</a>' +
                   '<div class="price-row">' +
                     '<span class="current-price">' + formatNaira(prod.price) + '</span>' +
-                    (prod.originalPrice > prod.price ? '<span class="original-price">' + formatNaira(prod.originalPrice) + '</span>' : '') +
-                    (prod.discount ? '<span class="discount-text">' + prod.discount + '</span>' : '') +
+                    cardOrig +
+                    cardDiscHtml +
                   '</div>' +
                   '<div class="rating-row">' +
                     '<div class="stars-row">' +
