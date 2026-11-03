@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -950,9 +950,10 @@
           if (itemsList) {
             itemsList.innerHTML = '';
             cart.forEach(function(item) {
+              var lineKey = item.cartLineId || (item.variant_id ? item.id + '_' + item.variant_id : item.id);
               var row = document.createElement('div');
               row.className = 'cart-item-row';
-              row.setAttribute('data-id', item.id);
+              row.setAttribute('data-id', lineKey);
 
               var discountHtml = '';
               if (item.originalPrice && item.originalPrice > item.price) {
@@ -963,6 +964,9 @@
               }
 
               var itemTotal = (item.price || 0) * (item.qty || 1);
+              var variantBadgeHtml = item.variant_name 
+                ? '<div style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#512175; background:#faf5ff; border:1px solid #d8b4fe; padding:2px 8px; border-radius:5px; margin:4px 0;"><span>Option:</span> <strong>' + item.variant_name + '</strong></div>' 
+                : '';
 
               row.innerHTML = 
                 '<a href="product.html?id=' + encodeURIComponent(item.id) + '" class="cart-item-img-wrapper">' +
@@ -970,16 +974,17 @@
                 '</a>' +
                 '<div class="cart-item-details">' +
                   '<a href="product.html?id=' + encodeURIComponent(item.id) + '" class="cart-item-title">' + item.title + '</a>' +
+                  variantBadgeHtml +
                   '<div class="cart-item-status">' +
                     '<span class="cart-item-status-dot"></span>' +
                     '<span>In Stock | Eligible for Doorstep Delivery</span>' +
                   '</div>' +
                   '<div class="cart-item-actions-row">' +
-                    '<button type="button" class="cart-action-btn-text cart-action-btn-remove" data-action="remove" data-id="' + item.id + '">' +
+                    '<button type="button" class="cart-action-btn-text cart-action-btn-remove" data-action="remove" data-id="' + lineKey + '">' +
                       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
                       'Remove' +
                     '</button>' +
-                    '<button type="button" class="cart-action-btn-text cart-action-btn-save" data-action="save" data-id="' + item.id + '">' +
+                    '<button type="button" class="cart-action-btn-text cart-action-btn-save" data-action="save" data-id="' + lineKey + '">' +
                       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>' +
                       'Save For Later' +
                     '</button>' +
@@ -994,9 +999,9 @@
                     '</div>' +
                   '</div>' +
                   '<div class="qty-stepper">' +
-                    '<button type="button" class="qty-btn qty-dec" data-action="dec" data-id="' + item.id + '" aria-label="Decrease quantity">-</button>' +
+                    '<button type="button" class="qty-btn qty-dec" data-action="dec" data-id="' + lineKey + '" aria-label="Decrease quantity">-</button>' +
                     '<span class="qty-display">' + (item.qty || 1) + '</span>' +
-                    '<button type="button" class="qty-btn qty-inc" data-action="inc" data-id="' + item.id + '" aria-label="Increase quantity">+</button>' +
+                    '<button type="button" class="qty-btn qty-inc" data-action="inc" data-id="' + lineKey + '" aria-label="Increase quantity">+</button>' +
                   '</div>' +
                 '</div>';
 
@@ -1134,7 +1139,10 @@
           if (!action || !id) return;
 
           var cart = getCart();
-          var itemIndex = cart.findIndex(function(item) { return item.id === id; });
+          var itemIndex = cart.findIndex(function(item) {
+            var k = item.cartLineId || (item.variant_id ? item.id + '_' + item.variant_id : item.id);
+            return k === id || item.id === id;
+          });
           if (itemIndex === -1) return;
 
           if (action === 'inc') {

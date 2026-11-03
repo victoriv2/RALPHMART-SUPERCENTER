@@ -1393,11 +1393,13 @@
         totalQty += qty;
         subtotal += (price * qty);
 
+        const variantTag = item.variant_name ? `<div style="font-size: 11px; color: #512175; font-weight: 700; margin-top: 1px;">Option: ${escapeHtml(item.variant_name)}</div>` : '';
         return `
           <div class="summary-item-row">
             <img src="${escapeHtml(item.image || 'images/subcategories/sub_smartphones.jpg')}" alt="${escapeHtml(item.title)}" class="summary-item-img" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
             <div class="summary-item-title">
               <div>${escapeHtml(item.title)}</div>
+              ${variantTag}
               <span class="summary-item-qty">Qty: ${qty} &times; ${formatNaira(price)}</span>
             </div>
             <span class="summary-item-price">${formatNaira(price * qty)}</span>
@@ -1582,6 +1584,49 @@
             console.warn('Local storage order save error:', e);
           }
         });
+
+        // 2b. Decrement inventory for ordered products & specific variants
+        try {
+          let localProds = JSON.parse(localStorage.getItem('nkemmart_admin_products') || '[]');
+          for (const item of cart) {
+            const prod = localProds.find(p => String(p.id) === String(item.id));
+            if (prod) {
+              const orderedQty = Number(item.qty || 1);
+              if (item.variant_id && Array.isArray(prod.variants)) {
+                const v = prod.variants.find(va => String(va.id) === String(item.variant_id) || va.name === item.variant_name);
+                if (v) {
+                  v.stock = Math.max(0, (Number(v.stock) || 0) - orderedQty);
+                }
+                prod.stock = prod.variants.reduce((sum, va) => sum + (Number(va.stock) || 0), 0);
+              } else {
+                prod.stock = Math.max(0, (Number(prod.stock) || 0) - orderedQty);
+              }
+              // Update cloud
+              if (client) {
+                try {
+                  const varPayload = (prod.specs && typeof prod.specs === 'object') ? { ...prod.specs } : {};
+                  if (Array.isArray(prod.variants) && prod.variants.length > 0) {
+                    varPayload.variants_data = {
+                      has_variants: true,
+                      variant_options: prod.variant_options || [],
+                      variants: prod.variants
+                    };
+                  }
+                  await client.from('products').update({
+                    stock: prod.stock,
+                    specs: varPayload
+                  }).eq('id', prod.id);
+                } catch (supaErr) {
+                  console.warn('Inventory decrement sync note:', supaErr);
+                }
+              }
+            }
+          }
+          localStorage.setItem('nkemmart_admin_products', JSON.stringify(localProds));
+          window.dispatchEvent(new CustomEvent('ralphmart_catalog_loaded', { detail: localProds }));
+        } catch (invErr) {
+          console.warn('Inventory update error:', invErr);
+        }
 
         // 3. Clear cart both locally and in cloud
         if (typeof syncCartToCloud === 'function') {

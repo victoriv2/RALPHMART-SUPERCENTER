@@ -5,6 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>Product Details - RALPHMART SUPERCENTER</title>
   <link rel="stylesheet" href="styles.css?v=23.0">
+  <style>
+    /* PDP Product Options & Variants Selector */
+    .pdp-variants-container {
+      margin: 16px 0;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .pdp-variants-container.shake-warn {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+      animation: pdpShake 0.4s ease-in-out;
+    }
+    @keyframes pdpShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .pdp-option-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pdp-option-group-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pdp-option-group-title .pdp-selected-val {
+      color: #512175;
+      font-weight: 800;
+    }
+    .pdp-option-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pdp-option-pill {
+      min-width: 44px;
+      height: 38px;
+      padding: 0 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .pdp-option-pill:hover {
+      border-color: #512175;
+      background: #faf5ff;
+      color: #512175;
+    }
+    .pdp-option-pill.active {
+      border-color: #512175;
+      background: #512175;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(81, 33, 117, 0.25);
+    }
+    .pdp-option-pill.out-of-stock {
+      opacity: 0.4;
+      text-decoration: line-through;
+      border-style: dashed;
+    }
+    .pdp-variant-stock-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 12px;
+    }
+    .pdp-variant-stock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+    .pdp-variant-stock-badge.in-stock {
+      color: #15803d;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+    .pdp-variant-stock-badge.out-stock {
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+    .pdp-variant-stock-badge.select-prompt {
+      color: #64748b;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js?v=8.0"></script>
   <script src="taxonomy.js?v=4.0"></script>
@@ -301,6 +411,11 @@
             <span class="pdp-stock-dot"></span>
             <span>In Stock (Doorstep delivery available)</span>
           </div>
+        </div>
+
+        <!-- Product Variants / Options Selector (Rendered dynamically if product has options) -->
+        <div class="pdp-variants-container" id="pdpVariantsContainer" style="display: none;">
+          <!-- Dynamically populated options (Color, Size, Weight, Type, etc.) -->
         </div>
 
         <!-- Action Row: Add to Cart (turns into Stepper when in cart) & Wishlist -->
@@ -2053,6 +2168,186 @@
       var qtyInc = document.getElementById('pdpQtyIncBtn');
       var qtyDec = document.getElementById('pdpQtyDecBtn');
 
+      // ==========================================
+      // PRODUCT VARIANTS / OPTIONS INTERACTION
+      // ==========================================
+      var selectedVariantOptions = {};
+      var currentMatchedVariant = null;
+
+      function getProductVariantsData() {
+        var varData = (activeProduct.specs && activeProduct.specs.variants_data) ? activeProduct.specs.variants_data : (activeProduct.variants_data || null);
+        var hasVars = (varData && varData.has_variants) || activeProduct.has_variants || (Array.isArray(activeProduct.variants) && activeProduct.variants.length > 0);
+        var optGroups = (varData && Array.isArray(varData.variant_options) && varData.variant_options.length > 0) 
+          ? varData.variant_options 
+          : (Array.isArray(activeProduct.variant_options) ? activeProduct.variant_options : []);
+        var variantsList = (varData && Array.isArray(varData.variants)) 
+          ? varData.variants 
+          : (Array.isArray(activeProduct.variants) ? activeProduct.variants : []);
+        return {
+          hasVariants: Boolean(hasVars && optGroups.length > 0),
+          optionGroups: optGroups,
+          variants: variantsList
+        };
+      }
+
+      function findMatchingVariant(optionsMap, variantsList) {
+        if (!variantsList || variantsList.length === 0) return null;
+        var keys = Object.keys(optionsMap);
+        if (keys.length === 0) return null;
+
+        var exact = variantsList.find(function(v) {
+          if (!v.attributes) return false;
+          return keys.every(function(k) {
+            return String(v.attributes[k] || '').trim().toLowerCase() === String(optionsMap[k] || '').trim().toLowerCase();
+          });
+        });
+        if (exact) return exact;
+
+        // Fallback: match by variant name containing all chosen values
+        var vals = keys.map(function(k) { return String(optionsMap[k] || '').trim().toLowerCase(); });
+        return variantsList.find(function(v) {
+          var vName = (v.name || '').toLowerCase();
+          return vals.every(function(val) { return vName.indexOf(val) !== -1; });
+        }) || null;
+      }
+
+      function renderProductVariants() {
+        var vData = getProductVariantsData();
+        var container = document.getElementById('pdpVariantsContainer');
+        if (!container) return;
+
+        if (!vData.hasVariants) {
+          container.style.display = 'none';
+          currentMatchedVariant = null;
+          return;
+        }
+
+        container.style.display = 'flex';
+        container.innerHTML = '';
+
+        vData.optionGroups.forEach(function(grp, gIdx) {
+          var grpDiv = document.createElement('div');
+          grpDiv.className = 'pdp-option-group';
+          grpDiv.setAttribute('data-group-name', grp.name);
+
+          var title = document.createElement('div');
+          title.className = 'pdp-option-group-title';
+          title.innerHTML = '<span>' + escapeHtml(grp.name) + ':</span> <span class="pdp-selected-val" id="pdpSelectedVal_' + gIdx + '">Select ' + escapeHtml(grp.name) + '</span>';
+          grpDiv.appendChild(title);
+
+          var pillsWrap = document.createElement('div');
+          pillsWrap.className = 'pdp-option-pills';
+
+          (grp.values || []).forEach(function(val) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'pdp-option-pill';
+            btn.setAttribute('data-group', grp.name);
+            btn.setAttribute('data-value', val);
+            btn.textContent = val;
+
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              pillsWrap.querySelectorAll('.pdp-option-pill').forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+
+              selectedVariantOptions[grp.name] = val;
+              var labelEl = document.getElementById('pdpSelectedVal_' + gIdx);
+              if (labelEl) labelEl.textContent = val;
+
+              // If Color option selected, auto switch gallery photo
+              if (grp.name.toLowerCase() === 'color' && typeof productImages !== 'undefined' && Array.isArray(productImages)) {
+                var cleanVal = String(val).toLowerCase().replace(/[^a-z0-9]/g, '-');
+                var matchIdx = -1;
+                productImages.forEach(function(imgUrl, idx) {
+                  if (matchIdx === -1 && imgUrl.toLowerCase().indexOf(cleanVal) !== -1) {
+                    matchIdx = idx;
+                  }
+                });
+                if (matchIdx !== -1 && typeof switchGalleryImage === 'function') {
+                  switchGalleryImage(matchIdx);
+                }
+              }
+
+              onVariantSelectionChanged();
+            });
+
+            pillsWrap.appendChild(btn);
+          });
+
+          grpDiv.appendChild(pillsWrap);
+          container.appendChild(grpDiv);
+        });
+
+        // Stock status & helper strip
+        var strip = document.createElement('div');
+        strip.className = 'pdp-variant-stock-strip';
+        strip.id = 'pdpVariantStockStrip';
+        strip.innerHTML = '<span class="pdp-variant-stock-badge select-prompt" id="pdpVariantStockBadge">Please select your ' + vData.optionGroups.map(function(g) { return escapeHtml(g.name); }).join(' &amp; ') + '</span>';
+        container.appendChild(strip);
+      }
+
+      function onVariantSelectionChanged() {
+        var vData = getProductVariantsData();
+        var badge = document.getElementById('pdpVariantStockBadge');
+        var missing = [];
+        vData.optionGroups.forEach(function(g) {
+          if (!selectedVariantOptions[g.name]) missing.push(g.name);
+        });
+
+        if (missing.length > 0) {
+          currentMatchedVariant = null;
+          if (badge) {
+            badge.className = 'pdp-variant-stock-badge select-prompt';
+            badge.textContent = 'Please choose ' + missing.join(' & ');
+          }
+          syncMainProductActionUI();
+          return;
+        }
+
+        currentMatchedVariant = findMatchingVariant(selectedVariantOptions, vData.variants);
+
+        if (currentMatchedVariant) {
+          var stockNum = Number(currentMatchedVariant.stock !== undefined ? currentMatchedVariant.stock : 1);
+          if (badge) {
+            if (stockNum > 0) {
+              badge.className = 'pdp-variant-stock-badge in-stock';
+              badge.innerHTML = '&#10003; In Stock: <strong>' + stockNum + '</strong> unit' + (stockNum === 1 ? '' : 's') + ' available for ' + escapeHtml(currentMatchedVariant.name);
+            } else {
+              badge.className = 'pdp-variant-stock-badge out-stock';
+              badge.innerHTML = '&#9888; Out of Stock for ' + escapeHtml(currentMatchedVariant.name);
+            }
+          }
+          if (currentMatchedVariant.price && Number(currentMatchedVariant.price) > 0) {
+            var curPriceEl = document.getElementById('pdpCurrentPrice');
+            if (curPriceEl) curPriceEl.textContent = formatNaira(currentMatchedVariant.price);
+          }
+        } else {
+          if (badge) {
+            badge.className = 'pdp-variant-stock-badge out-stock';
+            badge.textContent = 'Combination unavailable in stock';
+          }
+        }
+
+        syncMainProductActionUI();
+      }
+
+      function getActiveCartLineItem() {
+        var cart = getCart();
+        var vData = getProductVariantsData();
+        if (vData.hasVariants) {
+          if (!currentMatchedVariant) return null;
+          var lineKey = activeProduct.id + '_' + currentMatchedVariant.id;
+          return cart.find(function(it) {
+            return (it.cartLineId && it.cartLineId === lineKey) || (it.id === activeProduct.id && (it.variant_id === currentMatchedVariant.id || it.variant_name === currentMatchedVariant.name));
+          }) || null;
+        } else {
+          return cart.find(function(it) {
+            return it.id === activeProduct.id && !it.variant_id;
+          }) || null;
+        }
+      }
+
       // Main Product Cart & Stepper Controller (Transforms from Add to Cart to Stepper)
       function syncMainProductActionUI() {
         var adminProds = [];
@@ -2071,8 +2366,7 @@
           return;
         }
 
-        var cart = getCart();
-        var item = cart.find(function(it) { return it.id === activeProduct.id; });
+        var item = getActiveCartLineItem();
         var inCartQty = item ? (item.qty || 1) : 0;
         if (mainWrap) {
           if (inCartQty > 0) {
@@ -2095,7 +2389,6 @@
           }
         }
 
-        var stickyWrap = document.getElementById('pdpStickyActionWrap');
         if (stickyWrap) {
           if (inCartQty > 0) {
             stickyWrap.innerHTML = 
@@ -2119,9 +2412,85 @@
       }
 
       function addActiveProductToCart() {
+        var vData = getProductVariantsData();
+
+        // 1. If product has multiple options/classes, ensure customer made selections
+        if (vData.hasVariants) {
+          var missing = [];
+          vData.optionGroups.forEach(function(g) {
+            if (!selectedVariantOptions[g.name]) missing.push(g.name);
+          });
+
+          if (missing.length > 0) {
+            var container = document.getElementById('pdpVariantsContainer');
+            if (container) {
+              container.classList.remove('shake-warn');
+              void container.offsetWidth;
+              container.classList.add('shake-warn');
+              container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            showToast('Please select your ' + missing.join(' and ') + ' before adding to cart', null, null);
+            return;
+          }
+
+          if (!currentMatchedVariant) {
+            showToast('Selected option combination is currently unavailable', null, null);
+            return;
+          }
+
+          var vStock = Number(currentMatchedVariant.stock !== undefined ? currentMatchedVariant.stock : 1);
+          if (vStock <= 0) {
+            showToast('Sorry, ' + currentMatchedVariant.name + ' is currently out of stock', null, null);
+            return;
+          }
+
+          var cart = getCart();
+          var lineKey = activeProduct.id + '_' + currentMatchedVariant.id;
+          var existing = cart.find(function(it) {
+            return (it.cartLineId && it.cartLineId === lineKey) || (it.id === activeProduct.id && (it.variant_id === currentMatchedVariant.id || it.variant_name === currentMatchedVariant.name));
+          });
+
+          if (existing) {
+            if (existing.qty >= vStock) {
+              showToast('Only ' + vStock + ' unit(s) available in stock for ' + currentMatchedVariant.name, null, null);
+              return;
+            }
+            existing.qty += 1;
+          } else {
+            cart.push({
+              id: activeProduct.id,
+              cartLineId: lineKey,
+              title: activeProduct.title,
+              variant_id: currentMatchedVariant.id,
+              variant_name: currentMatchedVariant.name,
+              selected_options: Object.assign({}, selectedVariantOptions),
+              variant_stock: vStock,
+              price: (currentMatchedVariant.price && Number(currentMatchedVariant.price) > 0) ? currentMatchedVariant.price : activeProduct.price,
+              originalPrice: activeProduct.originalPrice,
+              image: currentMatchedVariant.image || activeProduct.image,
+              brand: activeProduct.brand,
+              qty: 1
+            });
+          }
+
+          saveCart(cart);
+          updateBadges();
+          syncMainProductActionUI();
+          if (typeof renderRecommendations === 'function') renderRecommendations();
+          showToast(activeProduct.title.substring(0, 18) + '... (' + currentMatchedVariant.name + ') added to cart', 'VIEW CART', 'cart.html');
+          return;
+        }
+
+        // 2. Standard single product (No variants) - Straightforward direct addition
         var cart = getCart();
-        var item = cart.find(function(it) { return it.id === activeProduct.id; });
+        var item = cart.find(function(it) { return it.id === activeProduct.id && !it.variant_id; });
+        var pStock = Number(activeProduct.stock !== undefined ? activeProduct.stock : 25);
+
         if (item) {
+          if (item.qty >= pStock) {
+            showToast('Only ' + pStock + ' unit(s) available in stock', null, null);
+            return;
+          }
           item.qty = (item.qty || 1) + 1;
         } else {
           cart.push({
@@ -2143,8 +2512,37 @@
       }
 
       function incrementActiveProductQty() {
+        var vData = getProductVariantsData();
         var cart = getCart();
-        var item = cart.find(function(it) { return it.id === activeProduct.id; });
+
+        if (vData.hasVariants) {
+          if (!currentMatchedVariant) {
+            addActiveProductToCart();
+            return;
+          }
+          var lineKey = activeProduct.id + '_' + currentMatchedVariant.id;
+          var item = cart.find(function(it) {
+            return (it.cartLineId && it.cartLineId === lineKey) || (it.id === activeProduct.id && (it.variant_id === currentMatchedVariant.id || it.variant_name === currentMatchedVariant.name));
+          });
+          if (item) {
+            var vStock = Number(currentMatchedVariant.stock !== undefined ? currentMatchedVariant.stock : 1);
+            if (item.qty >= vStock) {
+              showToast('Only ' + vStock + ' unit(s) available in stock for ' + currentMatchedVariant.name, null, null);
+              return;
+            }
+            item.qty += 1;
+            saveCart(cart);
+            updateBadges();
+            syncMainProductActionUI();
+            if (typeof renderRecommendations === 'function') renderRecommendations();
+            showToast(activeProduct.title.substring(0, 18) + '... (' + item.qty + ' in cart)', 'VIEW CART', 'cart.html');
+          } else {
+            addActiveProductToCart();
+          }
+          return;
+        }
+
+        var item = cart.find(function(it) { return it.id === activeProduct.id && !it.variant_id; });
         if (item) {
           item.qty = (item.qty || 1) + 1;
           saveCart(cart);
@@ -2158,19 +2556,30 @@
       }
 
       function decrementActiveProductQty() {
+        var vData = getProductVariantsData();
         var cart = getCart();
-        var idx = cart.findIndex(function(it) { return it.id === activeProduct.id; });
-        if (idx > -1) {
-          if (cart[idx].qty > 1) {
-            cart[idx].qty -= 1;
-            var newQty = cart[idx].qty;
+
+        var targetIdx = -1;
+        if (vData.hasVariants && currentMatchedVariant) {
+          var lineKey = activeProduct.id + '_' + currentMatchedVariant.id;
+          targetIdx = cart.findIndex(function(it) {
+            return (it.cartLineId && it.cartLineId === lineKey) || (it.id === activeProduct.id && (it.variant_id === currentMatchedVariant.id || it.variant_name === currentMatchedVariant.name));
+          });
+        } else {
+          targetIdx = cart.findIndex(function(it) { return it.id === activeProduct.id && !it.variant_id; });
+        }
+
+        if (targetIdx > -1) {
+          if (cart[targetIdx].qty > 1) {
+            cart[targetIdx].qty -= 1;
+            var newQty = cart[targetIdx].qty;
             saveCart(cart);
             updateBadges();
             syncMainProductActionUI();
             if (typeof renderRecommendations === 'function') renderRecommendations();
             showToast(activeProduct.title.substring(0, 22) + '... (' + newQty + ' in cart)', 'VIEW CART', 'cart.html');
           } else {
-            cart.splice(idx, 1);
+            cart.splice(targetIdx, 1);
             saveCart(cart);
             updateBadges();
             syncMainProductActionUI();
@@ -2179,6 +2588,9 @@
           }
         }
       }
+
+      // Render variants for active product
+      renderProductVariants();
 
       // Event delegation for desktop & mobile main product action containers
       document.addEventListener('click', function(e) {

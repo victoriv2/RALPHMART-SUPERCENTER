@@ -221,6 +221,16 @@ window.loadRalphmartCatalogFromCloud = async function() {
         var pDisc = p.discount ? (String(p.discount).startsWith('-') ? String(p.discount) : '-' + p.discount + '%') : (pOld > pPrice ? '-' + Math.round((pOld - pPrice) / pOld * 100) + '%' : '');
         var pImgs = (Array.isArray(p.images) && p.images.length > 0) ? p.images.filter(Boolean) : (p.image ? [p.image] : ['images/subcategories/sub_smartphones.jpg']);
         
+        var varData = (p.specs && p.specs.variants_data) ? p.specs.variants_data : (p.variants_data || null);
+        var hasVariants = (varData && varData.has_variants) || (Array.isArray(p.variants) && p.variants.length > 0) || false;
+        var variantOptions = (varData && Array.isArray(varData.variant_options)) ? varData.variant_options : (Array.isArray(p.variant_options) ? p.variant_options : []);
+        var variants = (varData && Array.isArray(varData.variants)) ? varData.variants : (Array.isArray(p.variants) ? p.variants : []);
+        var calcStock = p.stock !== undefined ? Number(p.stock) : 25;
+        if (hasVariants && variants.length > 0) {
+          var sumStock = variants.reduce(function(s, v) { return s + (Number(v.stock) || 0); }, 0);
+          if (sumStock >= 0) calcStock = sumStock;
+        }
+
         return {
           id: p.id,
           title: p.title,
@@ -233,7 +243,10 @@ window.loadRalphmartCatalogFromCloud = async function() {
           originalPrice: pOld,
           oldPrice: pOld,
           old_price: pOld,
-          stock: p.stock !== undefined ? p.stock : 25,
+          stock: calcStock,
+          has_variants: hasVariants,
+          variant_options: variantOptions,
+          variants: variants,
           discount: pDisc,
           status: p.status || 'active',
           rating: Number(p.rating) || 4.8,

@@ -1257,6 +1257,42 @@
       border-color: #e11d48;
     }
 
+    /* Variants Builder Styles */
+    .admin-option-group-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .admin-option-group-card select {
+      width: 140px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .admin-option-group-card input {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: #0f172a;
+    }
+    .admin-variant-row td {
+      padding: 6px 8px;
+    }
+    .admin-variant-row input, .admin-variant-row select {
+      font-size: 12px;
+      padding: 6px 8px;
+    }
+
     /* Tab Panes */
     .admin-tab-pane {
       display: none;
@@ -2817,6 +2853,63 @@
               </table>
             </div>
           </div>
+
+          <!-- Product Variants & Custom Options Builder -->
+          <div class="admin-builder-section" id="adminVariantsBuilderSection">
+            <div class="admin-builder-header">
+              <div>
+                <h4 class="admin-builder-title" style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#512175" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                  Product Variants &amp; Custom Options
+                </h4>
+                <p class="admin-builder-desc">For products with different sizes, colors, weights, types, or custom classes. Specify quantity per variant so sales record accurately.</p>
+              </div>
+              <label class="admin-variant-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 700; color: #512175; background: #faf5ff; border: 1.5px solid #d8b4fe; padding: 6px 14px; border-radius: 8px;">
+                <input type="checkbox" id="modalEnableVariantsCheckbox" style="accent-color: #512175; width: 16px; height: 16px; cursor: pointer;">
+                Enable Options / Variants
+              </label>
+            </div>
+
+            <div id="adminVariantsBuilderBody" style="display: none; margin-top: 14px;">
+              <!-- 1. Define Option Types (e.g. Color, Size, Weight, Type) -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: #1e293b;">1. Define Option Categories (e.g. Color, Size, Weight, Type, or Custom)</span>
+                  <button type="button" class="admin-btn btn-secondary" id="btnAddOptionGroupBtn" style="padding: 4px 10px; font-size: 11.5px; height: 28px;">+ Add Option</button>
+                </div>
+                <div id="adminOptionGroupsList" style="display: flex; flex-direction: column; gap: 8px;">
+                  <!-- Option Groups rendered here -->
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                  <button type="button" class="admin-btn btn-primary" id="btnGenerateVariantsMatrix" style="padding: 6px 14px; font-size: 12px; height: 32px; background: #512175; color: #fff;">Generate Variant Combinations</button>
+                  <button type="button" class="admin-btn btn-secondary" id="btnAddManualVariantRowBtn" style="padding: 6px 14px; font-size: 12px; height: 32px;">+ Add Single Variant Row</button>
+                </div>
+              </div>
+
+              <!-- 2. Variant Rows & Inventory Table -->
+              <div class="admin-specs-table-wrap">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: #1e293b;">2. Variant Inventory &amp; Quantities</span>
+                  <span id="adminVariantTotalStockBadge" style="font-size: 11.5px; font-weight: 700; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 6px;">Total Variant Stock: 0 units</span>
+                </div>
+                <table class="admin-specs-table" style="font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">Variant Name / Label</th>
+                      <th style="width: 20%;">Option Value(s)</th>
+                      <th style="width: 18%;">Matching Photo</th>
+                      <th style="width: 14%;">Price (&#8358;)</th>
+                      <th style="width: 15%; text-align: center;">Stock Qty <span style="color:#ef4444;">*</span></th>
+                      <th style="width: 8%; text-align: center;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminVariantsTableBody">
+                    <!-- Dynamic variant rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="admin-modal-footer">
@@ -3338,6 +3431,45 @@
         });
       }
 
+      const chkVariants = document.getElementById('modalEnableVariantsCheckbox');
+      const bodyVariants = document.getElementById('adminVariantsBuilderBody');
+      if (chkVariants && bodyVariants) {
+        chkVariants.addEventListener('change', () => {
+          bodyVariants.style.display = chkVariants.checked ? 'block' : 'none';
+          if (chkVariants.checked) {
+            const groupsList = document.getElementById('adminOptionGroupsList');
+            if (groupsList && groupsList.children.length === 0) {
+              groupsList.appendChild(createOptionGroupCard('Size', '48, 50, 52, 54, 56, 58, 60'));
+            }
+          }
+          updateVariantTotalStockBadge();
+        });
+      }
+
+      const btnAddOptionGroup = document.getElementById('btnAddOptionGroupBtn');
+      if (btnAddOptionGroup) {
+        btnAddOptionGroup.addEventListener('click', () => {
+          const list = document.getElementById('adminOptionGroupsList');
+          if (list) list.appendChild(createOptionGroupCard('', ''));
+        });
+      }
+
+      const btnGenMatrix = document.getElementById('btnGenerateVariantsMatrix');
+      if (btnGenMatrix) {
+        btnGenMatrix.addEventListener('click', generateVariantMatrix);
+      }
+
+      const btnAddManualVariant = document.getElementById('btnAddManualVariantRowBtn');
+      if (btnAddManualVariant) {
+        btnAddManualVariant.addEventListener('click', () => {
+          const tbody = document.getElementById('adminVariantsTableBody');
+          if (tbody) {
+            tbody.appendChild(createVariantTableRow({ name: '', attributes: {}, price: null, stock: 1, image: '' }));
+            updateVariantTotalStockBadge();
+          }
+        });
+      }
+
       document.getElementById('closeProductModal').addEventListener('click', () => {
         closeAdminModal('productModal');
       });
@@ -3573,6 +3705,7 @@
                 <div>
                   <span class="product-row-title" title="${escapeHtml(p.title)}">${escapeHtml(p.title)}</span>
                   <span class="product-row-id">${p.brand ? escapeHtml(p.brand) + ' &bull; ' : ''}ID: ${escapeHtml(p.id)}</span>
+                  ${(p.has_variants && Array.isArray(p.variants) && p.variants.length > 0) ? `<div style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; color:#512175; background:#faf5ff; border:1px solid #e9d5ff; padding:1px 6px; border-radius:4px; margin-top:2px;">${p.variants.length} Variants (${stock} in stock)</div>` : ''}
                 </div>
               </div>
             </td>
@@ -3874,6 +4007,254 @@
           });
         }
       }
+
+      // 3. Product Options & Variants Builder
+      populateVariantsBuilder(product);
+    }
+
+    // ==========================================
+    // PRODUCT VARIANTS & CUSTOM OPTIONS BUILDER
+    // ==========================================
+    function createOptionGroupCard(name, values) {
+      const div = document.createElement('div');
+      div.className = 'admin-option-group-card';
+      const n = (name || '').trim();
+      const v = Array.isArray(values) ? values.join(', ') : (values || '');
+      const presets = ['Size', 'Color', 'Weight', 'Type', 'Style', 'Material'];
+      const isCustom = n && presets.indexOf(n) === -1;
+
+      div.innerHTML = `
+        <select class="admin-opt-preset">
+          <option value="Size" ${n === 'Size' ? 'selected' : ''}>Size</option>
+          <option value="Color" ${n === 'Color' ? 'selected' : ''}>Color</option>
+          <option value="Weight" ${n === 'Weight' ? 'selected' : ''}>Weight</option>
+          <option value="Type" ${n === 'Type' ? 'selected' : ''}>Type / Model</option>
+          <option value="Style" ${n === 'Style' ? 'selected' : ''}>Style</option>
+          <option value="Material" ${n === 'Material' ? 'selected' : ''}>Material</option>
+          <option value="Custom" ${isCustom ? 'selected' : ''}>Custom Name...</option>
+        </select>
+        <input type="text" class="admin-opt-custom-name" value="${escapeHtml(n)}" placeholder="Option Name (e.g. Storage, Flavor)" style="${isCustom ? 'display:block;' : 'display:none;'} width: 140px;">
+        <input type="text" class="admin-opt-values" value="${escapeHtml(v)}" placeholder="Comma-separated values (e.g. 48, 50, 52 or Royal Blue, Charcoal Grey)">
+        <button type="button" class="admin-row-delete-btn" title="Remove Option" onclick="this.closest('.admin-option-group-card').remove()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      `;
+
+      const sel = div.querySelector('.admin-opt-preset');
+      const customInput = div.querySelector('.admin-opt-custom-name');
+      sel.addEventListener('change', () => {
+        if (sel.value === 'Custom') {
+          customInput.style.display = 'block';
+          customInput.focus();
+        } else {
+          customInput.style.display = 'none';
+          customInput.value = sel.value;
+        }
+      });
+      return div;
+    }
+
+    function createVariantTableRow(v) {
+      const tr = document.createElement('tr');
+      tr.className = 'admin-variant-row';
+      const name = escapeHtml(v.name || '');
+      const attrs = v.attributes ? Object.entries(v.attributes).map(([k, val]) => `${k}: ${val}`).join(' | ') : '';
+      const price = v.price !== undefined && v.price !== null ? v.price : '';
+      const stock = v.stock !== undefined && v.stock !== null ? Number(v.stock) : 1;
+      const img = v.image || '';
+
+      // Build options from uploaded gallery images
+      let imgOptions = `<option value="">Default Product Photo</option>`;
+      modalProductImages.forEach((imgUrl, idx) => {
+        const isSel = (img && img === imgUrl) ? 'selected' : '';
+        imgOptions += `<option value="${escapeHtml(imgUrl)}" ${isSel}>Photo ${idx + 1}</option>`;
+      });
+      if (img && !modalProductImages.includes(img)) {
+        imgOptions += `<option value="${escapeHtml(img)}" selected>Photo: ${escapeHtml(img.substring(img.lastIndexOf('/') + 1))}</option>`;
+      }
+
+      tr.innerHTML = `
+        <td>
+          <input type="text" class="admin-variant-name" value="${name}" placeholder="e.g. Royal Blue / 48" required>
+        </td>
+        <td>
+          <input type="text" class="admin-variant-attrs" value="${escapeHtml(attrs)}" placeholder="e.g. Color: Royal Blue | Size: 48">
+        </td>
+        <td>
+          <select class="admin-variant-img" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; font-size: 11.5px;">
+            ${imgOptions}
+          </select>
+        </td>
+        <td>
+          <input type="number" class="admin-variant-price" value="${price}" placeholder="Base" min="0" style="text-align: right;">
+        </td>
+        <td>
+          <input type="number" class="admin-variant-stock" value="${stock}" placeholder="Qty" min="0" required style="text-align: center; font-weight: 700; color: #15803d; background: #f0fdf4; border-color: #86efac;">
+        </td>
+        <td style="text-align: center;">
+          <button type="button" class="admin-row-delete-btn" title="Remove Variant" onclick="this.closest('tr').remove(); updateVariantTotalStockBadge();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </td>
+      `;
+
+      tr.querySelector('.admin-variant-stock').addEventListener('input', updateVariantTotalStockBadge);
+      return tr;
+    }
+
+    function updateVariantTotalStockBadge() {
+      const rows = document.querySelectorAll('#adminVariantsTableBody .admin-variant-row');
+      let total = 0;
+      rows.forEach(r => {
+        const inp = r.querySelector('.admin-variant-stock');
+        if (inp) total += (Number(inp.value) || 0);
+      });
+      const badge = document.getElementById('adminVariantTotalStockBadge');
+      if (badge) {
+        badge.textContent = `Total Variant Stock: ${total} unit${total === 1 ? '' : 's'} across ${rows.length} variant${rows.length === 1 ? '' : 's'}`;
+      }
+      const isVariantsActive = document.getElementById('modalEnableVariantsCheckbox') && document.getElementById('modalEnableVariantsCheckbox').checked;
+      if (isVariantsActive && rows.length > 0) {
+        const stockInp = document.getElementById('modalProductStock');
+        if (stockInp) stockInp.value = total;
+      }
+    }
+
+    function collectOptionGroupsFromModal() {
+      const list = [];
+      const cards = document.querySelectorAll('#adminOptionGroupsList .admin-option-group-card');
+      cards.forEach(c => {
+        const sel = c.querySelector('.admin-opt-preset');
+        const customInput = c.querySelector('.admin-opt-custom-name');
+        const valInput = c.querySelector('.admin-opt-values');
+        let name = (sel && sel.value !== 'Custom') ? sel.value : (customInput ? customInput.value.trim() : '');
+        if (!name && customInput) name = customInput.value.trim();
+        const rawVals = valInput ? valInput.value : '';
+        const values = rawVals.split(',').map(s => s.trim()).filter(Boolean);
+        if (name && values.length > 0) {
+          list.push({ name, values });
+        }
+      });
+      return list;
+    }
+
+    function collectVariantRowsFromModal() {
+      const variants = [];
+      const rows = document.querySelectorAll('#adminVariantsTableBody .admin-variant-row');
+      rows.forEach((r, idx) => {
+        const nameInp = r.querySelector('.admin-variant-name');
+        const attrsInp = r.querySelector('.admin-variant-attrs');
+        const imgSel = r.querySelector('.admin-variant-img');
+        const priceInp = r.querySelector('.admin-variant-price');
+        const stockInp = r.querySelector('.admin-variant-stock');
+        
+        const name = nameInp ? nameInp.value.trim() : `Variant ${idx + 1}`;
+        const rawAttrs = attrsInp ? attrsInp.value.trim() : '';
+        const attributes = {};
+        if (rawAttrs) {
+          rawAttrs.split('|').forEach(part => {
+            const pair = part.split(':');
+            if (pair.length === 2) {
+              attributes[pair[0].trim()] = pair[1].trim();
+            }
+          });
+        }
+        const img = imgSel ? imgSel.value : '';
+        const price = priceInp && priceInp.value ? Number(priceInp.value) : null;
+        const stock = stockInp ? (Number(stockInp.value) || 0) : 0;
+
+        variants.push({
+          id: 'var_' + (idx + 1) + '_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+          name: name,
+          attributes: attributes,
+          image: img,
+          price: price,
+          stock: stock
+        });
+      });
+      return variants;
+    }
+
+    function generateVariantMatrix() {
+      const groups = collectOptionGroupsFromModal();
+      if (groups.length === 0) {
+        alert('Please add at least one option with values (e.g. Size: 48, 50, 52 or Color: Blue, Grey) before generating combinations.');
+        return;
+      }
+
+      function cartesian(arrays) {
+        return arrays.reduce((acc, curr) => {
+          return acc.flatMap(a => curr.values.map(v => [...a, { name: curr.name, value: v }]));
+        }, [[]]);
+      }
+
+      const combos = cartesian(groups);
+      const tbody = document.getElementById('adminVariantsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      combos.forEach((combo, idx) => {
+        const label = combo.map(c => c.value).join(' / ');
+        const attrsObj = {};
+        combo.forEach(c => { attrsObj[c.name] = c.value; });
+
+        let matchedImg = '';
+        const colorItem = combo.find(c => c.name.toLowerCase() === 'color');
+        if (colorItem && modalProductImages.length > 0) {
+          const cVal = colorItem.value.toLowerCase().replace(/\s+/g, '-');
+          const foundImg = modalProductImages.find(im => im.toLowerCase().includes(cVal));
+          if (foundImg) matchedImg = foundImg;
+          else if (modalProductImages[idx % modalProductImages.length]) {
+            matchedImg = modalProductImages[idx % modalProductImages.length];
+          }
+        }
+
+        const vObj = {
+          name: label,
+          attributes: attrsObj,
+          price: null,
+          stock: 1,
+          image: matchedImg
+        };
+        tbody.appendChild(createVariantTableRow(vObj));
+      });
+
+      updateVariantTotalStockBadge();
+    }
+
+    function populateVariantsBuilder(product) {
+      const checkbox = document.getElementById('modalEnableVariantsCheckbox');
+      const body = document.getElementById('adminVariantsBuilderBody');
+      const groupsList = document.getElementById('adminOptionGroupsList');
+      const tbody = document.getElementById('adminVariantsTableBody');
+
+      if (!checkbox || !body || !groupsList || !tbody) return;
+
+      groupsList.innerHTML = '';
+      tbody.innerHTML = '';
+
+      const varData = (product && product.specs && product.specs.variants_data) ? product.specs.variants_data : (product && product.variants_data ? product.variants_data : null);
+      const hasVars = (varData && varData.has_variants) || (product && product.has_variants) || (product && Array.isArray(product.variants) && product.variants.length > 0);
+      const optGroups = (varData && Array.isArray(varData.variant_options)) ? varData.variant_options : ((product && Array.isArray(product.variant_options)) ? product.variant_options : []);
+      const varRows = (varData && Array.isArray(varData.variants)) ? varData.variants : ((product && Array.isArray(product.variants)) ? product.variants : []);
+
+      if (hasVars && (optGroups.length > 0 || varRows.length > 0)) {
+        checkbox.checked = true;
+        body.style.display = 'block';
+
+        optGroups.forEach(g => {
+          groupsList.appendChild(createOptionGroupCard(g.name, g.values));
+        });
+
+        varRows.forEach(v => {
+          tbody.appendChild(createVariantTableRow(v));
+        });
+      } else {
+        checkbox.checked = false;
+        body.style.display = 'none';
+      }
+
+      updateVariantTotalStockBadge();
     }
 
     let modalProductImages = [];
@@ -4198,6 +4579,28 @@
       const overview_sections = collectOverviewSectionsFromModal();
       const specs = collectSpecsFromModal();
 
+      const hasVariants = document.getElementById('modalEnableVariantsCheckbox') && document.getElementById('modalEnableVariantsCheckbox').checked;
+      let variant_options = [];
+      let variants = [];
+      let finalStock = stock;
+
+      if (hasVariants) {
+        variant_options = collectOptionGroupsFromModal();
+        variants = collectVariantRowsFromModal();
+        if (variants.length > 0) {
+          finalStock = variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+        }
+      }
+
+      const finalSpecs = {
+        ...(specs || {}),
+        variants_data: hasVariants ? {
+          has_variants: true,
+          variant_options: variant_options,
+          variants: variants
+        } : null
+      };
+
       if (currentEditingId) {
         // Update existing
         const idx = adminProducts.findIndex(p => String(p.id) === String(currentEditingId));
@@ -4213,7 +4616,10 @@
             price,
             oldPrice,
             old_price: oldPrice,
-            stock,
+            stock: finalStock,
+            has_variants: hasVariants,
+            variant_options: variant_options,
+            variants: variants,
             discount,
             rating,
             status,
@@ -4221,7 +4627,7 @@
             images,
             description,
             overview_sections,
-            specs,
+            specs: finalSpecs,
             updated_at: new Date().toISOString()
           };
         }
@@ -4239,14 +4645,17 @@
           price,
           oldPrice,
           old_price: oldPrice,
-          stock,
+          stock: finalStock,
+          has_variants: hasVariants,
+          variant_options: variant_options,
+          variants: variants,
           discount,
           status,
           image,
           images,
           description,
           overview_sections,
-          specs,
+          specs: finalSpecs,
           rating: rating,
           reviewsCount: 0,
           verified: true,
@@ -5577,6 +5986,7 @@
                 <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(it.title)}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff;" onerror="this.src='images/subcategories/sub_smartphones.jpg'">
                 <div>
                   <div style="font-weight: 700; color: #0f172a; font-size: 12.5px;">${escapeHtml(it.title || 'Product Item')}</div>
+                  ${it.variant_name ? `<div style="display:inline-block; font-size:11px; color:#512175; background:#faf5ff; border:1px solid #d8b4fe; padding:1px 6px; border-radius:4px; font-weight:700; margin-top:2px;">Option: ${escapeHtml(it.variant_name)}</div>` : ''}
                   <div style="font-size: 11px; color: #64748b; text-transform: capitalize;">${escapeHtml(it.category || 'General')}</div>
                 </div>
               </td>
