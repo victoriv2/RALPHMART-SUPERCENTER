@@ -143,9 +143,7 @@ async function getCurrentProfile() {
         const locObj = {
           stateKey: stateKey,
           stateName: (stateData && stateData.name) || stateName || stateKey,
-          city: lga || '',
-          cost: (stateData && stateData.cost) || '₦ 2,500',
-          time: (stateData && stateData.time) || 'Within 48 - 72 Hours'
+          city: lga || ''
         };
         localStorage.setItem('nkemmart_user_location', JSON.stringify(locObj));
       } catch (locErr) {
@@ -259,9 +257,7 @@ async function signUpUser(email, password, { firstName, lastName, fullName, phon
       const locObj = {
         stateKey: stateKey,
         stateName: (stateData && stateData.name) || state || stateKey,
-        city: lga || '',
-        cost: (stateData && stateData.cost) || '₦ 2,500',
-        time: (stateData && stateData.time) || 'Within 48 - 72 Hours'
+        city: lga || ''
       };
       localStorage.setItem('nkemmart_user_location', JSON.stringify(locObj));
     } catch (e) {
@@ -363,9 +359,7 @@ async function updateUserProfile({ firstName, lastName, phone, state, stateKey, 
       const locObj = {
         stateKey: stateKey,
         stateName: (stateData && stateData.name) || state || stateKey,
-        city: lga || '',
-        cost: (stateData && stateData.cost) || '₦ 2,500',
-        time: (stateData && stateData.time) || 'Within 48 - 72 Hours'
+        city: lga || ''
       };
       localStorage.setItem('nkemmart_user_location', JSON.stringify(locObj));
     } catch (e) {}

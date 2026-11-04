@@ -1424,10 +1424,10 @@
                 </div>
                 <div>
                   <h4 class="profile-delivery-title" id="deliveryStateNameDisplay">Delivery Destination</h4>
-                  <p class="profile-delivery-desc" id="deliveryTimelineDisplay">Within 48 - 72 Hours</p>
+                  <p class="profile-delivery-desc" id="deliveryTimelineDisplay">Doorstep delivery available</p>
                 </div>
               </div>
-              <div class="profile-delivery-rate" id="deliveryCostDisplay">₦ 2,500</div>
+              <div class="profile-delivery-rate" id="deliveryCostDisplay" style="display: none;"></div>
             </div>
 
             <!-- Save Changes Button -->
@@ -2234,9 +2234,10 @@
           return;
         }
         const s = locationsData[stateKey];
-        document.getElementById('deliveryStateNameDisplay').textContent = s.name + ' Shipping Rate';
-        document.getElementById('deliveryTimelineDisplay').textContent = s.time || 'Within 48 - 72 Hours';
-        document.getElementById('deliveryCostDisplay').textContent = s.cost || '₦ 2,500';
+        document.getElementById('deliveryStateNameDisplay').textContent = s.name;
+        document.getElementById('deliveryTimelineDisplay').textContent = 'Doorstep delivery available across ' + s.name;
+        const costDisp = document.getElementById('deliveryCostDisplay');
+        if (costDisp) costDisp.style.display = 'none';
         box.style.display = 'flex';
       }
 
@@ -2310,7 +2311,6 @@
           btn.innerHTML = `
             <div>
               <span class="pdp-picker-item-name">${s.name}</span>
-              <div class="pdp-picker-item-meta">${s.cost || '₦ 2,500'} &bull; ${s.time || 'Within 48 - 72 Hours'}</div>
             </div>
             ${isSelected ? '<span class="pdp-picker-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' : ''}
           `;

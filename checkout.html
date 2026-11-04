@@ -698,9 +698,9 @@
             <div class="radio-circle"></div>
             <div class="radio-option-info">
               <span class="radio-option-title">Doorstep Delivery</span>
-              <span class="radio-option-sub" id="checkoutDoorstepSub">Dispatched directly to your address within 24-48 hours</span>
+              <span class="radio-option-sub" id="checkoutDoorstepSub">Dispatched directly to your address</span>
             </div>
-            <span class="radio-option-fee" id="checkoutDoorstepFee">₦2,500</span>
+            <span class="radio-option-fee" id="checkoutDoorstepFee">FREE</span>
           </div>
 
           <div class="delivery-radio-option" id="optPickup">
@@ -772,7 +772,7 @@
 
           <div class="summary-row">
             <span>Delivery Fee</span>
-            <span id="checkoutDeliveryFee">₦2,500</span>
+            <span id="checkoutDeliveryFee">FREE</span>
           </div>
 
           <div class="summary-row total">
@@ -1118,8 +1118,8 @@
       const checkoutGrandTotal = document.getElementById('checkoutGrandTotal');
       const checkoutTotalCount = document.getElementById('checkoutTotalCount');
 
-      let deliveryFee = 2500;
-      let currentBaseDeliveryFee = 2500;
+      let deliveryFee = 0;
+      let currentBaseDeliveryFee = 0;
       let selectedDeliveryMethod = 'doorstep';
       let selectedPaymentMethod = 'pay_on_delivery';
 
@@ -1128,12 +1128,6 @@
       const doorstepFeeBadge = document.getElementById('checkoutDoorstepFee');
       const doorstepSubBadge = document.getElementById('checkoutDoorstepSub');
       const locations = window.NIGERIA_LOCATIONS || {};
-
-      function parseCostNumber(costStr) {
-        if (!costStr) return 2500;
-        var clean = String(costStr).replace(/[^0-9]/g, '');
-        return clean ? parseInt(clean, 10) : 2500;
-      }
 
       function populateStateDropdown() {
         if (!stateSelect) return;
@@ -1172,15 +1166,15 @@
           }
         }
 
-        currentBaseDeliveryFee = parseCostNumber(stateData.cost);
+        currentBaseDeliveryFee = 0;
         if (selectedDeliveryMethod === 'doorstep') {
-          deliveryFee = currentBaseDeliveryFee;
+          deliveryFee = 0;
         }
         if (doorstepFeeBadge) {
-          doorstepFeeBadge.textContent = stateData.cost || formatNaira(currentBaseDeliveryFee);
+          doorstepFeeBadge.textContent = 'FREE';
         }
-        if (doorstepSubBadge && stateData.time) {
-          doorstepSubBadge.textContent = 'Dispatched directly to your address (' + stateData.time + ')';
+        if (doorstepSubBadge) {
+          doorstepSubBadge.textContent = 'Dispatched directly to your address in ' + stateData.name;
         }
         updateTotals();
       }
@@ -1486,9 +1480,7 @@
             const locObj = {
               stateKey: stateKey,
               stateName: stateName,
-              city: lgaName,
-              cost: stateObj.cost || formatNaira(deliveryFee),
-              time: stateObj.time || 'Within 48 - 72 Hours'
+              city: lgaName
             };
             localStorage.setItem('nkemmart_user_location', JSON.stringify(locObj));
           } catch (e) {}

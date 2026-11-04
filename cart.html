@@ -1042,10 +1042,10 @@
             deliveryRowLabel.textContent = 'Delivery to ' + userLoc.stateName + (userLoc.city ? ' (' + userLoc.city + ')' : '');
           }
           if (deliveryRowVal) {
-            deliveryRowVal.textContent = userLoc.cost || 'Calculated at Checkout';
+            deliveryRowVal.textContent = 'Calculated at Checkout';
           }
           if (summarySubtext) {
-            summarySubtext.textContent = 'Doorstep shipping to ' + userLoc.stateName + ' is ' + (userLoc.cost || 'calculated at checkout');
+            summarySubtext.textContent = 'Doorstep shipping available to ' + userLoc.stateName;
           }
         }
 
