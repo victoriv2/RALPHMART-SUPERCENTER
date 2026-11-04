@@ -1204,12 +1204,36 @@
         return;
       }
 
-      // Pre-fill user profile if logged in
-      const profile = await getCurrentProfile();
+      // Pre-fill user profile if logged in or from local storage
+      let profile = null;
+      try {
+        if (typeof getCurrentProfile === 'function') {
+          profile = await getCurrentProfile();
+        }
+      } catch (err) {
+        console.warn('Profile fetch note:', err);
+      }
+
+      if (!profile) {
+        try {
+          profile = JSON.parse(localStorage.getItem('nkemmart_user_profile') || 'null');
+        } catch (e) {
+          profile = null;
+        }
+      }
+
       if (profile) {
-        if (profile.full_name) document.getElementById('checkoutFullName').value = profile.full_name;
-        if (profile.email) document.getElementById('checkoutEmail').value = profile.email;
-        if (profile.phone) document.getElementById('checkoutPhone').value = profile.phone;
+        const fullNameEl = document.getElementById('checkoutFullName');
+        const emailEl = document.getElementById('checkoutEmail');
+        const phoneEl = document.getElementById('checkoutPhone');
+        const streetEl = document.getElementById('checkoutStreet');
+
+        if (fullNameEl && profile.full_name) fullNameEl.value = profile.full_name;
+        if (emailEl && profile.email) emailEl.value = profile.email;
+        if (phoneEl && profile.phone) phoneEl.value = profile.phone;
+        if (streetEl && (profile.street || profile.street_address || profile.address)) {
+          streetEl.value = profile.street || profile.street_address || profile.address;
+        }
       }
 
       // Check saved default location and pre-select
@@ -1220,12 +1244,21 @@
         savedLoc = null;
       }
 
-      let defaultStateKey = (savedLoc && savedLoc.stateKey) || (profile && profile.state_key) || '';
-      let defaultLga = (savedLoc && savedLoc.city) || (profile && profile.lga) || '';
+      let defaultStateKey = (profile && profile.state_key) || (savedLoc && savedLoc.stateKey) || '';
+      let defaultLga = (profile && profile.lga) || (savedLoc && savedLoc.city) || '';
 
       if (!defaultStateKey && profile && profile.state) {
         for (let k in locations) {
-          if (locations[k].name.toLowerCase() === profile.state.toLowerCase()) {
+          if (locations[k].name.toLowerCase() === profile.state.toLowerCase() || k.toLowerCase() === profile.state.toLowerCase()) {
+            defaultStateKey = k;
+            break;
+          }
+        }
+      }
+
+      if (!defaultStateKey && savedLoc && savedLoc.stateName) {
+        for (let k in locations) {
+          if (locations[k].name.toLowerCase() === savedLoc.stateName.toLowerCase() || k.toLowerCase() === savedLoc.stateName.toLowerCase()) {
             defaultStateKey = k;
             break;
           }
@@ -1235,6 +1268,11 @@
       if (defaultStateKey && locations[defaultStateKey]) {
         stateSelect.value = defaultStateKey;
         onStateSelect(defaultStateKey, defaultLga);
+        stateSelect.dispatchEvent(new Event('input', { bubbles: true }));
+        if (citySelect) {
+          citySelect.value = defaultLga;
+          citySelect.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       }
 
       // Load & Render Saved Delivery Addresses
@@ -1293,6 +1331,10 @@
             if (stateKey) {
               stateSelect.value = stateKey;
               onStateSelect(stateKey, addr.lga || null);
+              stateSelect.dispatchEvent(new Event('input', { bubbles: true }));
+              if (citySelect) {
+                citySelect.dispatchEvent(new Event('input', { bubbles: true }));
+              }
             }
           }
         }

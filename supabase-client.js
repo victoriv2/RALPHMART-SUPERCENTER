@@ -185,7 +185,7 @@ async function getCurrentProfile() {
     const lName = (profile && profile.last_name) || user.user_metadata?.last_name || '';
     const computedFull = (profile && profile.full_name) || user.user_metadata?.full_name || (fName && lName ? `${fName} ${lName}` : (fName || lName || user.email.split('@')[0]));
 
-    return {
+    const fullProfileObj = {
       id: user.id,
       email: user.email,
       first_name: fName,
@@ -199,6 +199,12 @@ async function getCurrentProfile() {
       avatar_url: profile?.avatar_url || null,
       created_at: profile?.created_at || user.created_at
     };
+
+    try {
+      localStorage.setItem('nkemmart_user_profile', JSON.stringify(fullProfileObj));
+    } catch (e) {}
+
+    return fullProfileObj;
   } catch (err) {
     console.error('Error fetching profile:', err);
     return null;
@@ -279,7 +285,24 @@ async function signUpUser(email, password, { firstName, lastName, fullName, phon
     throw new Error('Account registration could not be completed. Please try again.');
   }
 
-  // Persist chosen location immediately to localStorage
+  // Persist user profile and location immediately to localStorage
+  const localProfile = {
+    id: data.user.id,
+    email: cleanEmail,
+    first_name: fName,
+    last_name: lName,
+    full_name: computedFullName,
+    phone: (phone || '').trim(),
+    state: (state || '').trim(),
+    state_key: (stateKey || '').trim(),
+    lga: (lga || '').trim(),
+    role: role,
+    created_at: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem('nkemmart_user_profile', JSON.stringify(localProfile));
+  } catch (e) {}
+
   if (stateKey && typeof window !== 'undefined') {
     try {
       const locations = window.NIGERIA_LOCATIONS || null;
@@ -293,6 +316,25 @@ async function signUpUser(email, password, { firstName, lastName, fullName, phon
     } catch (e) {
       // Storage fallback
     }
+  }
+
+  // Upsert profile into public.profiles table
+  try {
+    await client.from('profiles').upsert([{
+      id: data.user.id,
+      email: cleanEmail,
+      first_name: fName,
+      last_name: lName,
+      full_name: computedFullName,
+      phone: (phone || '').trim(),
+      state: (state || '').trim(),
+      state_key: (stateKey || '').trim(),
+      lga: (lga || '').trim(),
+      role: role,
+      updated_at: new Date().toISOString()
+    }]);
+  } catch (upsertErr) {
+    console.warn('Profile table upsert note:', upsertErr);
   }
 
   if (data && data.user && data.session) {

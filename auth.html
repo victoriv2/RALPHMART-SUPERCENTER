@@ -1865,7 +1865,21 @@
             lga: lga 
           });
 
-          // Save default location to localStorage immediately
+          // Save default location & user profile to localStorage immediately
+          const userProfObj = {
+            email: emailCheck.cleanEmail,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName || `${firstName} ${lastName}`.trim(),
+            phone: phone,
+            state: stateName,
+            state_key: stateKey,
+            lga: lga
+          };
+          try {
+            localStorage.setItem('nkemmart_user_profile', JSON.stringify(userProfObj));
+          } catch (e) {}
+
           if (stateObj) {
             const defaultLoc = {
               stateKey: stateKey,
