@@ -10,6 +10,8 @@
   <script src="supabase-client.js?v=8.0"></script>
   <script src="taxonomy.js?v=3.3"></script>
   <script src="modular-select-picker.js"></script>
+  <!-- Paystack Inline Popup JS -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
   <style>
     body {
       background-color: #f8fafc;
@@ -747,9 +749,10 @@
           <div class="delivery-radio-option" id="payCardOnline">
             <div class="radio-circle"></div>
             <div class="radio-option-info">
-              <span class="radio-option-title">Debit Card Online (Mastercard, Visa, Verve)</span>
-              <span class="radio-option-sub">Instant secure payment processing</span>
+              <span class="radio-option-title">Pay Online via Paystack (Cards, Bank Transfer, USSD)</span>
+              <span class="radio-option-sub">Fast, automated verification with Paystack live gateway</span>
             </div>
+            <span class="radio-option-fee" style="color: #059669; font-weight: 700; font-size: 11px; background: #ecfdf5; padding: 3px 8px; border-radius: 4px; border: 1px solid #a7f3d0;">PAYSTACK</span>
           </div>
 
         </div>
@@ -1506,133 +1509,192 @@
           delivery_fee: deliveryFee,
           total_amount: grandTotal,
           payment_method: selectedPaymentMethod,
-          payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : 'pending_verification',
+          payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : (selectedPaymentMethod === 'card_online' ? 'pending_payment' : 'pending_verification'),
           order_status: 'confirmed',
           status: 'confirmed',
           created_at: nowIso
         };
 
-        // 1. Save to Supabase (only send valid table columns)
-        const client = getSupabase();
-        if (client) {
-          try {
-            const user = await getCurrentUser();
-            const supabasePayload = {
-              id: orderId,
-              customer_name: fullName,
-              customer_phone: phone,
-              customer_email: email,
-              delivery_address: street,
-              city: lgaName,
-              state: stateName,
-              items: cart,
-              subtotal: subtotal,
-              delivery_fee: deliveryFee,
-              total_amount: grandTotal,
-              payment_method: selectedPaymentMethod,
-              payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : 'pending_verification',
-              order_status: 'confirmed',
-              created_at: nowIso
-            };
-            if (user) {
-              orderData.user_id = user.id;
-              supabasePayload.user_id = user.id;
-            }
-            await client.from('orders').insert([supabasePayload]);
+        async function executeOrderPlacement(finalOrderData) {
+          placeBtn.querySelector('span').textContent = 'Confirming Order...';
 
-            // Log order placement activity in user account
-            if (typeof logUserActivity === 'function') {
-              logUserActivity('order_placed', 'Placed order #' + orderId, {
-                order_id: orderId,
-                total: grandTotal,
-                items_count: (cart || []).length,
-                payment_method: selectedPaymentMethod,
-                city: lgaName,
-                state: stateName
-              });
-            }
-
-            // Send notification to user account
-            if (typeof addUserNotification === 'function') {
-              await addUserNotification({
-                type: 'order',
-                title: 'Order Placed Successfully',
-                message: 'Your order #' + orderId + ' (Total: ' + formatNaira(grandTotal) + ') has been confirmed and is being processed.',
-                link: 'orders.html?orderId=' + encodeURIComponent(orderId)
-              });
-            }
-          } catch (err) {
-            console.warn('Supabase order insert note:', err);
-          }
-        }
-
-        // 2. Save to both user and admin local storage histories
-        ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(storageKey) {
-          try {
-            const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            list.unshift(orderData);
-            localStorage.setItem(storageKey, JSON.stringify(list));
-          } catch (e) {
-            console.warn('Local storage order save error:', e);
-          }
-        });
-
-        // 2b. Decrement inventory for ordered products & specific variants
-        try {
-          let localProds = JSON.parse(localStorage.getItem('nkemmart_admin_products') || '[]');
-          for (const item of cart) {
-            const prod = localProds.find(p => String(p.id) === String(item.id));
-            if (prod) {
-              const orderedQty = Number(item.qty || 1);
-              if (item.variant_id && Array.isArray(prod.variants)) {
-                const v = prod.variants.find(va => String(va.id) === String(item.variant_id) || va.name === item.variant_name);
-                if (v) {
-                  v.stock = Math.max(0, (Number(v.stock) || 0) - orderedQty);
-                }
-                prod.stock = prod.variants.reduce((sum, va) => sum + (Number(va.stock) || 0), 0);
-              } else {
-                prod.stock = Math.max(0, (Number(prod.stock) || 0) - orderedQty);
+          // 1. Save to Supabase (only send valid table columns)
+          const client = getSupabase();
+          if (client) {
+            try {
+              const user = await getCurrentUser();
+              const supabasePayload = {
+                id: finalOrderData.id,
+                customer_name: finalOrderData.customer_name,
+                customer_phone: finalOrderData.customer_phone,
+                customer_email: finalOrderData.customer_email,
+                delivery_address: finalOrderData.delivery_address,
+                city: finalOrderData.city,
+                state: finalOrderData.state,
+                items: finalOrderData.items,
+                subtotal: finalOrderData.subtotal,
+                delivery_fee: finalOrderData.delivery_fee,
+                total_amount: finalOrderData.total_amount,
+                payment_method: finalOrderData.payment_method,
+                payment_status: finalOrderData.payment_status,
+                order_status: 'confirmed',
+                created_at: finalOrderData.created_at
+              };
+              if (user) {
+                finalOrderData.user_id = user.id;
+                supabasePayload.user_id = user.id;
               }
-              // Update cloud
-              if (client) {
-                try {
-                  const varPayload = (prod.specs && typeof prod.specs === 'object') ? { ...prod.specs } : {};
-                  if (Array.isArray(prod.variants) && prod.variants.length > 0) {
-                    varPayload.variants_data = {
-                      has_variants: true,
-                      variant_options: prod.variant_options || [],
-                      variants: prod.variants
-                    };
+              await client.from('orders').insert([supabasePayload]);
+
+              // Log order placement activity in user account
+              if (typeof logUserActivity === 'function') {
+                logUserActivity('order_placed', 'Placed order #' + finalOrderData.id, {
+                  order_id: finalOrderData.id,
+                  total: finalOrderData.total_amount,
+                  items_count: (cart || []).length,
+                  payment_method: finalOrderData.payment_method,
+                  payment_status: finalOrderData.payment_status,
+                  city: finalOrderData.city,
+                  state: finalOrderData.state
+                });
+              }
+
+              // Send notification to user account
+              if (typeof addUserNotification === 'function') {
+                const isPaid = finalOrderData.payment_status === 'paid';
+                await addUserNotification({
+                  type: 'order',
+                  title: isPaid ? 'Payment Confirmed & Order Placed' : 'Order Placed Successfully',
+                  message: isPaid
+                    ? 'Your payment of ' + formatNaira(finalOrderData.total_amount) + ' for order #' + finalOrderData.id + ' was successfully verified via Paystack.'
+                    : 'Your order #' + finalOrderData.id + ' (Total: ' + formatNaira(finalOrderData.total_amount) + ') has been confirmed and is being processed.',
+                  link: 'orders.html?orderId=' + encodeURIComponent(finalOrderData.id)
+                });
+              }
+            } catch (err) {
+              console.warn('Supabase order insert note:', err);
+            }
+          }
+
+          // 2. Save to both user and admin local storage histories
+          ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(storageKey) {
+            try {
+              const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+              list.unshift(finalOrderData);
+              localStorage.setItem(storageKey, JSON.stringify(list));
+            } catch (e) {
+              console.warn('Local storage order save error:', e);
+            }
+          });
+
+          // 2b. Decrement inventory for ordered products & specific variants
+          try {
+            let localProds = JSON.parse(localStorage.getItem('nkemmart_admin_products') || '[]');
+            for (const item of cart) {
+              const prod = localProds.find(p => String(p.id) === String(item.id));
+              if (prod) {
+                const orderedQty = Number(item.qty || 1);
+                if (item.variant_id && Array.isArray(prod.variants)) {
+                  const v = prod.variants.find(va => String(va.id) === String(item.variant_id) || va.name === item.variant_name);
+                  if (v) {
+                    v.stock = Math.max(0, (Number(v.stock) || 0) - orderedQty);
                   }
-                  await client.from('products').update({
-                    stock: prod.stock,
-                    specs: varPayload
-                  }).eq('id', prod.id);
-                } catch (supaErr) {
-                  console.warn('Inventory decrement sync note:', supaErr);
+                  prod.stock = prod.variants.reduce((sum, va) => sum + (Number(va.stock) || 0), 0);
+                } else {
+                  prod.stock = Math.max(0, (Number(prod.stock) || 0) - orderedQty);
+                }
+                // Update cloud
+                if (client) {
+                  try {
+                    const varPayload = (prod.specs && typeof prod.specs === 'object') ? { ...prod.specs } : {};
+                    if (Array.isArray(prod.variants) && prod.variants.length > 0) {
+                      varPayload.variants_data = {
+                        has_variants: true,
+                        variant_options: prod.variant_options || [],
+                        variants: prod.variants
+                      };
+                    }
+                    await client.from('products').update({
+                      stock: prod.stock,
+                      specs: varPayload
+                    }).eq('id', prod.id);
+                  } catch (supaErr) {
+                    console.warn('Inventory decrement sync note:', supaErr);
+                  }
                 }
               }
             }
+            localStorage.setItem('nkemmart_admin_products', JSON.stringify(localProds));
+            window.dispatchEvent(new CustomEvent('ralphmart_catalog_loaded', { detail: localProds }));
+          } catch (invErr) {
+            console.warn('Inventory update error:', invErr);
           }
-          localStorage.setItem('nkemmart_admin_products', JSON.stringify(localProds));
-          window.dispatchEvent(new CustomEvent('ralphmart_catalog_loaded', { detail: localProds }));
-        } catch (invErr) {
-          console.warn('Inventory update error:', invErr);
+
+          // 3. Clear cart both locally and in cloud
+          if (typeof syncCartToCloud === 'function') {
+            syncCartToCloud([]);
+          } else {
+            localStorage.removeItem('nkemmart_cart');
+          }
+          window.dispatchEvent(new Event('cartUpdated'));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: finalOrderData.id, status: 'confirmed' } }));
+          }
+
+          // 4. Redirect to order confirmation page
+          const paidQuery = finalOrderData.payment_status === 'paid' ? '&paid=true' : '';
+          window.location.href = `orders.html?orderId=${finalOrderData.id}&placed=true${paidQuery}`;
         }
 
-        // 3. Clear cart both locally and in cloud
-        if (typeof syncCartToCloud === 'function') {
-          syncCartToCloud([]);
+        // Process based on payment method
+        if (selectedPaymentMethod === 'card_online') {
+          placeBtn.querySelector('span').textContent = 'Connecting to Paystack...';
+
+          if (typeof PaystackPop === 'undefined') {
+            alert('Paystack gateway is initializing. Please check your internet connection and try again.');
+            placeBtn.disabled = false;
+            placeBtn.querySelector('span').textContent = 'Confirm & Place Order';
+            return;
+          }
+
+          const paystackKey = (window.RALPHMART_PAYSTACK && window.RALPHMART_PAYSTACK.getPublicKey())
+            || 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
+
+          const paystackHandler = PaystackPop.setup({
+            key: paystackKey,
+            email: email,
+            amount: Math.round(grandTotal * 100), // amount in kobo
+            currency: 'NGN',
+            ref: orderId,
+            metadata: {
+              custom_fields: [
+                { display_name: "Customer Name", variable_name: "customer_name", value: fullName },
+                { display_name: "Phone Number", variable_name: "phone_number", value: phone },
+                { display_name: "Delivery City", variable_name: "city", value: lgaName },
+                { display_name: "Delivery State", variable_name: "state", value: stateName },
+                { display_name: "Order ID", variable_name: "order_id", value: orderId }
+              ]
+            },
+            callback: function(response) {
+              const reference = (response && (response.reference || response.trxref)) || orderId;
+              orderData.payment_status = 'paid';
+              orderData.payment_reference = reference;
+              orderData.paystack_reference = reference;
+              orderData.paystack_transaction = (response && response.transaction) || '';
+              orderData.paid_at = new Date().toISOString();
+              executeOrderPlacement(orderData);
+            },
+            onClose: function() {
+              placeBtn.disabled = false;
+              placeBtn.querySelector('span').textContent = 'Confirm & Place Order';
+              alert('Payment session was closed before completion. You can retry with Paystack or choose Pay on Delivery / Bank Transfer.');
+            }
+          });
+
+          paystackHandler.openIframe();
         } else {
-          localStorage.removeItem('nkemmart_cart');
+          await executeOrderPlacement(orderData);
         }
-        window.dispatchEvent(new Event('cartUpdated'));
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'confirmed' } }));
-        }
-
-        // 4. Redirect to order confirmation page
-        window.location.href = `orders.html?orderId=${orderId}&placed=true`;
       });
     });
 

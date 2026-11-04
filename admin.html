@@ -2709,6 +2709,48 @@
             </div>
           </div>
 
+          <!-- PAYSTACK PAYMENT GATEWAY SETTINGS -->
+          <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 4px 0;">Paystack Payment Gateway</h3>
+                <span style="font-size: 12px; color: #64748b;">Live payment processing for debit cards, transfers, and USSD</span>
+              </div>
+              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 3px 8px; border-radius: 12px;">
+                <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981;"></span>
+                LIVE ACTIVE
+              </span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+              <div>
+                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #334155; margin-bottom: 4px;">Public Key (Client Inline)</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="text" id="adminPaystackPubKey" class="sales-input-control" value="pk_live_732d9b62cd035b8dad96e981d7f6982540342e80" style="font-family: monospace; font-size: 11.5px; flex: 1;">
+                  <button type="button" class="admin-btn btn-secondary" onclick="copyPaystackKey('pub')" style="font-size: 11.5px; padding: 0 12px;" title="Copy Public Key">Copy</button>
+                </div>
+              </div>
+
+              <div>
+                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #334155; margin-bottom: 4px;">Secret Key (Private Server Key)</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="password" id="adminPaystackSecKey" class="sales-input-control" placeholder="Paste your Paystack Secret Key (stored locally)" style="font-family: monospace; font-size: 11.5px; flex: 1;">
+                  <button type="button" class="admin-btn btn-secondary" onclick="togglePaystackSecVisibility()" id="btnToggleSecKey" style="font-size: 11.5px; padding: 0 10px;" title="Show / Hide">Show</button>
+                  <button type="button" class="admin-btn btn-secondary" onclick="copyPaystackKey('sec')" style="font-size: 11.5px; padding: 0 12px;" title="Copy Secret Key">Copy</button>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
+                <button type="button" class="admin-btn btn-primary" onclick="saveAdminPaystackKeys()" style="font-size: 12px; padding: 6px 14px;">
+                  Save Gateway Credentials
+                </button>
+                <a href="https://dashboard.paystack.com/#/transactions" target="_blank" rel="noopener" class="admin-btn btn-secondary" style="font-size: 12px; padding: 6px 12px; text-decoration: none;">
+                  Open Paystack Dashboard &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
             <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Store Data Reset &amp; Clean Slate</h3>
             <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
@@ -3099,6 +3141,7 @@
               </div>
               <div style="font-size: 12.5px; color: #334155;">Payment Method: <strong id="modalOrderPaymentMethod">Pay on Delivery</strong></div>
               <div style="font-size: 12.5px; color: #334155; margin-top: 2px;">Payment Status: <strong id="modalOrderPaymentStatus">Pending Verification</strong></div>
+              <div style="font-size: 12px; color: #0f766e; margin-top: 3px; display: none;" id="modalOrderPaystackRefWrap">Paystack Ref: <code id="modalOrderPaystackRef" style="font-weight: 700; background: #f0fdf4; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;"></code></div>
               <div style="font-size: 11.5px; color: #64748b; margin-top: 6px;" id="modalOrderDate">Placed: -</div>
             </div>
             <div style="font-size: 16px; font-weight: 800; color: #15803d; margin-top: 8px;" id="modalOrderGrandTotal">&#8358;0</div>
@@ -6348,8 +6391,20 @@
       badge.className = `status-chip ${statusKey}`;
       badge.textContent = statusKey.toUpperCase();
 
-      document.getElementById('modalOrderPaymentMethod').textContent = (order.payment_method || 'Verified Pay').replace(/_/g, ' ').toUpperCase();
+      document.getElementById('modalOrderPaymentMethod').textContent = (order.payment_method === 'card_online' ? 'PAYSTACK ONLINE' : (order.payment_method || 'Verified Pay')).replace(/_/g, ' ').toUpperCase();
       document.getElementById('modalOrderPaymentStatus').textContent = (order.payment_status || 'Paid / Verified').replace(/_/g, ' ').toUpperCase();
+
+      const refWrap = document.getElementById('modalOrderPaystackRefWrap');
+      const refCode = document.getElementById('modalOrderPaystackRef');
+      const payRef = order.payment_reference || order.paystack_reference;
+      if (refWrap && refCode) {
+        if (payRef) {
+          refCode.textContent = payRef;
+          refWrap.style.display = 'block';
+        } else {
+          refWrap.style.display = 'none';
+        }
+      }
       document.getElementById('modalOrderDate').textContent = `Placed: ${dateFmt}`;
       document.getElementById('modalOrderGrandTotal').textContent = formatNaira(order.total_amount);
 
@@ -6561,6 +6616,51 @@
       loadAdminReviews();
       loadAdminReviewsForVoting();
     });
+
+    // Paystack Gateway Helper Functions in Admin
+    window.togglePaystackSecVisibility = function() {
+      const input = document.getElementById('adminPaystackSecKey');
+      const btn = document.getElementById('btnToggleSecKey');
+      if (!input || !btn) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'Show';
+      }
+    };
+
+    window.copyPaystackKey = function(type) {
+      const el = document.getElementById(type === 'pub' ? 'adminPaystackPubKey' : 'adminPaystackSecKey');
+      if (!el || !el.value) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.value).then(() => {
+          alert((type === 'pub' ? 'Public' : 'Secret') + ' Key copied to clipboard!');
+        });
+      } else {
+        el.select();
+        document.execCommand('copy');
+        alert((type === 'pub' ? 'Public' : 'Secret') + ' Key copied!');
+      }
+    };
+
+    window.saveAdminPaystackKeys = function() {
+      const pub = (document.getElementById('adminPaystackPubKey')?.value || '').trim();
+      const sec = (document.getElementById('adminPaystackSecKey')?.value || '').trim();
+      if (!pub.startsWith('pk_')) {
+        alert('Warning: Public Key typically starts with pk_live_ or pk_test_');
+      }
+      if (!sec.startsWith('sk_')) {
+        alert('Warning: Secret Key typically starts with sk_live_ or sk_test_');
+      }
+      if (window.RALPHMART_PAYSTACK && typeof window.RALPHMART_PAYSTACK.setKeys === 'function') {
+        window.RALPHMART_PAYSTACK.setKeys(pub, sec);
+      } else {
+        localStorage.setItem('ralphmart_paystack_config', JSON.stringify({ publicKey: pub, secretKey: sec, updated_at: new Date().toISOString() }));
+      }
+      alert('Paystack Gateway credentials saved and updated live!');
+    };
 
     function escapeHtml(str) {
       if (!str) return '';

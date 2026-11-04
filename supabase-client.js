@@ -9,6 +9,36 @@ const SUPABASE_CONFIG = {
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbXpwemdqb3hmZHR2YW1wdnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjEyOTgsImV4cCI6MjEwODY5NzI5OH0.iwo2tR2Hn-LXFYUOaIBQ7fiko8AtOto60bJGk0WpCYQ'
 };
 
+// Paystack Live Payment Gateway Configuration
+window.RALPHMART_PAYSTACK = {
+  publicKey: 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80',
+  getPublicKey() {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('ralphmart_paystack_config') || '{}');
+      if (cfg && cfg.publicKey) return cfg.publicKey;
+    } catch (e) {}
+    return this.publicKey;
+  },
+  getSecretKey() {
+    try {
+      const cfg = JSON.parse(localStorage.getItem('ralphmart_paystack_config') || '{}');
+      if (cfg && cfg.secretKey) return cfg.secretKey;
+    } catch (e) {}
+    return '';
+  },
+  setKeys(pubKey, secKey) {
+    const payload = {
+      publicKey: (pubKey || '').trim() || this.publicKey,
+      secretKey: (secKey || '').trim() || this.getSecretKey(),
+      updated_at: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem('ralphmart_paystack_config', JSON.stringify(payload));
+    } catch (e) {}
+    return payload;
+  }
+};
+
 // Initialize Supabase Client
 let _supabaseInstance = null;
 

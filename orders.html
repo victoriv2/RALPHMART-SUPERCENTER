@@ -1161,7 +1161,9 @@
                 </div>
                 <div>
                   <strong>Payment Information:</strong><br>
-                  Method: <span style="text-transform: capitalize;">${(ord.payment_method || 'Pay on Delivery').replace(/_/g, ' ')}</span><br>
+                  Method: <span style="text-transform: capitalize;">${(ord.payment_method === 'card_online' ? 'Paystack Online' : (ord.payment_method || 'Pay on Delivery')).replace(/_/g, ' ')}</span><br>
+                  Payment Status: <span style="font-weight: 700; color: ${ord.payment_status === 'paid' ? '#15803d' : '#d97706'};">${ord.payment_status === 'paid' ? 'Paid (Verified via Paystack)' : 'Pending'}</span><br>
+                  ${ord.payment_reference ? `<span style="font-size: 11.5px; color: #64748b;">Ref: <code>${escapeHtml(ord.payment_reference)}</code></span><br>` : ''}
                   Delivery Fee: ${formatNaira(ord.delivery_fee || 0)}<br>
                   Grand Total: <strong style="color: #512175; font-size: 15px;">${formatNaira(ord.total_amount || 0)}</strong>
                 </div>
