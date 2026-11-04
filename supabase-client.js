@@ -5,8 +5,8 @@
  */
 
 const SUPABASE_CONFIG = {
-  url: 'https://clmzpzgjoxfdtvampvvb.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbXpwemdqb3hmZHR2YW1wdnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMjEyOTgsImV4cCI6MjEwODY5NzI5OH0.iwo2tR2Hn-LXFYUOaIBQ7fiko8AtOto60bJGk0WpCYQ'
+  url: 'https://xgdwxuraupeztihfugxb.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHd4dXJhdXBlenRpaGZ1Z3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDM1NDAsImV4cCI6MjEwOTI3OTU0MH0.0caOjkT0es74sh2qs9bx-y2jX8DIsM0MH1ZOflW4irk'
 };
 
 // Paystack Live Payment Gateway Configuration
