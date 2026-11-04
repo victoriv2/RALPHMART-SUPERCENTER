@@ -700,9 +700,9 @@
             <div class="radio-circle"></div>
             <div class="radio-option-info">
               <span class="radio-option-title">Doorstep Delivery</span>
-              <span class="radio-option-sub" id="checkoutDoorstepSub">Dispatched directly to your address</span>
+              <span class="radio-option-sub" id="checkoutDoorstepSub">Calculated based on your exact street address & destination</span>
             </div>
-            <span class="radio-option-fee" id="checkoutDoorstepFee">FREE</span>
+            <span class="radio-option-fee" id="checkoutDoorstepFee" style="color: #512175; font-weight: 700; font-size: 11px; background: #faf5ff; border: 1px solid #d8b4fe; padding: 2px 8px; border-radius: 4px;">LOCATION REVIEW</span>
           </div>
 
           <div class="delivery-radio-option" id="optPickup">
@@ -711,7 +711,7 @@
               <span class="radio-option-title">Pickup Station</span>
               <span class="radio-option-sub">Collect at nearest RALPHMART verified partner hub</span>
             </div>
-            <span class="radio-option-fee" style="color: #512175; font-weight: 700;">FREE</span>
+            <span class="radio-option-fee" style="color: #059669; font-weight: 700; font-size: 11px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px;">FREE</span>
           </div>
         </div>
 
@@ -1450,8 +1450,19 @@
       checkoutSubtotal.textContent = formatNaira(subtotal);
       
       function updateTotals() {
-        checkoutDeliveryFee.textContent = deliveryFee === 0 ? 'FREE' : formatNaira(deliveryFee);
-        checkoutGrandTotal.textContent = formatNaira(subtotal + deliveryFee);
+        if (selectedDeliveryMethod === 'doorstep') {
+          checkoutDeliveryFee.innerHTML = '<span style="color: #512175; font-size: 11.5px; font-weight: 700; background: #faf5ff; border: 1px solid #d8b4fe; padding: 2px 6px; border-radius: 4px;">Pending Quote</span>';
+          checkoutGrandTotal.textContent = formatNaira(subtotal) + ' + Delivery';
+          const btnSpan = placeOrderBtn ? placeOrderBtn.querySelector('span') : null;
+          if (btnSpan) btnSpan.textContent = 'Confirm & Request Delivery Quote';
+        } else {
+          checkoutDeliveryFee.textContent = 'FREE';
+          checkoutGrandTotal.textContent = formatNaira(subtotal);
+          const btnSpan = placeOrderBtn ? placeOrderBtn.querySelector('span') : null;
+          if (btnSpan) {
+            btnSpan.textContent = (selectedPaymentMethod === 'card_online') ? 'Pay Online with Paystack' : 'Confirm & Place Pickup Order';
+          }
+        }
       }
       updateTotals();
 
@@ -1462,7 +1473,7 @@
       optDoorstep.addEventListener('click', () => {
         optDoorstep.classList.add('selected');
         optPickup.classList.remove('selected');
-        deliveryFee = currentBaseDeliveryFee;
+        deliveryFee = 0;
         selectedDeliveryMethod = 'doorstep';
         updateTotals();
       });
@@ -1486,6 +1497,7 @@
         activeElem.classList.add('selected');
         selectedPaymentMethod = method;
         bankInfoBox.style.display = method === 'bank_transfer' ? 'block' : 'none';
+        updateTotals();
       }
 
       payOnDelivery.addEventListener('click', () => selectPayMethod('pay_on_delivery', payOnDelivery));
@@ -1532,8 +1544,12 @@
         }
 
         const orderId = 'NKM-' + Math.floor(100000 + Math.random() * 900000);
-        const grandTotal = subtotal + deliveryFee;
+        const isDoorstep = (selectedDeliveryMethod === 'doorstep');
+        const quoteStatus = isDoorstep ? 'pending_quote' : 'not_required';
+        const initialStatus = isDoorstep ? 'pending_quote' : 'confirmed';
+        const grandTotal = subtotal + (isDoorstep ? 0 : deliveryFee);
         const nowIso = new Date().toISOString();
+        const deliveryPinCode = String(Math.floor(1000 + Math.random() * 9000));
 
         const orderData = {
           id: orderId,
@@ -1546,14 +1562,17 @@
           delivery_address: street,
           city: lgaName,
           state: stateName,
+          delivery_method: selectedDeliveryMethod,
           items: cart,
           subtotal: subtotal,
-          delivery_fee: deliveryFee,
+          delivery_fee: isDoorstep ? 0 : deliveryFee,
           total_amount: grandTotal,
           payment_method: selectedPaymentMethod,
           payment_status: selectedPaymentMethod === 'pay_on_delivery' ? 'pending_delivery' : (selectedPaymentMethod === 'card_online' ? 'pending_payment' : 'pending_verification'),
-          order_status: 'confirmed',
-          status: 'confirmed',
+          order_status: initialStatus,
+          status: initialStatus,
+          quote_status: quoteStatus,
+          delivery_pin: deliveryPinCode,
           created_at: nowIso
         };
 
@@ -1579,7 +1598,7 @@
                 total_amount: finalOrderData.total_amount,
                 payment_method: finalOrderData.payment_method,
                 payment_status: finalOrderData.payment_status,
-                order_status: 'confirmed',
+                order_status: finalOrderData.order_status,
                 created_at: finalOrderData.created_at
               };
               if (user) {
@@ -1590,7 +1609,7 @@
 
               // Log order placement activity in user account
               if (typeof logUserActivity === 'function') {
-                logUserActivity('order_placed', 'Placed order #' + finalOrderData.id, {
+                logUserActivity('order_placed', 'Placed order #' + finalOrderData.id + (isDoorstep ? ' (Awaiting delivery fee review)' : ''), {
                   order_id: finalOrderData.id,
                   total: finalOrderData.total_amount,
                   items_count: (cart || []).length,
@@ -1604,12 +1623,19 @@
               // Send notification to user account
               if (typeof addUserNotification === 'function') {
                 const isPaid = finalOrderData.payment_status === 'paid';
+                let notifTitle = 'Order Placed Successfully';
+                let notifMsg = 'Your order #' + finalOrderData.id + ' has been confirmed and is being processed.';
+                if (isDoorstep) {
+                  notifTitle = 'Order Submitted — Awaiting Delivery Quote';
+                  notifMsg = 'Your order #' + finalOrderData.id + ' is under review. Our dispatch team is calculating the exact delivery fee for ' + finalOrderData.city + ', ' + finalOrderData.state + '. You will receive an instant quote shortly.';
+                } else if (isPaid) {
+                  notifTitle = 'Payment Confirmed & Order Placed';
+                  notifMsg = 'Your payment of ' + formatNaira(finalOrderData.total_amount) + ' for order #' + finalOrderData.id + ' was successfully verified via Paystack.';
+                }
                 await addUserNotification({
                   type: 'order',
-                  title: isPaid ? 'Payment Confirmed & Order Placed' : 'Order Placed Successfully',
-                  message: isPaid
-                    ? 'Your payment of ' + formatNaira(finalOrderData.total_amount) + ' for order #' + finalOrderData.id + ' was successfully verified via Paystack.'
-                    : 'Your order #' + finalOrderData.id + ' (Total: ' + formatNaira(finalOrderData.total_amount) + ') has been confirmed and is being processed.',
+                  title: notifTitle,
+                  message: notifMsg,
                   link: 'orders.html?orderId=' + encodeURIComponent(finalOrderData.id)
                 });
               }
@@ -1680,16 +1706,21 @@
           }
           window.dispatchEvent(new Event('cartUpdated'));
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: finalOrderData.id, status: 'confirmed' } }));
+            window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: finalOrderData.id, status: finalOrderData.order_status } }));
           }
 
           // 4. Redirect to order confirmation page
           const paidQuery = finalOrderData.payment_status === 'paid' ? '&paid=true' : '';
-          window.location.href = `orders.html?orderId=${finalOrderData.id}&placed=true${paidQuery}`;
+          const quotePendingQuery = isDoorstep ? '&quote_pending=true' : '';
+          window.location.href = `orders.html?orderId=${finalOrderData.id}&placed=true${paidQuery}${quotePendingQuery}`;
         }
 
-        // Process based on payment method
-        if (selectedPaymentMethod === 'card_online') {
+        // Process based on delivery mode and payment method
+        if (isDoorstep) {
+          // For doorstep delivery, order is placed for delivery quote review first without immediate online charge
+          await executeOrderPlacement(orderData);
+        } else if (selectedPaymentMethod === 'card_online') {
+          // For pickup station with Paystack online payment
           placeBtn.querySelector('span').textContent = 'Connecting to Paystack...';
 
           if (typeof PaystackPop === 'undefined') {

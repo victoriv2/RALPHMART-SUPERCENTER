@@ -3211,12 +3211,355 @@ function calculateStoreLeaderboards(productsList, reviewsList, usersList) {
   };
 }
 
+/**
+ * =========================================================================
+ * LOGISTICS, DYNAMIC DELIVERY QUOTING & DELIVERY AGENT PORTAL SERVICES
+ * =========================================================================
+ */
+
+// Initial system default delivery riders
+const DEFAULT_DELIVERY_AGENTS = [
+  {
+    id: 'agent-101',
+    full_name: 'Emeka Udoh',
+    phone: '08031234567',
+    pin: '1234',
+    vehicle_type: 'Motorcycle',
+    plate_number: 'ABJ-452-XY',
+    status: 'active',
+    completed_deliveries: 42,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'agent-102',
+    full_name: 'Bassey Effiong',
+    phone: '08098765432',
+    pin: '1234',
+    vehicle_type: 'Delivery Van',
+    plate_number: 'UYO-188-KT',
+    status: 'active',
+    completed_deliveries: 28,
+    created_at: new Date().toISOString()
+  }
+];
+
+function getStoredDeliveryAgents() {
+  try {
+    let list = JSON.parse(localStorage.getItem('nkemmart_delivery_agents') || '[]');
+    if (!Array.isArray(list) || list.length === 0) {
+      list = [...DEFAULT_DELIVERY_AGENTS];
+      localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(list));
+    }
+    return list;
+  } catch (e) {
+    return [...DEFAULT_DELIVERY_AGENTS];
+  }
+}
+
+async function getDeliveryAgents() {
+  const client = getSupabase();
+  let agents = [];
+  if (client) {
+    try {
+      const { data, error } = await client.from('delivery_agents').select('*').order('full_name', { ascending: true });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        agents = data;
+      }
+    } catch (e) {
+      console.warn('Supabase getDeliveryAgents note:', e);
+    }
+  }
+  if (agents.length === 0) {
+    agents = getStoredDeliveryAgents();
+  }
+  return agents;
+}
+
+async function saveDeliveryAgent(agentData) {
+  const list = getStoredDeliveryAgents();
+  const existingIdx = list.findIndex(a => String(a.id) === String(agentData.id) || a.phone === agentData.phone);
+  const now = new Date().toISOString();
+  let updated;
+  if (existingIdx !== -1) {
+    updated = Object.assign({}, list[existingIdx], agentData, { updated_at: now });
+    list[existingIdx] = updated;
+  } else {
+    updated = Object.assign({
+      id: agentData.id || 'agent-' + Math.floor(100 + Math.random() * 900),
+      pin: agentData.pin || '1234',
+      status: 'active',
+      completed_deliveries: 0,
+      created_at: now
+    }, agentData);
+    list.push(updated);
+  }
+  localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(list));
+
+  const client = getSupabase();
+  if (client) {
+    try {
+      await client.from('delivery_agents').upsert([updated]);
+    } catch (e) {
+      console.warn('Supabase saveDeliveryAgent note:', e);
+    }
+  }
+  return updated;
+}
+
+// Admin sets delivery fee quote for an order
+async function submitAdminDeliveryQuote(orderId, deliveryFee, eta, notes, assignedRiderId) {
+  if (!orderId) throw new Error('Order ID required');
+  const feeNum = Math.max(0, Number(deliveryFee) || 0);
+  const now = new Date().toISOString();
+  let riderInfo = null;
+
+  if (assignedRiderId) {
+    const riders = await getDeliveryAgents();
+    riderInfo = riders.find(r => String(r.id) === String(assignedRiderId));
+  }
+
+  // Update localStorage first for instant reactivity
+  let updatedOrder = null;
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const target = list.find(o => String(o.id) === String(orderId));
+      if (target) {
+        target.quote_status = 'quote_ready';
+        target.order_status = 'quote_ready';
+        target.status = 'quote_ready';
+        target.delivery_fee = feeNum;
+        target.subtotal = Number(target.subtotal || target.total_amount || 0);
+        target.total_amount = target.subtotal + feeNum;
+        target.delivery_eta = eta || 'Within 24-48 Hours';
+        target.delivery_quote_notes = notes || '';
+        target.quote_sent_at = now;
+        if (!target.delivery_pin) {
+          target.delivery_pin = String(Math.floor(1000 + Math.random() * 9000));
+        }
+        if (riderInfo) {
+          target.assigned_rider_id = riderInfo.id;
+          target.rider_name = riderInfo.full_name;
+          target.rider_phone = riderInfo.phone;
+          target.rider_vehicle = riderInfo.vehicle_type;
+        }
+        localStorage.setItem(key, JSON.stringify(list));
+        if (!updatedOrder) updatedOrder = target;
+      }
+    } catch (e) {}
+  });
+
+  // Cloud update
+  const client = getSupabase();
+  if (client) {
+    try {
+      const payload = {
+        delivery_fee: feeNum,
+        total_amount: updatedOrder ? updatedOrder.total_amount : feeNum,
+        order_status: 'quote_ready',
+        updated_at: now
+      };
+      const extendedPayload = Object.assign({}, payload, {
+        admin_notes: (notes || '') + ' [Quote: ₦' + feeNum.toLocaleString() + ' | ETA: ' + (eta || 'Standard') + ']'
+      });
+      await client.from('orders').update(extendedPayload).eq('id', orderId);
+    } catch (err) {
+      console.warn('Supabase quote update note:', err);
+    }
+  }
+
+  // Notify customer
+  try {
+    if (typeof addUserNotification === 'function' && updatedOrder) {
+      await addUserNotification({
+        type: 'order',
+        title: 'Delivery Quote Ready - Order #' + orderId,
+        message: 'Your delivery fee has been calculated at ' + formatNaira(feeNum) + ' (Total: ' + formatNaira(updatedOrder.total_amount) + '). Tap to review and confirm dispatch.',
+        link: 'orders.html?orderId=' + encodeURIComponent(orderId)
+      });
+    }
+  } catch (e) {}
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'quote_ready' } }));
+  }
+  return updatedOrder;
+}
+
+// Customer accepts delivery quote (COD or after Paystack online payment)
+async function acceptCustomerDeliveryQuote(orderId, paymentReference) {
+  if (!orderId) throw new Error('Order ID required');
+  const now = new Date().toISOString();
+  let updatedOrder = null;
+
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const target = list.find(o => String(o.id) === String(orderId));
+      if (target) {
+        target.quote_status = 'accepted';
+        target.order_status = 'confirmed';
+        target.status = 'confirmed';
+        if (paymentReference) {
+          target.payment_status = 'paid';
+          target.payment_reference = paymentReference;
+          target.paid_at = now;
+        } else if (target.payment_method === 'pay_on_delivery') {
+          target.payment_status = 'pending_delivery';
+        }
+        if (!target.delivery_pin) {
+          target.delivery_pin = String(Math.floor(1000 + Math.random() * 9000));
+        }
+        localStorage.setItem(key, JSON.stringify(list));
+        if (!updatedOrder) updatedOrder = target;
+      }
+    } catch (e) {}
+  });
+
+  const client = getSupabase();
+  if (client) {
+    try {
+      const patch = {
+        order_status: 'confirmed',
+        updated_at: now
+      };
+      if (paymentReference) {
+        patch.payment_status = 'paid';
+      }
+      await client.from('orders').update(patch).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase accept quote note:', e);
+    }
+  }
+
+  try {
+    if (typeof addUserNotification === 'function' && updatedOrder) {
+      await addUserNotification({
+        type: 'order',
+        title: 'Order Confirmed for Dispatch',
+        message: 'Order #' + orderId + ' delivery quote accepted. Your items are being packaged for courier pickup.',
+        link: 'orders.html?orderId=' + encodeURIComponent(orderId)
+      });
+    }
+  } catch (e) {}
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'confirmed' } }));
+  }
+  return updatedOrder;
+}
+
+// Delivery Agent Order Transitions
+async function updateRiderDeliveryStep(orderId, riderPhone, newStep, inputPin) {
+  if (!orderId || !newStep) throw new Error('Order ID and step required');
+  const validSteps = ['picked_up', 'in_transit', 'arrived', 'delivered'];
+  if (!validSteps.includes(newStep)) throw new Error('Invalid delivery step');
+  const now = new Date().toISOString();
+
+  let targetOrder = null;
+  const list = JSON.parse(localStorage.getItem('nkemmart_orders') || '[]');
+  targetOrder = list.find(o => String(o.id) === String(orderId));
+
+  if (newStep === 'delivered') {
+    const requiredPin = targetOrder ? String(targetOrder.delivery_pin || '') : '';
+    if (requiredPin && String(inputPin).trim() !== requiredPin.trim()) {
+      return { success: false, message: 'Incorrect Delivery Confirmation PIN. Please request the 4-digit PIN from the recipient.' };
+    }
+  }
+
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const orders = JSON.parse(localStorage.getItem(key) || '[]');
+      const ord = orders.find(o => String(o.id) === String(orderId));
+      if (ord) {
+        ord.order_status = (newStep === 'picked_up' || newStep === 'in_transit' || newStep === 'arrived') ? 'shipped' : newStep;
+        ord.status = ord.order_status;
+        ord.delivery_substatus = newStep;
+        ord.updated_at = now;
+        if (newStep === 'delivered') {
+          ord.delivered_at = now;
+          if (ord.payment_method === 'pay_on_delivery') {
+            ord.payment_status = 'paid_on_delivery';
+          }
+        }
+        localStorage.setItem(key, JSON.stringify(orders));
+        targetOrder = ord;
+      }
+    } catch (e) {}
+  });
+
+  const client = getSupabase();
+  if (client) {
+    try {
+      const finalStatus = (newStep === 'delivered') ? 'delivered' : 'shipped';
+      const patch = {
+        order_status: finalStatus,
+        updated_at: now
+      };
+      if (newStep === 'delivered' && targetOrder && targetOrder.payment_method === 'pay_on_delivery') {
+        patch.payment_status = 'paid';
+      }
+      await client.from('orders').update(patch).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase rider update note:', e);
+    }
+  }
+
+  // Update Rider completed counts if delivered
+  if (newStep === 'delivered' && riderPhone) {
+    try {
+      const agents = getStoredDeliveryAgents();
+      const ag = agents.find(a => a.phone === riderPhone);
+      if (ag) {
+        ag.completed_deliveries = (ag.completed_deliveries || 0) + 1;
+        ag.last_delivery_at = now;
+        localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(agents));
+      }
+    } catch (e) {}
+  }
+
+  // Notify customer
+  try {
+    if (typeof addUserNotification === 'function' && targetOrder) {
+      const titles = {
+        picked_up: 'Package Picked Up from Supercenter',
+        in_transit: 'Rider is Out for Delivery',
+        arrived: 'Rider Has Arrived at Your Address',
+        delivered: 'Order Delivered Successfully'
+      };
+      const messages = {
+        picked_up: 'Rider ' + (targetOrder.rider_name || '') + ' has collected your package and is en route.',
+        in_transit: 'Your order #' + orderId + ' is on the way. Your Delivery PIN is ' + (targetOrder.delivery_pin || '----') + '.',
+        arrived: 'The delivery rider is at your doorstep. Please have your Delivery PIN ready: ' + (targetOrder.delivery_pin || '----') + '.',
+        delivered: 'Your order #' + orderId + ' was successfully delivered and verified. Thank you for shopping with RALPHMART!'
+      };
+      await addUserNotification({
+        type: 'order',
+        title: titles[newStep] || 'Delivery Update',
+        message: messages[newStep] || 'Order #' + orderId + ' has a new delivery update.',
+        link: 'orders.html?orderId=' + encodeURIComponent(orderId)
+      });
+    }
+  } catch (e) {}
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: newStep } }));
+  }
+
+  return { success: true, order: targetOrder };
+}
+
 if (typeof window !== 'undefined') {
   window.getAdminUsersOverview = getAdminUsersOverview;
   window.getAdminOrdersOverview = getAdminOrdersOverview;
   window.updateAdminOrderStatus = updateAdminOrderStatus;
   window.updateProductVisibility = updateProductVisibility;
   window.calculateStoreLeaderboards = calculateStoreLeaderboards;
+  window.getDeliveryAgents = getDeliveryAgents;
+  window.saveDeliveryAgent = saveDeliveryAgent;
+  window.submitAdminDeliveryQuote = submitAdminDeliveryQuote;
+  window.acceptCustomerDeliveryQuote = acceptCustomerDeliveryQuote;
+  window.updateRiderDeliveryStep = updateRiderDeliveryStep;
 }
 
 // Auto update menu, badges, smart header, realtime sync, and back-to-top on DOM load

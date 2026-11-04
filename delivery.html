@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <title>Delivery Agent Portal - RALPHMART SUPERCENTER</title>
+  <link rel="stylesheet" href="styles.css?v=21.0">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js?v=8.0"></script>
+  <style>
+    :root {
+      --rider-primary: #512175;
+      --rider-dark: #091e3a;
+      --rider-bg: #f8fafc;
+      --rider-card: #ffffff;
+      --rider-border: #e2e8f0;
+      --rider-green: #15803d;
+      --rider-amber: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--rider-bg);
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top App Bar */
+    .rider-header {
+      background: var(--rider-dark);
+      border-bottom: 3px solid var(--rider-primary);
+      color: #ffffff;
+      padding: 12px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .rider-header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .rider-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .rider-brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--rider-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .rider-brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .rider-brand-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      display: block;
+    }
+
+    .rider-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rider-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rider-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .rider-logout-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Container */
+    .rider-container {
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 14px 40px;
+      flex: 1;
+    }
+
+    /* KPI Summary Strip */
+    .rider-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .rider-kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--rider-border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .rider-kpi-val {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--rider-primary);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .rider-kpi-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tabs */
+    .rider-tabs-bar {
+      display: flex;
+      background: #ffffff;
+      border: 1px solid var(--rider-border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .rider-tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .rider-tab-btn.active {
+      background: var(--rider-primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(81, 33, 117, 0.25);
+    }
+
+    .rider-tab-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    .rider-tab-btn:not(.active) .rider-tab-count {
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    /* Order Card */
+    .rider-order-card {
+      background: #ffffff;
+      border: 1.5px solid var(--rider-border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s ease;
+    }
+
+    .rider-order-header {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--rider-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .rider-order-id {
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--rider-primary);
+    }
+
+    .rider-order-date {
+      font-size: 11.5px;
+      color: #64748b;
+    }
+
+    .rider-order-body {
+      padding: 16px;
+    }
+
+    /* Customer & Call Strip */
+    .rider-recipient-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--rider-border);
+      margin-bottom: 14px;
+    }
+
+    .rider-recipient-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .rider-recipient-phone {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .rider-contact-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .contact-action-btn {
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-call-rider {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-wa-rider {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* Address & Map Block */
+    .rider-address-block {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .rider-address-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .rider-address-text {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .rider-map-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-google-nav {
+      background: #091e3a;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-toggle-map {
+      background: #ffffff;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .rider-map-frame {
+      width: 100%;
+      height: 200px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Payment Badge */
+    .rider-payment-banner {
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .rider-payment-banner.prepaid {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      color: #14532d;
+    }
+
+    .rider-payment-banner.cod {
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      color: #78350f;
+    }
+
+    /* Items summary */
+    .rider-items-list {
+      font-size: 12.5px;
+      color: #334155;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    /* Workflow Actions */
+    .rider-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-rider-step {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .btn-step-pickup {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1.5px solid #bfdbfe;
+    }
+
+    .btn-step-transit {
+      background: #091e3a;
+      color: #ffffff;
+    }
+
+    .btn-step-deliver {
+      background: var(--rider-green);
+      color: #ffffff;
+    }
+
+    /* Rider Login Screen */
+    .rider-auth-screen {
+      position: fixed;
+      inset: 0;
+      background: #091e3a;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .rider-auth-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .rider-auth-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: #091e3a;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .rider-auth-sub {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Modal for PIN Verification */
+    .rider-pin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .rider-pin-modal.open {
+      display: flex;
+    }
+
+    .rider-pin-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .rider-pin-input {
+      width: 100%;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      text-align: center;
+      padding: 12px;
+      border: 2px solid var(--rider-primary);
+      border-radius: 10px;
+      color: var(--rider-primary);
+      margin: 16px 0;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- RIDER AUTHENTICATION SCREEN -->
+  <div class="rider-auth-screen" id="riderAuthScreen">
+    <div class="rider-auth-card">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: #512175; color: #fff; font-size: 20px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center;">
+          RM
+        </div>
+      </div>
+      <h2 class="rider-auth-title">RALPHMART Logistics</h2>
+      <p class="rider-auth-sub">Delivery Agent &amp; Courier Portal</p>
+
+      <form id="riderLoginForm" onsubmit="window.handleRiderLogin(event)">
+        <div style="margin-bottom: 14px; text-align: left;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Rider Phone Number *</label>
+          <input type="tel" id="loginRiderPhone" required placeholder="e.g. 08031234567" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+        </div>
+        <div style="margin-bottom: 18px; text-align: left;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Security PIN (4 Digits) *</label>
+          <input type="password" id="loginRiderPin" required maxlength="6" placeholder="****" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 18px; font-weight: 800; letter-spacing: 4px;">
+        </div>
+        <button type="submit" class="admin-btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 800; background: #512175; border-radius: 8px;">
+          Log into Dispatch Queue
+        </button>
+      </form>
+
+      <!-- Quick Demo Rider Autofill -->
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b;">
+        <span>Quick Test Access:</span>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <button type="button" onclick="window.quickFillRider('08031234567', '1234')" style="flex: 1; padding: 6px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+            Emeka (Bike)
+          </button>
+          <button type="button" onclick="window.quickFillRider('08098765432', '1234')" style="flex: 1; padding: 6px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+            Bassey (Van)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP APP BAR -->
+  <header class="rider-header">
+    <div class="rider-header-inner">
+      <a href="javascript:void(0)" class="rider-brand">
+        <div class="rider-brand-logo">RM</div>
+        <div>
+          <span class="rider-brand-title">RALPHMART LOGISTICS</span>
+          <span class="rider-brand-sub" id="headerRiderInfo">Dispatch Agent Portal</span>
+        </div>
+      </a>
+      <div class="rider-header-actions">
+        <div class="rider-status-pill">
+          <span class="rider-status-dot"></span>
+          <span>Online</span>
+        </div>
+        <button type="button" class="rider-logout-btn" onclick="window.handleRiderLogout()">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="rider-container">
+
+    <!-- KPI STRIP -->
+    <div class="rider-kpi-grid">
+      <div class="rider-kpi-card">
+        <span class="rider-kpi-val" id="kpiActiveCount">0</span>
+        <span class="rider-kpi-lbl">Active Deliveries</span>
+      </div>
+      <div class="rider-kpi-card">
+        <span class="rider-kpi-val" id="kpiDeliveredCount" style="color: #15803d;">0</span>
+        <span class="rider-kpi-lbl">Delivered Today</span>
+      </div>
+      <div class="rider-kpi-card">
+        <span class="rider-kpi-val" id="kpiCashToCollect" style="color: #b45309; font-size: 16px;">₦0</span>
+        <span class="rider-kpi-lbl">Cash to Collect</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="rider-tabs-bar">
+      <button type="button" class="rider-tab-btn active" data-tab="active" onclick="window.switchRiderTab('active')">
+        <span>Active Dispatches</span>
+        <span class="rider-tab-count" id="tabCountActive">0</span>
+      </button>
+      <button type="button" class="rider-tab-btn" data-tab="pickup" onclick="window.switchRiderTab('pickup')">
+        <span>Ready for Pickup</span>
+        <span class="rider-tab-count" id="tabCountPickup">0</span>
+      </button>
+      <button type="button" class="rider-tab-btn" data-tab="history" onclick="window.switchRiderTab('history')">
+        <span>Completed</span>
+        <span class="rider-tab-count" id="tabCountHistory">0</span>
+      </button>
+    </div>
+
+    <!-- ORDERS FEED -->
+    <div id="riderOrdersFeed">
+      <!-- Populated via renderRiderFeed() -->
+    </div>
+
+  </main>
+
+  <!-- PIN VERIFICATION MODAL -->
+  <div class="rider-pin-modal" id="riderPinModal">
+    <div class="rider-pin-card">
+      <h3 style="font-size: 18px; font-weight: 900; color: #091e3a; margin-bottom: 4px;">Confirm Package Handoff</h3>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;" id="pinModalCustomerPrompt">
+        Ask the recipient for their 4-digit Delivery PIN.
+      </p>
+
+      <div id="pinModalCodWarning" style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12.5px; color: #78350f; font-weight: 700; display: none;">
+        Collect <span id="pinModalCashAmount">₦0</span> in Cash or POS before handing over package!
+      </div>
+
+      <input type="number" id="inputDeliveryPin" class="rider-pin-input" placeholder="0000" maxlength="4" autofocus>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <button type="button" class="admin-btn btn-secondary" onclick="window.closePinModal()" style="flex: 1; padding: 11px;">Cancel</button>
+        <button type="button" class="admin-btn btn-primary" onclick="window.confirmOrderHandoff()" style="flex: 1; padding: 11px; background: #15803d;">Verify &amp; Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let activeRider = null;
+    let activeRiderTab = 'active';
+    let pendingVerifyOrderId = null;
+    let riderOrders = [];
+
+    // Check active login on load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check query param e.g. delivery.html?phone=08031234567
+      const urlParams = new URLSearchParams(window.location.search);
+      const phoneParam = urlParams.get('phone');
+
+      try {
+        const stored = JSON.parse(localStorage.getItem('nkemmart_active_rider') || 'null');
+        if (stored && stored.phone) {
+          activeRider = stored;
+        } else if (phoneParam) {
+          const agents = (typeof getStoredDeliveryAgents === 'function') ? getStoredDeliveryAgents() : [];
+          const match = agents.find(a => a.phone === phoneParam);
+          if (match) {
+            activeRider = match;
+            localStorage.setItem('nkemmart_active_rider', JSON.stringify(match));
+          }
+        }
+      } catch (e) {}
+
+      if (activeRider) {
+        showRiderApp();
+      } else {
+        document.getElementById('riderAuthScreen').style.display = 'flex';
+      }
+
+      window.addEventListener('nkemmart_order_updated', () => {
+        if (activeRider) loadRiderOrders();
+      });
+    });
+
+    window.quickFillRider = function(phone, pin) {
+      document.getElementById('loginRiderPhone').value = phone;
+      document.getElementById('loginRiderPin').value = pin;
+    };
+
+    window.handleRiderLogin = async function(e) {
+      e.preventDefault();
+      const phone = document.getElementById('loginRiderPhone').value.trim();
+      const pin = document.getElementById('loginRiderPin').value.trim();
+
+      let agents = [];
+      if (typeof getDeliveryAgents === 'function') {
+        agents = await getDeliveryAgents();
+      }
+      const match = agents.find(a => a.phone === phone && String(a.pin || '1234') === pin);
+
+      if (!match) {
+        alert('Invalid rider phone number or security PIN. Please contact store dispatch.');
+        return;
+      }
+
+      activeRider = match;
+      localStorage.setItem('nkemmart_active_rider', JSON.stringify(match));
+      showRiderApp();
+    };
+
+    window.handleRiderLogout = function() {
+      localStorage.removeItem('nkemmart_active_rider');
+      activeRider = null;
+      document.getElementById('riderAuthScreen').style.display = 'flex';
+    };
+
+    function showRiderApp() {
+      document.getElementById('riderAuthScreen').style.display = 'none';
+      const infoEl = document.getElementById('headerRiderInfo');
+      if (infoEl && activeRider) {
+        infoEl.textContent = `${activeRider.full_name} (${activeRider.vehicle_type || 'Rider'})`;
+      }
+      loadRiderOrders();
+    }
+
+    async function loadRiderOrders() {
+      if (!activeRider) return;
+      let allOrders = [];
+
+      // 1. Fetch from Supabase
+      const client = getSupabase();
+      if (client) {
+        try {
+          const { data, error } = await client.from('orders').select('*').order('created_at', { ascending: false });
+          if (!error && Array.isArray(data)) allOrders = data;
+        } catch (e) {}
+      }
+
+      // 2. Merge local orders
+      ['nkemmart_user_orders', 'nkemmart_orders'].forEach(key => {
+        try {
+          const local = JSON.parse(localStorage.getItem(key) || '[]');
+          local.forEach(lo => {
+            if (!lo || !lo.id) return;
+            const exists = allOrders.find(o => String(o.id) === String(lo.id));
+            if (!exists) allOrders.push(lo);
+          });
+        } catch (e) {}
+      });
+
+      // Filter orders assigned to this rider or available for pickup
+      riderOrders = allOrders.filter(o => {
+        const isAssigned = (String(o.assigned_rider_id) === String(activeRider.id)) || (o.rider_phone === activeRider.phone);
+        // Also allow unassigned confirmed orders in the pickup queue
+        const isUnassignedConfirmed = !o.assigned_rider_id && (o.order_status === 'confirmed' || o.status === 'confirmed');
+        return isAssigned || isUnassignedConfirmed;
+      });
+
+      renderKPIs();
+      renderRiderFeed();
+    }
+
+    function renderKPIs() {
+      const activeList = riderOrders.filter(o => {
+        const s = (o.order_status || o.status || '').toLowerCase();
+        return s === 'shipped' || s === 'processing' || o.delivery_substatus === 'picked_up' || o.delivery_substatus === 'in_transit';
+      });
+
+      const deliveredList = riderOrders.filter(o => {
+        const s = (o.order_status || o.status || '').toLowerCase();
+        return s === 'delivered';
+      });
+
+      let codTotal = 0;
+      activeList.forEach(o => {
+        if (o.payment_method === 'pay_on_delivery' && o.payment_status !== 'paid_on_delivery') {
+          codTotal += Number(o.total_amount || 0);
+        }
+      });
+
+      document.getElementById('kpiActiveCount').textContent = activeList.length;
+      document.getElementById('kpiDeliveredCount').textContent = deliveredList.length;
+      document.getElementById('kpiCashToCollect').textContent = formatNaira(codTotal);
+
+      document.getElementById('tabCountActive').textContent = activeList.length;
+      const pickupList = riderOrders.filter(o => (o.order_status === 'confirmed' || o.status === 'confirmed') && !o.delivery_substatus);
+      document.getElementById('tabCountPickup').textContent = pickupList.length;
+      document.getElementById('tabCountHistory').textContent = deliveredList.length;
+    }
+
+    window.switchRiderTab = function(tab) {
+      activeRiderTab = tab;
+      document.querySelectorAll('.rider-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tab) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      renderRiderFeed();
+    };
+
+    function renderRiderFeed() {
+      const feed = document.getElementById('riderOrdersFeed');
+      if (!feed) return;
+
+      let list = [];
+      if (activeRiderTab === 'active') {
+        list = riderOrders.filter(o => {
+          const s = (o.order_status || o.status || '').toLowerCase();
+          return s === 'shipped' || s === 'processing' || o.delivery_substatus === 'picked_up' || o.delivery_substatus === 'in_transit' || o.delivery_substatus === 'arrived';
+        });
+      } else if (activeRiderTab === 'pickup') {
+        list = riderOrders.filter(o => (o.order_status === 'confirmed' || o.status === 'confirmed') && !o.delivery_substatus);
+      } else if (activeRiderTab === 'history') {
+        list = riderOrders.filter(o => (o.order_status || o.status || '').toLowerCase() === 'delivered');
+      }
+
+      if (list.length === 0) {
+        feed.innerHTML = `
+          <div style="background: #ffffff; border: 1px solid var(--rider-border); border-radius: 12px; padding: 48px 20px; text-align: center; color: #64748b;">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" style="margin-bottom: 12px;"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            <h4 style="font-size: 16px; color: #091e3a; margin-bottom: 4px;">No ${activeRiderTab} dispatches</h4>
+            <p style="font-size: 12.5px;">Orders assigned to you by store dispatch will show up here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = list.map(o => {
+        const dest = `${o.delivery_address || ''}, ${o.city || ''}, ${o.state || 'Nigeria'}`;
+        const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`;
+        const embedMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(dest)}&output=embed`;
+        const phone = o.customer_phone || o.phone || '';
+        const waUrl = `https://wa.me/234${phone.replace(/^0/, '')}?text=${encodeURIComponent('Hello ' + (o.customer_name || 'Customer') + ', this is ' + activeRider.full_name + ' from RALPHMART Logistics regarding order #' + o.id + '.')}`;
+        const isPrepaid = (o.payment_method === 'card_online' || o.payment_status === 'paid');
+        const substatus = o.delivery_substatus || (o.order_status === 'shipped' ? 'in_transit' : 'ready_for_pickup');
+
+        // Items manifest summary
+        let itemsStr = 'Store items';
+        if (Array.isArray(o.items) && o.items.length > 0) {
+          itemsStr = o.items.map(it => `${it.qty || 1}x ${it.title}${it.variant_name ? ' (' + it.variant_name + ')' : ''}`).join(', ');
+        }
+
+        return `
+          <div class="rider-order-card" id="rider-card-${escapeHtml(o.id)}">
+            <div class="rider-order-header">
+              <div>
+                <span class="rider-order-id">Order #${escapeHtml(o.id)}</span>
+                <span class="rider-order-date">&bull; ${o.created_at ? new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Recent'}</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #faf5ff; color: #512175; border: 1px solid #d8b4fe; text-transform: uppercase;">
+                ${escapeHtml(substatus.replace(/_/g, ' '))}
+              </span>
+            </div>
+
+            <div class="rider-order-body">
+              <!-- Customer & Contact -->
+              <div class="rider-recipient-strip">
+                <div>
+                  <div class="rider-recipient-name">${escapeHtml(o.customer_name || 'Valued Customer')}</div>
+                  <div class="rider-recipient-phone">Contact: <strong>${escapeHtml(phone || 'Not provided')}</strong></div>
+                </div>
+                <div class="rider-contact-btns">
+                  ${phone ? `
+                    <a href="tel:${escapeHtml(phone)}" class="contact-action-btn btn-call-rider">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                      <span>Call</span>
+                    </a>
+                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="contact-action-btn btn-wa-rider">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Destination & Google Map -->
+              <div class="rider-address-block">
+                <div class="rider-address-label">Delivery Destination</div>
+                <div class="rider-address-text">${escapeHtml(dest)}</div>
+
+                <div class="rider-map-actions">
+                  <a href="${navUrl}" target="_blank" rel="noopener noreferrer" class="btn-google-nav">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    <span>Navigate in Google Maps</span>
+                  </a>
+                  <button type="button" class="btn-toggle-map" onclick="window.toggleRiderMap('${escapeHtml(o.id)}')">
+                    <span>Show/Hide Map Preview</span>
+                  </button>
+                </div>
+                <iframe id="map-frame-${escapeHtml(o.id)}" class="rider-map-frame" src="${embedMapUrl}" loading="lazy"></iframe>
+              </div>
+
+              <!-- Payment Status Strip -->
+              <div class="rider-payment-banner ${isPrepaid ? 'prepaid' : 'cod'}">
+                <div>
+                  <strong style="font-size: 13px;">${isPrepaid ? 'PREPAID ONLINE VIA PAYSTACK' : 'COLLECT PAYMENT ON DELIVERY'}</strong>
+                  <div style="font-size: 11.5px; opacity: 0.9;">
+                    ${isPrepaid ? 'Goods already paid in full. Do not collect any cash.' : 'Collect total payment before releasing parcel to customer.'}
+                  </div>
+                </div>
+                <strong style="font-size: 16px;">${formatNaira(o.total_amount)}</strong>
+              </div>
+
+              <!-- Manifest -->
+              <div class="rider-items-list">
+                <strong>Package Contents:</strong> ${escapeHtml(itemsStr)}
+              </div>
+
+              <!-- Progression Buttons -->
+              <div class="rider-actions-bar">
+                ${(substatus === 'ready_for_pickup' || !o.delivery_substatus) ? `
+                  <button type="button" class="btn-rider-step btn-step-pickup" onclick="window.advanceRiderStep('${escapeHtml(o.id)}', 'picked_up')">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Confirm Pickup from Store</span>
+                  </button>
+                ` : ''}
+
+                ${substatus === 'picked_up' ? `
+                  <button type="button" class="btn-rider-step btn-step-transit" onclick="window.advanceRiderStep('${escapeHtml(o.id)}', 'in_transit')">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Start Delivery (Out for Delivery)</span>
+                  </button>
+                ` : ''}
+
+                ${substatus === 'in_transit' ? `
+                  <button type="button" class="btn-rider-step btn-step-transit" onclick="window.advanceRiderStep('${escapeHtml(o.id)}', 'arrived')" style="background: #1e3a8a;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>Mark Arrived at Destination</span>
+                  </button>
+                ` : ''}
+
+                ${(substatus === 'arrived' || substatus === 'in_transit') ? `
+                  <button type="button" class="btn-rider-step btn-step-deliver" onclick="window.openPinModal('${escapeHtml(o.id)}')">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Verify PIN &amp; Complete Delivery</span>
+                  </button>
+                ` : ''}
+
+                ${substatus === 'delivered' ? `
+                  <div style="width: 100%; text-align: center; color: #15803d; font-weight: 800; font-size: 13px; padding: 6px;">
+                    Delivered &amp; Verified on ${o.delivered_at ? new Date(o.delivered_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today'}
+                  </div>
+                ` : ''}
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.toggleRiderMap = function(orderId) {
+      const frame = document.getElementById('map-frame-' + orderId);
+      if (frame) {
+        frame.style.display = (frame.style.display === 'block') ? 'none' : 'block';
+      }
+    };
+
+    window.advanceRiderStep = async function(orderId, step) {
+      if (!confirm(`Update order #${orderId} status to "${step.replace(/_/g, ' ').toUpperCase()}"?`)) return;
+      try {
+        if (typeof updateRiderDeliveryStep === 'function') {
+          const res = await updateRiderDeliveryStep(orderId, activeRider.phone, step);
+          if (res && res.success) {
+            loadRiderOrders();
+          } else {
+            alert(res.message || 'Could not update delivery step.');
+          }
+        }
+      } catch (e) {
+        alert('Update error: ' + e.message);
+      }
+    };
+
+    window.openPinModal = function(orderId) {
+      pendingVerifyOrderId = orderId;
+      const target = riderOrders.find(o => String(o.id) === String(orderId));
+      if (!target) return;
+
+      const promptEl = document.getElementById('pinModalCustomerPrompt');
+      const codWarn = document.getElementById('pinModalCodWarning');
+      const cashAmt = document.getElementById('pinModalCashAmount');
+
+      if (promptEl) {
+        promptEl.textContent = `Ask ${target.customer_name || 'the customer'} for the 4-digit Delivery PIN shown in their order tracker.`;
+      }
+
+      if (target.payment_method === 'pay_on_delivery') {
+        codWarn.style.display = 'block';
+        cashAmt.textContent = formatNaira(target.total_amount);
+      } else {
+        codWarn.style.display = 'none';
+      }
+
+      document.getElementById('inputDeliveryPin').value = '';
+      document.getElementById('riderPinModal').classList.add('open');
+      document.getElementById('inputDeliveryPin').focus();
+    };
+
+    window.closePinModal = function() {
+      document.getElementById('riderPinModal').classList.remove('open');
+      pendingVerifyOrderId = null;
+    };
+
+    window.confirmOrderHandoff = async function() {
+      if (!pendingVerifyOrderId) return;
+      const pinVal = document.getElementById('inputDeliveryPin').value.trim();
+
+      if (!pinVal || pinVal.length < 4) {
+        alert('Please enter the 4-digit Delivery PIN provided by the customer.');
+        return;
+      }
+
+      try {
+        if (typeof updateRiderDeliveryStep === 'function') {
+          const res = await updateRiderDeliveryStep(pendingVerifyOrderId, activeRider.phone, 'delivered', pinVal);
+          if (res && res.success) {
+            alert('Delivery verified successfully! Order #' + pendingVerifyOrderId + ' is now marked as DELIVERED.');
+            window.closePinModal();
+            loadRiderOrders();
+          } else {
+            alert(res.message || 'Incorrect PIN code. Please confirm with customer.');
+          }
+        }
+      } catch (err) {
+        alert('Verification error: ' + err.message);
+      }
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
