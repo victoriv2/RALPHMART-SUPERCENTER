@@ -1168,6 +1168,8 @@
           else if (status === 'delivered') { statusClass = 'status-delivered'; statusText = 'Delivered'; }
           else if (status === 'pending') { statusClass = 'status-pending'; statusText = 'Pending'; }
           else if (status === 'pending_quote' || ord.quote_status === 'pending_quote') { statusClass = 'status-pending-quote'; statusText = 'Location Review'; }
+          else if (status === 'assigned_to_agent') { statusClass = 'status-pending-quote'; statusText = 'Agent Assigned'; }
+          else if (status === 'agent_quoted') { statusClass = 'status-pending-quote'; statusText = 'Quote in Review'; }
           else if (status === 'quote_ready' || ord.quote_status === 'quote_ready') { statusClass = 'status-quote-ready'; statusText = 'Quote Ready'; }
           else if (status === 'cancelled') { statusClass = 'status-cancelled'; statusText = 'Cancelled'; }
 
@@ -1202,15 +1204,39 @@
 
           // Dynamic Delivery Fee Quoting Banners
           let quoteBanner = '';
-          if (ord.quote_status === 'pending_quote' || status === 'pending_quote') {
+          if (status === 'assigned_to_agent') {
+            quoteBanner = `
+              <div class="delivery-quote-box reviewing">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                  <span class="quote-badge-tag reviewing">Delivery Agent Assigned</span>
+                  <span style="font-size: 12px; color: #92400e; font-weight: 600;">Destination: ${escapeHtml(ord.city || '')}, ${escapeHtml(ord.state || '')}</span>
+                </div>
+                <div style="font-size: 13px; color: #78350f; line-height: 1.5; margin-top: 6px;">
+                  Delivery agent <strong>${escapeHtml(ord.assigned_agent_name || 'Assigned Courier')}</strong> has been assigned to your order. The agent is reviewing your location to calculate the exact delivery fee.
+                </div>
+              </div>
+            `;
+          } else if (status === 'agent_quoted') {
+            quoteBanner = `
+              <div class="delivery-quote-box reviewing">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                  <span class="quote-badge-tag reviewing">Quote Under Review</span>
+                  <span style="font-size: 12px; color: #92400e; font-weight: 600;">Destination: ${escapeHtml(ord.city || '')}, ${escapeHtml(ord.state || '')}</span>
+                </div>
+                <div style="font-size: 13px; color: #78350f; line-height: 1.5; margin-top: 6px;">
+                  Our delivery agent has submitted a delivery price quote. Store administration is reviewing and finalizing your quote.
+                </div>
+              </div>
+            `;
+          } else if (ord.quote_status === 'pending_quote' || status === 'pending_quote') {
             quoteBanner = `
               <div class="delivery-quote-box reviewing">
                 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                   <span class="quote-badge-tag reviewing">Reviewing Delivery Address</span>
                   <span style="font-size: 12px; color: #92400e; font-weight: 600;">Location: ${escapeHtml(ord.delivery_address || '')}, ${escapeHtml(ord.city || '')}, ${escapeHtml(ord.state || '')}</span>
                 </div>
-                <div style="font-size: 13px; color: #78350f; line-height: 1.5;">
-                  Our logistics dispatch team is calculating the exact delivery fee based on your destination and parcel size. You will receive an instant notification here once your quote is ready.
+                <div style="font-size: 13px; color: #78350f; line-height: 1.5; margin-top: 6px;">
+                  Our dispatch team is assigning an agent to inspect your address and calculate the exact delivery fee based on your destination. You will receive a notification as soon as your quote is ready.
                 </div>
               </div>
             `;

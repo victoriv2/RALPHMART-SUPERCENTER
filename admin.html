@@ -2679,13 +2679,12 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Rider Name</th>
-                  <th>Phone Number</th>
-                  <th>Login PIN</th>
-                  <th>Vehicle Type</th>
-                  <th>Plate Number</th>
+                  <th>Agent Name</th>
+                  <th>Contact Info</th>
+                  <th>State &amp; LGA</th>
+                  <th>Street Address</th>
                   <th>Status</th>
-                  <th>Completed Deliveries</th>
+                  <th>Deliveries</th>
                   <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
@@ -2700,7 +2699,7 @@
         <section class="admin-table-card">
           <div class="admin-table-header">
             <h3 class="admin-table-title" style="font-size: 15px;">Active Dispatches on the Road</h3>
-            <p style="margin: 4px 0 0 0; font-size: 12.5px; color: #64748b;">Live orders currently out for delivery or picked up by riders.</p>
+            <p style="margin: 4px 0 0 0; font-size: 12.5px; color: #64748b;">Live orders currently assigned to agents, out for delivery, or fulfilled.</p>
           </div>
           <div class="admin-table-responsive">
             <table class="admin-table">
@@ -2709,11 +2708,11 @@
                   <th>Order ID</th>
                   <th>Recipient</th>
                   <th>Destination Address</th>
-                  <th>Assigned Rider</th>
+                  <th>Assigned Agent</th>
                   <th>Total Amount</th>
                   <th>Payment Type</th>
                   <th>Delivery Substatus</th>
-                  <th style="text-align: right;">Google Map Navigation</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody id="adminActiveDispatchesTbody">
@@ -3284,6 +3283,10 @@
 
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <select id="modalOrderStatusSelect" class="admin-select" style="flex: 1; min-width: 180px; padding: 8px 12px; font-weight: 700; font-size: 13px; border-radius: 8px; border: 1.5px solid #cbd5e1;">
+              <option value="pending_quote">Pending Delivery Quote</option>
+              <option value="assigned_to_agent">Assigned to Agent</option>
+              <option value="agent_quoted">Agent Quoted</option>
+              <option value="quote_ready">Quote Ready (Awaiting Customer)</option>
               <option value="confirmed">Confirmed</option>
               <option value="processing">Processing (Preparing for Dispatch)</option>
               <option value="shipped">Out for Delivery (Shipped)</option>
@@ -3339,49 +3342,67 @@
     </div>
   </div>
 
-  <!-- ADD DELIVERY AGENT / RIDER MODAL -->
+  <!-- ADD DELIVERY AGENT MODAL -->
   <div class="admin-modal" id="adminAddRiderModal" role="dialog" aria-modal="true" aria-labelledby="addRiderModalTitle">
-    <div class="admin-modal-card" style="max-width: 500px;">
-      <div class="admin-modal-header" style="background: linear-gradient(135deg, #091e3a 0%, #1e293b 100%);">
+    <div class="admin-modal-card" style="max-width: 520px;">
+      <div class="admin-modal-header" style="background: #512175;">
         <div>
           <h3 class="admin-modal-title" id="addRiderModalTitle" style="color: #ffffff;">Register Delivery Agent</h3>
-          <span style="font-size: 11.5px; color: #94a3b8;">Add a verified dispatch rider or courier driver</span>
+          <span style="font-size: 11.5px; color: #e9d5ff;">Add and verify an official delivery agent</span>
         </div>
         <button type="button" class="admin-modal-close" onclick="window.closeAddRiderModal()" style="color: #ffffff;">&times;</button>
       </div>
       <form id="adminAddRiderForm" onsubmit="window.handleAddRiderSubmit(event)" style="padding: 20px 24px;">
-        <div style="margin-bottom: 14px;">
-          <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Rider Full Name *</label>
-          <input type="text" id="newRiderName" required placeholder="e.g. Samuel Okon" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
-        </div>
-        <div style="margin-bottom: 14px;">
-          <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Phone Number (Rider Login ID) *</label>
-          <input type="tel" id="newRiderPhone" required placeholder="e.g. 08012345678" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
           <div>
-            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Vehicle Type</label>
-            <select id="newRiderVehicle" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
-              <option value="Motorcycle">Motorcycle</option>
-              <option value="Delivery Van">Delivery Van</option>
-              <option value="Tricycle">Tricycle</option>
-              <option value="Car">Car</option>
-              <option value="Truck">Truck</option>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">First Name *</label>
+            <input type="text" id="newRiderFirstName" required placeholder="First Name" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Last Name *</label>
+            <input type="text" id="newRiderLastName" required placeholder="Last Name" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Phone Number *</label>
+            <input type="tel" id="newRiderPhone" required placeholder="08012345678" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Email Address *</label>
+            <input type="email" id="newRiderEmail" required placeholder="agent@example.com" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Operating State *</label>
+            <select id="newRiderState" required style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px;" onchange="window.populateAdminRiderLgas(this.value)">
+              <option value="" disabled selected>Select State</option>
             </select>
           </div>
           <div>
-            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Plate Number</label>
-            <input type="text" id="newRiderPlate" placeholder="e.g. UYO-456-XY" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Primary LGA *</label>
+            <select id="newRiderLga" required style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+              <option value="" disabled selected>Select State first</option>
+            </select>
           </div>
         </div>
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Portal Login Security PIN *</label>
-          <input type="text" id="newRiderPin" required value="1234" maxlength="6" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; font-weight: 700; letter-spacing: 2px;">
-          <span style="font-size: 11px; color: #64748b;">Rider uses this PIN and their phone number to log into the delivery agent app.</span>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Street Address / Base *</label>
+          <input type="text" id="newRiderAddress" required placeholder="e.g. 12 Aka Road, Uyo" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Portal Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="newRiderPassword" required placeholder="Create password" style="width: 100%; box-sizing: border-box; padding: 9px 40px 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+            <button type="button" onclick="window.toggleAdminRiderPasswordEye('newRiderPassword', this)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%) !important; background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; display: inline-flex; align-items: center;" aria-label="Toggle password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
           <button type="button" class="admin-btn btn-secondary" onclick="window.closeAddRiderModal()">Cancel</button>
-          <button type="submit" class="admin-btn btn-primary" style="background: #512175;">Register Rider</button>
+          <button type="submit" class="admin-btn btn-primary" style="background: #512175;">Register &amp; Approve Agent</button>
         </div>
       </form>
     </div>
@@ -6629,68 +6650,169 @@
       document.getElementById('modalOrderDeliveryFee').textContent = formatNaira(deliveryFee);
       document.getElementById('modalOrderPayable').textContent = formatNaira(grandTotal);
 
-      // Populate Google Maps link
-      const mapLink = document.getElementById('modalOrderGoogleMapsLink');
-      if (mapLink) {
-        const fullAddr = (order.delivery_address || '') + ', ' + (order.city || '') + ', ' + (order.state || 'Nigeria');
-        mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(fullAddr);
-      }
+      // Dynamic Location Quoting Desk Rendering
+      const quoteBox = document.getElementById('modalOrderDeliveryQuoteBox');
+      const orderStatus = (order.order_status || order.status || 'pending_quote').toLowerCase();
+      const isUnassigned = !order.assigned_agent_id || orderStatus === 'pending_quote';
+      const isAwaitingQuote = orderStatus === 'assigned_to_agent';
+      const isAgentQuoted = orderStatus === 'agent_quoted';
+      const isQuoteReady = orderStatus === 'quote_ready';
 
-      // Populate Quoting box
-      const quoteFeeInput = document.getElementById('modalOrderQuoteFeeInput');
-      const quoteEtaInput = document.getElementById('modalOrderQuoteEtaInput');
-      const quoteNotesInput = document.getElementById('modalOrderQuoteNotesInput');
-      const quoteRiderSelect = document.getElementById('modalOrderQuoteRiderSelect');
-      const pinCodeEl = document.getElementById('modalOrderPinCode');
-
-      if (quoteFeeInput) quoteFeeInput.value = order.delivery_fee || '';
-      if (quoteEtaInput) quoteEtaInput.value = order.delivery_eta || 'Within 24 Hours';
-      if (quoteNotesInput) quoteNotesInput.value = order.delivery_quote_notes || '';
-      if (pinCodeEl) pinCodeEl.textContent = order.delivery_pin || '----';
-
-      if (quoteRiderSelect) {
-        quoteRiderSelect.innerHTML = '<option value="">Select Delivery Rider...</option>';
-        if (typeof getDeliveryAgents === 'function') {
-          getDeliveryAgents().then(riders => {
-            riders.forEach(r => {
-              const opt = document.createElement('option');
-              opt.value = r.id;
-              opt.textContent = `${r.full_name} (${r.vehicle_type} - ${r.phone})`;
-              if (String(order.assigned_rider_id) === String(r.id)) opt.selected = true;
-              quoteRiderSelect.appendChild(opt);
+      if (quoteBox) {
+        if (isUnassigned) {
+          quoteBox.innerHTML = `
+            <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                <span style="background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">Step 1: Assign Delivery Agent</span>
+                <span style="font-size: 12px; font-weight: 700; color: #1e3a8a;">Destination: ${escapeHtml(order.city || '')}, ${escapeHtml(order.state || 'Nigeria')}</span>
+              </div>
+              <p style="margin: 0 0 10px 0; font-size: 12.5px; color: #475569;">
+                Select an approved delivery agent to inspect the customer's delivery destination and quote the exact delivery price.
+              </p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <select id="modalAssignAgentSelect" style="flex: 1; min-width: 200px; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                  <option value="" disabled selected>Select Approved Delivery Agent...</option>
+                </select>
+                <button type="button" class="admin-btn btn-primary" id="btnAdminAssignAgent" style="padding: 8px 16px; font-size: 12.5px; background: #512175;">Assign Agent to Quote Price</button>
+              </div>
+            </div>
+          `;
+          if (typeof getDeliveryAgents === 'function') {
+            getDeliveryAgents().then(agents => {
+              const sel = document.getElementById('modalAssignAgentSelect');
+              if (sel) {
+                const approved = agents.filter(a => (a.approval_status || a.status || '').toLowerCase() === 'approved' || (a.approval_status || a.status || '').toLowerCase() === 'active');
+                if (approved.length === 0) {
+                  sel.innerHTML = '<option value="" disabled selected>No approved agents available. Approve an agent in Logistics tab first.</option>';
+                } else {
+                  approved.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    const aName = (a.first_name || a.last_name) ? `${a.first_name || ''} ${a.last_name || ''}`.trim() : (a.full_name || 'Agent');
+                    opt.textContent = `${aName} (${a.phone} - ${a.state || 'NG'})`;
+                    sel.appendChild(opt);
+                  });
+                }
+              }
             });
-          });
+          }
+          const assignBtn = document.getElementById('btnAdminAssignAgent');
+          if (assignBtn) {
+            assignBtn.onclick = async function() {
+              const sel = document.getElementById('modalAssignAgentSelect');
+              const agentId = sel ? sel.value : '';
+              if (!agentId) {
+                alert('Please select an approved delivery agent.');
+                return;
+              }
+              assignBtn.disabled = true;
+              assignBtn.textContent = 'Assigning...';
+              try {
+                if (typeof assignOrderToAgent === 'function') {
+                  await assignOrderToAgent(order.id, agentId);
+                }
+                showAdminToast(`Order #${order.id} assigned to delivery agent.`);
+                loadOrdersTab();
+                closeOrderDetailsModal();
+              } catch (err) {
+                alert('Could not assign agent: ' + err.message);
+                assignBtn.disabled = false;
+                assignBtn.textContent = 'Assign Agent to Quote Price';
+              }
+            };
+          }
+        } else if (isAwaitingQuote) {
+          quoteBox.innerHTML = `
+            <div style="background: #fefce8; border: 1.5px solid #fef08a; border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                <span style="background: #ca8a04; color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">Awaiting Agent Price Quote</span>
+                <span style="font-size: 12px; font-weight: 700; color: #854d0e;">Assigned: ${escapeHtml(order.assigned_agent_name || 'Agent')} (${escapeHtml(order.assigned_agent_phone || '')})</span>
+              </div>
+              <p style="margin: 0; font-size: 12.5px; color: #713f12; line-height: 1.5;">
+                This order is with delivery agent <strong>${escapeHtml(order.assigned_agent_name || '')}</strong>. The agent is reviewing the destination (<strong>${escapeHtml(order.city || '')}, ${escapeHtml(order.state || '')}</strong>) in the Delivery Portal and will input their delivery price quote.
+              </p>
+            </div>
+          `;
+        } else if (isAgentQuoted) {
+          quoteBox.innerHTML = `
+            <div style="background: #faf5ff; border: 1.5px solid #d8b4fe; border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                <span style="background: #7c3aed; color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">Step 2: Review Agent Price Quote</span>
+                <span style="font-size: 12px; font-weight: 700; color: #5b21b6;">Agent: ${escapeHtml(order.assigned_agent_name || 'Agent')}</span>
+              </div>
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; font-size: 12.5px; color: #334155;">
+                <div>Agent Quoted Price: <strong style="color: #15803d; font-size: 15px;">â‚¦${Number(order.delivery_fee || 0).toLocaleString()}</strong></div>
+                <div>Estimated Timeframe: <strong>${escapeHtml(order.delivery_eta || 'Standard')}</strong></div>
+                ${order.delivery_quote_notes ? `<div>Agent Notes: <em>${escapeHtml(order.delivery_quote_notes)}</em></div>` : ''}
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Approved Delivery Fee (â‚¦) *</label>
+                  <input type="number" id="modalApprovedFeeInput" value="${order.delivery_fee || 0}" min="0" style="width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 700;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Delivery Timeframe</label>
+                  <input type="text" id="modalApprovedEtaInput" value="${escapeHtml(order.delivery_eta || 'Within 24 Hours')}" style="width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                </div>
+              </div>
+              <button type="button" class="admin-btn btn-primary" id="btnAdminApproveQuote" style="padding: 8px 18px; font-size: 12.5px; background: #512175;">
+                Approve Price & Send to Customer
+              </button>
+            </div>
+          `;
+          const approveBtn = document.getElementById('btnAdminApproveQuote');
+          if (approveBtn) {
+            approveBtn.onclick = async function() {
+              const feeInp = document.getElementById('modalApprovedFeeInput');
+              const etaInp = document.getElementById('modalApprovedEtaInput');
+              const feeVal = Number(feeInp ? feeInp.value : 0);
+              const etaVal = etaInp ? etaInp.value.trim() : 'Within 24 Hours';
+              if (feeVal <= 0) {
+                alert('Please enter a valid approved delivery fee greater than 0.');
+                return;
+              }
+              approveBtn.disabled = true;
+              approveBtn.textContent = 'Approving & Sending...';
+              try {
+                if (typeof adminApproveAgentQuote === 'function') {
+                  await adminApproveAgentQuote(order.id, feeVal, etaVal);
+                }
+                showAdminToast(`Approved delivery fee of ${formatNaira(feeVal)} sent to customer.`);
+                loadOrdersTab();
+                closeOrderDetailsModal();
+              } catch (err) {
+                alert('Could not approve quote: ' + err.message);
+                approveBtn.disabled = false;
+                approveBtn.textContent = 'Approve Price & Send to Customer';
+              }
+            };
+          }
+        } else if (isQuoteReady) {
+          quoteBox.innerHTML = `
+            <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                <span style="background: #16a34a; color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">Quote Sent to Customer</span>
+                <span style="font-size: 12px; font-weight: 700; color: #166534;">Approved Delivery Fee: â‚¦${Number(order.delivery_fee || 0).toLocaleString()}</span>
+              </div>
+              <p style="margin: 0; font-size: 12.5px; color: #14532d; line-height: 1.5;">
+                Total payable by customer: <strong>${formatNaira(order.total_amount)}</strong>. Waiting for customer to accept quote / proceed with payment in their order portal.
+              </p>
+            </div>
+          `;
+        } else {
+          quoteBox.innerHTML = `
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                <span style="font-size: 12.5px; font-weight: 700; color: #0f172a;">Assigned Courier: ${escapeHtml(order.assigned_agent_name || order.rider_name || 'Assigned Agent')}</span>
+                <span style="font-size: 12.5px; font-weight: 700; color: #15803d;">Delivery Fee: â‚¦${Number(order.delivery_fee || 0).toLocaleString()}</span>
+              </div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                Fulfillment Status: <strong style="color: #512175; text-transform: uppercase;">${escapeHtml((order.delivery_substatus || order.order_status || '').replace(/_/g, ' '))}</strong>
+              </div>
+            </div>
+          `;
         }
       }
-
-      const submitQuoteBtn = document.getElementById('modalSubmitQuoteBtn');
-      if (submitQuoteBtn) {
-        submitQuoteBtn.onclick = async function() {
-          const fee = Number(quoteFeeInput.value) || 0;
-          if (fee <= 0) {
-            alert('Please enter a valid delivery fee (greater than 0).');
-            quoteFeeInput.focus();
-            return;
-          }
-          submitQuoteBtn.disabled = true;
-          submitQuoteBtn.querySelector('span').textContent = 'Sending Quote...';
-          try {
-            const eta = quoteEtaInput.value.trim() || 'Within 24-48 Hours';
-            const notes = quoteNotesInput.value.trim();
-            const riderId = quoteRiderSelect.value;
-            await submitAdminDeliveryQuote(order.id, fee, eta, notes, riderId);
-            showAdminToast(`Delivery quote of ${formatNaira(fee)} sent for Order #${order.id}`);
-            loadOrdersTab();
-            closeOrderDetailsModal();
-          } catch (err) {
-            alert('Failed to send quote: ' + err.message);
-          } finally {
-            submitQuoteBtn.disabled = false;
-            submitQuoteBtn.querySelector('span').textContent = 'Approve & Send Delivery Quote';
-          }
-        };
-      }
-
       modal.classList.add('open');
     };
 
@@ -6701,7 +6823,7 @@
     }
 
     // ========================================================
-    // LOGISTICS & DELIVERY RIDERS MODULE
+    // LOGISTICS & DELIVERY AGENTS MODULE
     // ========================================================
     async function loadAdminLogisticsTab() {
       const ridersTbody = document.getElementById('adminRidersTableBody');
@@ -6721,22 +6843,48 @@
 
       if (ridersTbody) {
         if (riders.length === 0) {
-          ridersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: #64748b;">No delivery agents registered yet.</td></tr>';
+          ridersTbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">No delivery agents registered yet.</td></tr>';
         } else {
-          ridersTbody.innerHTML = riders.map(r => `
-            <tr>
-              <td><strong style="color: #0f172a;">${escapeHtml(r.full_name)}</strong></td>
-              <td><a href="tel:${escapeHtml(r.phone)}" style="color: #512175; font-weight: 700;">${escapeHtml(r.phone)}</a></td>
-              <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 800; color: #512175;">${escapeHtml(r.pin || '1234')}</code></td>
-              <td><span style="background: #faf5ff; border: 1px solid #d8b4fe; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; color: #512175;">${escapeHtml(r.vehicle_type || 'Motorcycle')}</span></td>
-              <td>${escapeHtml(r.plate_number || 'N/A')}</td>
-              <td><span class="status-chip ${r.status === 'busy' ? 'processing' : 'confirmed'}">${escapeHtml((r.status || 'Active').toUpperCase())}</span></td>
-              <td><strong style="color: #15803d;">${r.completed_deliveries || 0}</strong></td>
-              <td style="text-align: right;">
-                <a href="delivery.html?phone=${encodeURIComponent(r.phone)}" target="_blank" rel="noopener noreferrer" class="admin-btn btn-secondary" style="padding: 4px 10px; font-size: 11px; text-decoration: none;">Launch App</a>
-              </td>
-            </tr>
-          `).join('');
+          ridersTbody.innerHTML = riders.map(r => {
+            const agentName = (r.first_name || r.last_name) ? `${r.first_name || ''} ${r.last_name || ''}`.trim() : (r.full_name || 'Agent');
+            const statusKey = (r.approval_status || r.status || 'pending_approval').toLowerCase();
+            const isApproved = statusKey === 'approved' || statusKey === 'active';
+            const isPending = statusKey === 'pending_approval' || statusKey === 'pending';
+
+            let statusBadge = '';
+            if (isApproved) {
+              statusBadge = '<span class="status-chip confirmed">APPROVED</span>';
+            } else if (isPending) {
+              statusBadge = '<span class="status-chip processing" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">PENDING APPROVAL</span>';
+            } else {
+              statusBadge = '<span class="status-chip cancelled">REJECTED</span>';
+            }
+
+            return `
+              <tr>
+                <td><strong style="color: #0f172a;">${escapeHtml(agentName)}</strong></td>
+                <td>
+                  <div><a href="tel:${escapeHtml(r.phone)}" style="color: #512175; font-weight: 700;">${escapeHtml(r.phone)}</a></div>
+                  <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(r.email || 'No email')}</div>
+                </td>
+                <td>
+                  <strong style="color: #334155;">${escapeHtml(r.state || 'All States')}</strong>
+                  <div style="font-size: 11.5px; color: #64748b;">${escapeHtml(r.lga || 'All LGAs')}</div>
+                </td>
+                <td style="max-width: 180px; font-size: 12px; color: #475569;">${escapeHtml(r.address || '-')}</td>
+                <td>${statusBadge}</td>
+                <td><strong style="color: #15803d;">${r.completed_deliveries || 0}</strong></td>
+                <td style="text-align: right; white-space: nowrap;">
+                  ${isPending ? `
+                    <button type="button" class="admin-btn btn-green" onclick="window.handleAdminApproveAgent('${escapeHtml(r.id)}')" style="padding: 4px 10px; font-size: 11px; margin-right: 4px;">Approve</button>
+                    <button type="button" class="admin-btn btn-danger" onclick="window.handleAdminDeleteAgent('${escapeHtml(r.id)}')" style="padding: 4px 8px; font-size: 11px; background: #dc2626; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                  ` : `
+                    <button type="button" class="admin-btn btn-danger" onclick="window.handleAdminDeleteAgent('${escapeHtml(r.id)}')" style="padding: 4px 8px; font-size: 11px; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 4px; cursor: pointer;">Delete / Revoke</button>
+                  `}
+                </td>
+              </tr>
+            `;
+          }).join('');
         }
       }
 
@@ -6744,7 +6892,7 @@
       if (dispatchesTbody) {
         const activeDispatches = adminOrdersList.filter(o => {
           const s = (o.order_status || o.status || '').toLowerCase();
-          return s === 'shipped' || s === 'processing' || s === 'in_transit' || o.delivery_substatus === 'in_transit' || o.delivery_substatus === 'picked_up';
+          return s === 'assigned_to_agent' || s === 'agent_quoted' || s === 'quote_ready' || s === 'shipped' || s === 'processing' || s === 'in_transit' || o.delivery_substatus === 'in_transit' || o.delivery_substatus === 'picked_up';
         });
 
         if (activeDispatches.length === 0) {
@@ -6752,21 +6900,18 @@
         } else {
           dispatchesTbody.innerHTML = activeDispatches.map(o => {
             const dest = `${o.delivery_address || ''}, ${o.city || ''}, ${o.state || ''}`;
-            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
+            const substatus = (o.delivery_substatus || o.order_status || 'Assigned').replace(/_/g, ' ');
             return `
               <tr>
                 <td><strong style="color: #512175;">#${escapeHtml(o.id)}</strong></td>
                 <td><strong>${escapeHtml(o.customer_name || 'Customer')}</strong><br><span style="font-size: 11px; color: #64748b;">${escapeHtml(o.customer_phone || '')}</span></td>
                 <td style="max-width: 200px; font-size: 12px;">${escapeHtml(dest)}</td>
-                <td><strong style="color: #0f172a;">${escapeHtml(o.rider_name || 'Pending assignment')}</strong></td>
+                <td><strong style="color: #0f172a;">${escapeHtml(o.assigned_agent_name || o.rider_name || 'Pending assignment')}</strong></td>
                 <td><strong style="color: #15803d;">${formatNaira(o.total_amount)}</strong></td>
                 <td><span style="font-size: 11px; text-transform: uppercase;">${(o.payment_method || '').replace(/_/g, ' ')}</span></td>
-                <td><span class="status-chip ${o.order_status === 'shipped' ? 'shipped' : 'processing'}">${escapeHtml((o.delivery_substatus || o.order_status || 'In Transit').toUpperCase())}</span></td>
+                <td><span class="status-chip ${o.order_status === 'shipped' ? 'shipped' : 'processing'}">${escapeHtml(substatus.toUpperCase())}</span></td>
                 <td style="text-align: right;">
-                  <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="admin-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>Google Maps</span>
-                  </a>
+                  <button type="button" class="admin-btn btn-secondary" onclick="window.openOrderDetailsModal('${escapeHtml(o.id)}')" style="padding: 4px 10px; font-size: 11.5px;">View Order</button>
                 </td>
               </tr>
             `;
@@ -6775,9 +6920,87 @@
       }
     }
 
+    window.handleAdminApproveAgent = async function(agentId) {
+      if (!agentId) return;
+      try {
+        if (typeof approveDeliveryAgent === 'function') {
+          await approveDeliveryAgent(agentId);
+        }
+        showAdminToast('Delivery agent approved successfully!');
+        loadAdminLogisticsTab();
+      } catch (err) {
+        alert('Could not approve agent: ' + err.message);
+      }
+    };
+
+    window.handleAdminDeleteAgent = async function(agentId) {
+      if (!agentId) return;
+      if (!confirm('Are you sure you want to delete / reject this delivery agent?')) return;
+      try {
+        if (typeof deleteDeliveryAgent === 'function') {
+          await deleteDeliveryAgent(agentId);
+        }
+        showAdminToast('Delivery agent record removed.');
+        loadAdminLogisticsTab();
+      } catch (err) {
+        alert('Could not delete agent: ' + err.message);
+      }
+    };
+
+    window.populateAdminRiderStates = function() {
+      const stateSelect = document.getElementById('newRiderState');
+      if (!stateSelect) return;
+      const locations = window.NIGERIA_LOCATIONS || {};
+      stateSelect.innerHTML = '<option value="" disabled selected>Select State</option>';
+      Object.keys(locations).sort((a, b) => locations[a].name.localeCompare(locations[b].name)).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = locations[k].name;
+        opt.setAttribute('data-key', k);
+        opt.textContent = locations[k].name;
+        stateSelect.appendChild(opt);
+      });
+    };
+
+    window.populateAdminRiderLgas = function(selectedStateName) {
+      const lgaSelect = document.getElementById('newRiderLga');
+      if (!lgaSelect) return;
+      const locations = window.NIGERIA_LOCATIONS || {};
+      let stateObj = null;
+      for (let k in locations) {
+        if (locations[k].name === selectedStateName || k === selectedStateName) {
+          stateObj = locations[k];
+          break;
+        }
+      }
+      lgaSelect.innerHTML = '<option value="" disabled selected>Select LGA</option>';
+      if (stateObj && stateObj.lgas) {
+        stateObj.lgas.forEach(lga => {
+          const opt = document.createElement('option');
+          opt.value = lga;
+          opt.textContent = lga;
+          lgaSelect.appendChild(opt);
+        });
+      }
+    };
+
+    window.toggleAdminRiderPasswordEye = function(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+      } else {
+        inp.type = 'password';
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+      }
+    };
+
     window.openAddRiderModal = function() {
       const modal = document.getElementById('adminAddRiderModal');
-      if (modal) modal.classList.add('open');
+      if (modal) {
+        window.populateAdminRiderStates();
+        modal.classList.add('open');
+      }
     };
 
     window.closeAddRiderModal = function() {
@@ -6787,30 +7010,42 @@
 
     window.handleAddRiderSubmit = async function(e) {
       e.preventDefault();
-      const name = document.getElementById('newRiderName').value.trim();
+      const firstName = document.getElementById('newRiderFirstName').value.trim();
+      const lastName = document.getElementById('newRiderLastName').value.trim();
       const phone = document.getElementById('newRiderPhone').value.trim();
-      const vehicle = document.getElementById('newRiderVehicle').value;
-      const plate = document.getElementById('newRiderPlate').value.trim();
-      const pin = document.getElementById('newRiderPin').value.trim() || '1234';
+      const email = document.getElementById('newRiderEmail').value.trim();
+      const state = document.getElementById('newRiderState').value;
+      const lga = document.getElementById('newRiderLga').value;
+      const address = document.getElementById('newRiderAddress').value.trim();
+      const password = document.getElementById('newRiderPassword').value;
 
-      if (!name || !phone) {
-        alert('Please enter rider full name and phone number.');
+      if (!firstName || !lastName || !phone || !email || !state || !lga || !address || !password) {
+        alert('Please fill out all required fields.');
         return;
       }
 
       try {
-        await saveDeliveryAgent({
-          full_name: name,
-          phone: phone,
-          vehicle_type: vehicle,
-          plate_number: plate,
-          pin: pin
-        });
-        showAdminToast(`Rider ${name} registered successfully!`);
+        if (typeof registerDeliveryAgent === 'function') {
+          const registered = await registerDeliveryAgent({
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            email: email,
+            state: state,
+            lga: lga,
+            address: address,
+            password: password
+          });
+          // Auto-approve since admin added directly
+          if (registered && registered.id && typeof approveDeliveryAgent === 'function') {
+            await approveDeliveryAgent(registered.id);
+          }
+        }
+        showAdminToast(`Agent ${firstName} ${lastName} registered and approved!`);
         window.closeAddRiderModal();
         loadAdminLogisticsTab();
       } catch (err) {
-        alert('Could not save rider: ' + err.message);
+        alert('Could not save agent: ' + err.message);
       }
     };
 

@@ -3217,43 +3217,19 @@ function calculateStoreLeaderboards(productsList, reviewsList, usersList) {
  * =========================================================================
  */
 
-// Initial system default delivery riders
-const DEFAULT_DELIVERY_AGENTS = [
-  {
-    id: 'agent-101',
-    full_name: 'Emeka Udoh',
-    phone: '08031234567',
-    pin: '1234',
-    vehicle_type: 'Motorcycle',
-    plate_number: 'ABJ-452-XY',
-    status: 'active',
-    completed_deliveries: 42,
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'agent-102',
-    full_name: 'Bassey Effiong',
-    phone: '08098765432',
-    pin: '1234',
-    vehicle_type: 'Delivery Van',
-    plate_number: 'UYO-188-KT',
-    status: 'active',
-    completed_deliveries: 28,
-    created_at: new Date().toISOString()
-  }
-];
-
 function getStoredDeliveryAgents() {
   try {
-    let list = JSON.parse(localStorage.getItem('nkemmart_delivery_agents') || '[]');
-    if (!Array.isArray(list) || list.length === 0) {
-      list = [...DEFAULT_DELIVERY_AGENTS];
-      localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(list));
-    }
-    return list;
+    const list = JSON.parse(localStorage.getItem('nkemmart_delivery_agents') || '[]');
+    return Array.isArray(list) ? list.filter(a => a && a.id !== 'agent-101' && a.id !== 'agent-102') : [];
   } catch (e) {
-    return [...DEFAULT_DELIVERY_AGENTS];
+    return [];
   }
+}
+
+function setStoredDeliveryAgents(agents) {
+  try {
+    localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(agents || []));
+  } catch (e) {}
 }
 
 async function getDeliveryAgents() {
@@ -3261,8 +3237,8 @@ async function getDeliveryAgents() {
   let agents = [];
   if (client) {
     try {
-      const { data, error } = await client.from('delivery_agents').select('*').order('full_name', { ascending: true });
-      if (!error && Array.isArray(data) && data.length > 0) {
+      const { data, error } = await client.from('delivery_agents').select('*').order('created_at', { ascending: false });
+      if (!error && Array.isArray(data)) {
         agents = data;
       }
     } catch (e) {
@@ -3272,99 +3248,257 @@ async function getDeliveryAgents() {
   if (agents.length === 0) {
     agents = getStoredDeliveryAgents();
   }
-  return agents;
+  return agents.filter(a => a && a.id !== 'agent-101' && a.id !== 'agent-102');
 }
 
-async function saveDeliveryAgent(agentData) {
-  const list = getStoredDeliveryAgents();
-  const existingIdx = list.findIndex(a => String(a.id) === String(agentData.id) || a.phone === agentData.phone);
-  const now = new Date().toISOString();
-  let updated;
-  if (existingIdx !== -1) {
-    updated = Object.assign({}, list[existingIdx], agentData, { updated_at: now });
-    list[existingIdx] = updated;
-  } else {
-    updated = Object.assign({
-      id: agentData.id || 'agent-' + Math.floor(100 + Math.random() * 900),
-      pin: agentData.pin || '1234',
-      status: 'active',
-      completed_deliveries: 0,
-      created_at: now
-    }, agentData);
-    list.push(updated);
+// Register a new delivery agent account (First name, Last name, Phone, Email, State, LGA, Address, Password)
+async function registerDeliveryAgent(agentData) {
+  const cleanEmail = (agentData.email || '').trim().toLowerCase();
+  const cleanPhone = (agentData.phone || '').trim();
+  const cleanPassword = (agentData.password || '').trim();
+
+  if (!agentData.first_name || !agentData.last_name || !cleanPhone || !cleanEmail || !cleanPassword) {
+    throw new Error('Please fill all required registration fields.');
   }
-  localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(list));
+
+  const existingAgents = await getDeliveryAgents();
+  const duplicate = existingAgents.find(a => (a.email && a.email.toLowerCase() === cleanEmail) || a.phone === cleanPhone);
+  if (duplicate) {
+    throw new Error('A delivery agent with this email or phone number is already registered.');
+  }
+
+  const agentId = 'AGT-' + Math.floor(100000 + Math.random() * 900000);
+  const now = new Date().toISOString();
+
+  const newAgent = {
+    id: agentId,
+    first_name: agentData.first_name.trim(),
+    last_name: agentData.last_name.trim(),
+    full_name: `${agentData.first_name.trim()} ${agentData.last_name.trim()}`,
+    phone: cleanPhone,
+    email: cleanEmail,
+    state: (agentData.state || '').trim(),
+    lga: (agentData.lga || '').trim(),
+    address: (agentData.address || '').trim(),
+    password: cleanPassword,
+    status: 'pending_approval', // Admin must approve before agent can log in
+    completed_deliveries: 0,
+    created_at: now,
+    updated_at: now
+  };
+
+  // Local storage
+  const list = getStoredDeliveryAgents();
+  list.unshift(newAgent);
+  setStoredDeliveryAgents(list);
+
+  // Cloud storage (Supabase)
+  const client = getSupabase();
+  if (client) {
+    try {
+      await client.from('delivery_agents').insert([newAgent]);
+    } catch (e) {
+      console.warn('Supabase agent registration note:', e);
+    }
+  }
+
+  return newAgent;
+}
+
+// Delivery Agent login
+async function loginDeliveryAgent(identifier, password) {
+  const cleanId = (identifier || '').trim().toLowerCase();
+  const cleanPass = (password || '').trim();
+  const agents = await getDeliveryAgents();
+
+  const match = agents.find(a =>
+    ((a.email && a.email.toLowerCase() === cleanId) || (a.phone && a.phone === cleanId)) &&
+    (a.password === cleanPass)
+  );
+
+  if (!match) {
+    throw new Error('Invalid email/phone or password.');
+  }
+
+  if (match.status === 'pending_approval') {
+    throw new Error('Your delivery agent account is pending administrator review and approval. Please check back shortly.');
+  }
+
+  if (match.status === 'rejected') {
+    throw new Error('Your delivery agent application was rejected or suspended. Please contact store administration.');
+  }
+
+  return match;
+}
+
+// Admin approves delivery agent
+async function approveDeliveryAgent(agentId) {
+  const now = new Date().toISOString();
+  const list = getStoredDeliveryAgents();
+  const target = list.find(a => String(a.id) === String(agentId));
+  if (target) {
+    target.status = 'approved';
+    target.approved_at = now;
+    setStoredDeliveryAgents(list);
+  }
 
   const client = getSupabase();
   if (client) {
     try {
-      await client.from('delivery_agents').upsert([updated]);
+      await client.from('delivery_agents').update({ status: 'approved', updated_at: now }).eq('id', agentId);
     } catch (e) {
-      console.warn('Supabase saveDeliveryAgent note:', e);
+      console.warn('Supabase agent approval note:', e);
     }
   }
-  return updated;
+  return true;
 }
 
-// Admin sets delivery fee quote for an order
-async function submitAdminDeliveryQuote(orderId, deliveryFee, eta, notes, assignedRiderId) {
-  if (!orderId) throw new Error('Order ID required');
-  const feeNum = Math.max(0, Number(deliveryFee) || 0);
-  const now = new Date().toISOString();
-  let riderInfo = null;
+// Admin deletes or rejects delivery agent
+async function deleteDeliveryAgent(agentId) {
+  let list = getStoredDeliveryAgents();
+  list = list.filter(a => String(a.id) !== String(agentId));
+  setStoredDeliveryAgents(list);
 
-  if (assignedRiderId) {
-    const riders = await getDeliveryAgents();
-    riderInfo = riders.find(r => String(r.id) === String(assignedRiderId));
+  const client = getSupabase();
+  if (client) {
+    try {
+      await client.from('delivery_agents').delete().eq('id', agentId);
+    } catch (e) {
+      console.warn('Supabase agent delete note:', e);
+    }
   }
+  return true;
+}
 
-  // Update localStorage first for instant reactivity
+// Step 1: Admin assigns order to an approved Delivery Agent
+async function assignOrderToAgent(orderId, agentId) {
+  const agents = await getDeliveryAgents();
+  const agent = agents.find(a => String(a.id) === String(agentId));
+  if (!agent) throw new Error('Selected delivery agent not found or not approved.');
+
+  const now = new Date().toISOString();
   let updatedOrder = null;
+
   ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
     try {
       const list = JSON.parse(localStorage.getItem(key) || '[]');
-      const target = list.find(o => String(o.id) === String(orderId));
-      if (target) {
-        target.quote_status = 'quote_ready';
-        target.order_status = 'quote_ready';
-        target.status = 'quote_ready';
-        target.delivery_fee = feeNum;
-        target.subtotal = Number(target.subtotal || target.total_amount || 0);
-        target.total_amount = target.subtotal + feeNum;
-        target.delivery_eta = eta || 'Within 24-48 Hours';
-        target.delivery_quote_notes = notes || '';
-        target.quote_sent_at = now;
-        if (!target.delivery_pin) {
-          target.delivery_pin = String(Math.floor(1000 + Math.random() * 9000));
-        }
-        if (riderInfo) {
-          target.assigned_rider_id = riderInfo.id;
-          target.rider_name = riderInfo.full_name;
-          target.rider_phone = riderInfo.phone;
-          target.rider_vehicle = riderInfo.vehicle_type;
-        }
+      const ord = list.find(o => String(o.id) === String(orderId));
+      if (ord) {
+        ord.assigned_agent_id = agent.id;
+        ord.assigned_agent_name = agent.full_name;
+        ord.assigned_agent_phone = agent.phone;
+        ord.assigned_agent_email = agent.email;
+        ord.order_status = 'assigned_to_agent';
+        ord.status = 'assigned_to_agent';
+        ord.quote_status = 'awaiting_agent_quote';
+        ord.assigned_at = now;
         localStorage.setItem(key, JSON.stringify(list));
-        if (!updatedOrder) updatedOrder = target;
+        if (!updatedOrder) updatedOrder = ord;
       }
     } catch (e) {}
   });
 
-  // Cloud update
   const client = getSupabase();
   if (client) {
     try {
-      const payload = {
+      await client.from('orders').update({
+        order_status: 'assigned_to_agent',
+        admin_notes: `Assigned to agent ${agent.full_name} (${agent.phone}) for delivery price quote.`,
+        updated_at: now
+      }).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase assign agent note:', e);
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'assigned_to_agent' } }));
+  }
+  return updatedOrder;
+}
+
+// Step 2: Delivery Agent inputs their price quote for the order
+async function submitAgentPriceQuote(orderId, agentId, quotedPrice, eta, notes) {
+  const feeNum = Math.max(0, Number(quotedPrice) || 0);
+  if (feeNum <= 0) throw new Error('Please enter a valid delivery price.');
+  const now = new Date().toISOString();
+  let updatedOrder = null;
+
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const ord = list.find(o => String(o.id) === String(orderId));
+      if (ord) {
+        ord.agent_quoted_fee = feeNum;
+        ord.agent_eta = eta || 'Within 24 Hours';
+        ord.agent_notes = notes || '';
+        ord.agent_quoted_at = now;
+        ord.order_status = 'agent_quoted';
+        ord.status = 'agent_quoted';
+        ord.quote_status = 'awaiting_admin_approval';
+        localStorage.setItem(key, JSON.stringify(list));
+        if (!updatedOrder) updatedOrder = ord;
+      }
+    } catch (e) {}
+  });
+
+  const client = getSupabase();
+  if (client) {
+    try {
+      await client.from('orders').update({
+        order_status: 'agent_quoted',
+        delivery_fee: feeNum,
+        admin_notes: `Agent quoted ₦${feeNum.toLocaleString()} (ETA: ${eta || 'Standard'}). Awaiting Admin Approval.`,
+        updated_at: now
+      }).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase agent quote note:', e);
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: 'agent_quoted' } }));
+  }
+  return updatedOrder;
+}
+
+// Step 3: Admin approves the agent's quoted delivery price
+async function adminApproveAgentQuote(orderId, approvedFee, adminNotes) {
+  const feeNum = Math.max(0, Number(approvedFee) || 0);
+  const now = new Date().toISOString();
+  let updatedOrder = null;
+
+  ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
+    try {
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const ord = list.find(o => String(o.id) === String(orderId));
+      if (ord) {
+        ord.delivery_fee = feeNum;
+        ord.subtotal = Number(ord.subtotal || ord.total_amount || 0);
+        ord.total_amount = ord.subtotal + feeNum;
+        ord.order_status = 'quote_ready';
+        ord.status = 'quote_ready';
+        ord.quote_status = 'quote_ready';
+        ord.admin_approved_quote_at = now;
+        if (adminNotes) ord.delivery_quote_notes = adminNotes;
+        localStorage.setItem(key, JSON.stringify(list));
+        if (!updatedOrder) updatedOrder = ord;
+      }
+    } catch (e) {}
+  });
+
+  const client = getSupabase();
+  if (client) {
+    try {
+      await client.from('orders').update({
+        order_status: 'quote_ready',
         delivery_fee: feeNum,
         total_amount: updatedOrder ? updatedOrder.total_amount : feeNum,
-        order_status: 'quote_ready',
+        admin_notes: `Approved delivery fee ₦${feeNum.toLocaleString()}. Quote sent to customer.`,
         updated_at: now
-      };
-      const extendedPayload = Object.assign({}, payload, {
-        admin_notes: (notes || '') + ' [Quote: ₦' + feeNum.toLocaleString() + ' | ETA: ' + (eta || 'Standard') + ']'
-      });
-      await client.from('orders').update(extendedPayload).eq('id', orderId);
-    } catch (err) {
-      console.warn('Supabase quote update note:', err);
+      }).eq('id', orderId);
+    } catch (e) {
+      console.warn('Supabase admin quote approval note:', e);
     }
   }
 
@@ -3373,8 +3507,8 @@ async function submitAdminDeliveryQuote(orderId, deliveryFee, eta, notes, assign
     if (typeof addUserNotification === 'function' && updatedOrder) {
       await addUserNotification({
         type: 'order',
-        title: 'Delivery Quote Ready - Order #' + orderId,
-        message: 'Your delivery fee has been calculated at ' + formatNaira(feeNum) + ' (Total: ' + formatNaira(updatedOrder.total_amount) + '). Tap to review and confirm dispatch.',
+        title: 'Delivery Fee Set — Order #' + orderId,
+        message: 'Your delivery fee has been set at ' + formatNaira(feeNum) + ' (Total Payable: ' + formatNaira(updatedOrder.total_amount) + '). Please tap here to review and proceed with payment.',
         link: 'orders.html?orderId=' + encodeURIComponent(orderId)
       });
     }
@@ -3386,7 +3520,7 @@ async function submitAdminDeliveryQuote(orderId, deliveryFee, eta, notes, assign
   return updatedOrder;
 }
 
-// Customer accepts delivery quote (COD or after Paystack online payment)
+// Step 4: Customer accepts the quote (via Paystack payment or COD)
 async function acceptCustomerDeliveryQuote(orderId, paymentReference) {
   if (!orderId) throw new Error('Order ID required');
   const now = new Date().toISOString();
@@ -3406,9 +3540,6 @@ async function acceptCustomerDeliveryQuote(orderId, paymentReference) {
           target.paid_at = now;
         } else if (target.payment_method === 'pay_on_delivery') {
           target.payment_status = 'pending_delivery';
-        }
-        if (!target.delivery_pin) {
-          target.delivery_pin = String(Math.floor(1000 + Math.random() * 9000));
         }
         localStorage.setItem(key, JSON.stringify(list));
         if (!updatedOrder) updatedOrder = target;
@@ -3437,7 +3568,7 @@ async function acceptCustomerDeliveryQuote(orderId, paymentReference) {
       await addUserNotification({
         type: 'order',
         title: 'Order Confirmed for Dispatch',
-        message: 'Order #' + orderId + ' delivery quote accepted. Your items are being packaged for courier pickup.',
+        message: 'Order #' + orderId + ' delivery quote accepted. Your assigned delivery agent will now pick up and dispatch your items.',
         link: 'orders.html?orderId=' + encodeURIComponent(orderId)
       });
     }
@@ -3449,40 +3580,30 @@ async function acceptCustomerDeliveryQuote(orderId, paymentReference) {
   return updatedOrder;
 }
 
-// Delivery Agent Order Transitions
-async function updateRiderDeliveryStep(orderId, riderPhone, newStep, inputPin) {
-  if (!orderId || !newStep) throw new Error('Order ID and step required');
-  const validSteps = ['picked_up', 'in_transit', 'arrived', 'delivered'];
-  if (!validSteps.includes(newStep)) throw new Error('Invalid delivery step');
+// Step 5: Agent updates delivery fulfillment stage (picked_up, shipped, delivered)
+async function updateAgentDeliveryStatus(orderId, agentId, newStatus) {
+  if (!orderId || !newStatus) throw new Error('Order ID and status required');
+  const valid = ['picked_up', 'shipped', 'delivered'];
+  if (!valid.includes(newStatus)) throw new Error('Invalid delivery status');
   const now = new Date().toISOString();
-
   let targetOrder = null;
-  const list = JSON.parse(localStorage.getItem('nkemmart_orders') || '[]');
-  targetOrder = list.find(o => String(o.id) === String(orderId));
-
-  if (newStep === 'delivered') {
-    const requiredPin = targetOrder ? String(targetOrder.delivery_pin || '') : '';
-    if (requiredPin && String(inputPin).trim() !== requiredPin.trim()) {
-      return { success: false, message: 'Incorrect Delivery Confirmation PIN. Please request the 4-digit PIN from the recipient.' };
-    }
-  }
 
   ['nkemmart_user_orders', 'nkemmart_orders'].forEach(function(key) {
     try {
-      const orders = JSON.parse(localStorage.getItem(key) || '[]');
-      const ord = orders.find(o => String(o.id) === String(orderId));
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const ord = list.find(o => String(o.id) === String(orderId));
       if (ord) {
-        ord.order_status = (newStep === 'picked_up' || newStep === 'in_transit' || newStep === 'arrived') ? 'shipped' : newStep;
-        ord.status = ord.order_status;
-        ord.delivery_substatus = newStep;
+        ord.order_status = newStatus;
+        ord.status = newStatus;
+        ord.delivery_substatus = newStatus;
         ord.updated_at = now;
-        if (newStep === 'delivered') {
+        if (newStatus === 'delivered') {
           ord.delivered_at = now;
           if (ord.payment_method === 'pay_on_delivery') {
             ord.payment_status = 'paid_on_delivery';
           }
         }
-        localStorage.setItem(key, JSON.stringify(orders));
+        localStorage.setItem(key, JSON.stringify(list));
         targetOrder = ord;
       }
     } catch (e) {}
@@ -3491,29 +3612,27 @@ async function updateRiderDeliveryStep(orderId, riderPhone, newStep, inputPin) {
   const client = getSupabase();
   if (client) {
     try {
-      const finalStatus = (newStep === 'delivered') ? 'delivered' : 'shipped';
       const patch = {
-        order_status: finalStatus,
+        order_status: newStatus,
         updated_at: now
       };
-      if (newStep === 'delivered' && targetOrder && targetOrder.payment_method === 'pay_on_delivery') {
+      if (newStatus === 'delivered' && targetOrder && targetOrder.payment_method === 'pay_on_delivery') {
         patch.payment_status = 'paid';
       }
       await client.from('orders').update(patch).eq('id', orderId);
     } catch (e) {
-      console.warn('Supabase rider update note:', e);
+      console.warn('Supabase agent update note:', e);
     }
   }
 
-  // Update Rider completed counts if delivered
-  if (newStep === 'delivered' && riderPhone) {
+  // Update agent completed count if delivered
+  if (newStatus === 'delivered' && agentId) {
     try {
       const agents = getStoredDeliveryAgents();
-      const ag = agents.find(a => a.phone === riderPhone);
+      const ag = agents.find(a => String(a.id) === String(agentId));
       if (ag) {
         ag.completed_deliveries = (ag.completed_deliveries || 0) + 1;
-        ag.last_delivery_at = now;
-        localStorage.setItem('nkemmart_delivery_agents', JSON.stringify(agents));
+        setStoredDeliveryAgents(agents);
       }
     } catch (e) {}
   }
@@ -3522,30 +3641,27 @@ async function updateRiderDeliveryStep(orderId, riderPhone, newStep, inputPin) {
   try {
     if (typeof addUserNotification === 'function' && targetOrder) {
       const titles = {
-        picked_up: 'Package Picked Up from Supercenter',
-        in_transit: 'Rider is Out for Delivery',
-        arrived: 'Rider Has Arrived at Your Address',
+        picked_up: 'Package Collected from Store',
+        shipped: 'Order is Out for Delivery',
         delivered: 'Order Delivered Successfully'
       };
-      const messages = {
-        picked_up: 'Rider ' + (targetOrder.rider_name || '') + ' has collected your package and is en route.',
-        in_transit: 'Your order #' + orderId + ' is on the way. Your Delivery PIN is ' + (targetOrder.delivery_pin || '----') + '.',
-        arrived: 'The delivery rider is at your doorstep. Please have your Delivery PIN ready: ' + (targetOrder.delivery_pin || '----') + '.',
-        delivered: 'Your order #' + orderId + ' was successfully delivered and verified. Thank you for shopping with RALPHMART!'
+      const msgs = {
+        picked_up: 'Delivery agent ' + (targetOrder.assigned_agent_name || '') + ' has collected your package from RALPHMART Supercenter.',
+        shipped: 'Your order #' + orderId + ' is currently out for delivery to your address.',
+        delivered: 'Your order #' + orderId + ' has been delivered. Thank you for shopping with RALPHMART!'
       };
       await addUserNotification({
         type: 'order',
-        title: titles[newStep] || 'Delivery Update',
-        message: messages[newStep] || 'Order #' + orderId + ' has a new delivery update.',
+        title: titles[newStatus] || 'Delivery Update',
+        message: msgs[newStatus] || 'Your order status has been updated to ' + newStatus.toUpperCase(),
         link: 'orders.html?orderId=' + encodeURIComponent(orderId)
       });
     }
   } catch (e) {}
 
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: newStep } }));
+    window.dispatchEvent(new CustomEvent('nkemmart_order_updated', { detail: { id: orderId, status: newStatus } }));
   }
-
   return { success: true, order: targetOrder };
 }
 
@@ -3556,10 +3672,15 @@ if (typeof window !== 'undefined') {
   window.updateProductVisibility = updateProductVisibility;
   window.calculateStoreLeaderboards = calculateStoreLeaderboards;
   window.getDeliveryAgents = getDeliveryAgents;
-  window.saveDeliveryAgent = saveDeliveryAgent;
-  window.submitAdminDeliveryQuote = submitAdminDeliveryQuote;
+  window.registerDeliveryAgent = registerDeliveryAgent;
+  window.loginDeliveryAgent = loginDeliveryAgent;
+  window.approveDeliveryAgent = approveDeliveryAgent;
+  window.deleteDeliveryAgent = deleteDeliveryAgent;
+  window.assignOrderToAgent = assignOrderToAgent;
+  window.submitAgentPriceQuote = submitAgentPriceQuote;
+  window.adminApproveAgentQuote = adminApproveAgentQuote;
   window.acceptCustomerDeliveryQuote = acceptCustomerDeliveryQuote;
-  window.updateRiderDeliveryStep = updateRiderDeliveryStep;
+  window.updateAgentDeliveryStatus = updateAgentDeliveryStatus;
 }
 
 // Auto update menu, badges, smart header, realtime sync, and back-to-top on DOM load
