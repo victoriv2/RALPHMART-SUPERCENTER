@@ -1061,6 +1061,12 @@
                     </span>
                     <span>At least 1 symbol</span>
                   </div>
+                  <div class="password-guidance-item" id="reqMatch">
+                    <span class="req-icon">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                    <span>Passwords match</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1279,20 +1285,31 @@
       const reqUpper = document.getElementById('reqUpper');
       const reqNumber = document.getElementById('reqNumber');
       const reqSymbol = document.getElementById('reqSymbol');
+      const reqMatch = document.getElementById('reqMatch');
+      const regConfirmPasswordInput = document.getElementById('regConfirmPassword');
 
       function validatePasswordRules(val) {
         const str = val || '';
+        const retype = regConfirmPasswordInput ? regConfirmPasswordInput.value : '';
         const hasMin = str.length >= 6;
         const hasUp = /[A-Z]/.test(str);
         const hasNum = /[0-9]/.test(str);
         const hasSym = /[^A-Za-z0-9]/.test(str);
+        const hasMatch = str.length > 0 && str === retype;
 
         if (reqMinChar) reqMinChar.classList.toggle('valid', hasMin);
         if (reqUpper) reqUpper.classList.toggle('valid', hasUp);
         if (reqNumber) reqNumber.classList.toggle('valid', hasNum);
         if (reqSymbol) reqSymbol.classList.toggle('valid', hasSym);
+        if (reqMatch) reqMatch.classList.toggle('valid', hasMatch);
 
-        return { hasMin, hasUp, hasNum, hasSym, isValid: (hasMin && hasUp && hasNum && hasSym) };
+        return { hasMin, hasUp, hasNum, hasSym, hasMatch, isValid: (hasMin && hasUp && hasNum && hasSym && hasMatch) };
+      }
+
+      if (regConfirmPasswordInput) {
+        regConfirmPasswordInput.addEventListener('input', () => {
+          validatePasswordRules(regPasswordInput ? regPasswordInput.value : '');
+        });
       }
 
       // Live Password Strength Indicator

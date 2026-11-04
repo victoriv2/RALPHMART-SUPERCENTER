@@ -3394,10 +3394,13 @@
         <div style="margin-bottom: 18px;">
           <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Portal Password *</label>
           <div style="position: relative;">
-            <input type="password" id="newRiderPassword" required placeholder="Create password" style="width: 100%; box-sizing: border-box; padding: 9px 40px 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
+            <input type="password" id="newRiderPassword" required placeholder="Create strong password" style="width: 100%; box-sizing: border-box; padding: 9px 40px 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px;">
             <button type="button" onclick="window.toggleAdminRiderPasswordEye('newRiderPassword', this)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%) !important; background: none; border: none; cursor: pointer; color: #64748b; padding: 4px; display: inline-flex; align-items: center;" aria-label="Toggle password">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
+          </div>
+          <div style="font-size: 11px; color: #64748b; margin-top: 5px; line-height: 1.4;">
+            Must contain at least 6 characters, 1 uppercase letter (A-Z), 1 number (0-9), and 1 symbol.
           </div>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
@@ -7021,6 +7024,27 @@
 
       if (!firstName || !lastName || !phone || !email || !state || !lga || !address || !password) {
         alert('Please fill out all required fields.');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        document.getElementById('newRiderPassword').focus();
+        return;
+      }
+      if (!/[A-Z]/.test(password)) {
+        alert('Password must contain at least 1 uppercase capital letter (A-Z).');
+        document.getElementById('newRiderPassword').focus();
+        return;
+      }
+      if (!/[0-9]/.test(password)) {
+        alert('Password must contain at least 1 number (0-9).');
+        document.getElementById('newRiderPassword').focus();
+        return;
+      }
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        alert('Password must contain at least 1 symbol or special character (e.g. !@#$%^&*).');
+        document.getElementById('newRiderPassword').focus();
         return;
       }
 

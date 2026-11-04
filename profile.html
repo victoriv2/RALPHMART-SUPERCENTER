@@ -1458,17 +1458,68 @@
             <div class="profile-form-row">
               <div class="profile-form-group">
                 <label for="newPassword" class="profile-label">New Password</label>
-                <div class="profile-input-wrapper">
+                <div class="profile-input-wrapper" style="position: relative;">
                   <svg class="profile-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                  <input type="password" id="newPassword" class="profile-input" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password">
+                  <input type="password" id="newPassword" class="profile-input" placeholder="Create strong password" minlength="6" required autocomplete="new-password" style="padding-right: 42px;">
+                  <button type="button" class="profile-pass-toggle-btn" onclick="window.toggleProfPasswordEye('newPassword', this)" aria-label="Toggle password view" title="Show/Hide Password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%) !important; background: transparent; border: none; cursor: pointer; color: #94a3b8; padding: 4px; display: inline-flex; align-items: center;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
                 </div>
               </div>
 
               <div class="profile-form-group">
                 <label for="confirmNewPassword" class="profile-label">Confirm New Password</label>
-                <div class="profile-input-wrapper">
+                <div class="profile-input-wrapper" style="position: relative;">
                   <svg class="profile-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                  <input type="password" id="confirmNewPassword" class="profile-input" placeholder="Re-enter new password" minlength="6" required autocomplete="new-password">
+                  <input type="password" id="confirmNewPassword" class="profile-input" placeholder="Re-enter new password" minlength="6" required autocomplete="new-password" style="padding-right: 42px;">
+                  <button type="button" class="profile-pass-toggle-btn" onclick="window.toggleProfPasswordEye('confirmNewPassword', this)" aria-label="Toggle password view" title="Show/Hide Password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%) !important; background: transparent; border: none; cursor: pointer; color: #94a3b8; padding: 4px; display: inline-flex; align-items: center;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password Strength Bar -->
+            <div class="password-strength-wrap" id="profPassStrengthWrap">
+              <div class="password-strength-bar">
+                <div class="password-strength-fill" id="profPassStrengthFill"></div>
+              </div>
+              <div class="password-strength-text" id="profPassStrengthText">Password strength</div>
+            </div>
+
+            <!-- Password Requirements Guidance Checklist -->
+            <div class="password-guidance-box" id="profPassGuidanceBox" style="margin-top: 10px; margin-bottom: 16px;">
+              <div class="password-guidance-title">Password Security Requirements:</div>
+              <div class="password-guidance-grid">
+                <div class="password-guidance-item" id="profReqMin">
+                  <span class="req-icon">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>At least 6 characters</span>
+                </div>
+                <div class="password-guidance-item" id="profReqUpper">
+                  <span class="req-icon">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>At least 1 uppercase letter (A-Z)</span>
+                </div>
+                <div class="password-guidance-item" id="profReqNumber">
+                  <span class="req-icon">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>At least 1 number (0-9)</span>
+                </div>
+                <div class="password-guidance-item" id="profReqSymbol">
+                  <span class="req-icon">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>At least 1 symbol (!@#$%^&amp;*)</span>
+                </div>
+                <div class="password-guidance-item" id="profReqMatch">
+                  <span class="req-icon">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>Passwords match</span>
                 </div>
               </div>
             </div>
@@ -2513,6 +2564,88 @@
         }
       });
 
+      // Eye Toggle for Profile Password Inputs
+      window.toggleProfPasswordEye = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        if (isPass) {
+          btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        } else {
+          btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        }
+      };
+
+      // Live Profile Password Validation
+      const newPassInput = document.getElementById('newPassword');
+      const confirmPassInput = document.getElementById('confirmNewPassword');
+      const profStrengthWrap = document.getElementById('profPassStrengthWrap');
+      const profStrengthFill = document.getElementById('profPassStrengthFill');
+      const profStrengthText = document.getElementById('profPassStrengthText');
+
+      const profReqMin = document.getElementById('profReqMin');
+      const profReqUpper = document.getElementById('profReqUpper');
+      const profReqNumber = document.getElementById('profReqNumber');
+      const profReqSymbol = document.getElementById('profReqSymbol');
+      const profReqMatch = document.getElementById('profReqMatch');
+
+      function updateProfPasswordValidation() {
+        const val = newPassInput ? newPassInput.value : '';
+        const retypeVal = confirmPassInput ? confirmPassInput.value : '';
+
+        const hasMin = val.length >= 6;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasNumber = /[0-9]/.test(val);
+        const hasSymbol = /[^A-Za-z0-9]/.test(val);
+        const hasMatch = val.length > 0 && val === retypeVal;
+
+        if (profReqMin) profReqMin.classList.toggle('valid', hasMin);
+        if (profReqUpper) profReqUpper.classList.toggle('valid', hasUpper);
+        if (profReqNumber) profReqNumber.classList.toggle('valid', hasNumber);
+        if (profReqSymbol) profReqSymbol.classList.toggle('valid', hasSymbol);
+        if (profReqMatch) profReqMatch.classList.toggle('valid', hasMatch);
+
+        if (!val) {
+          if (profStrengthWrap) profStrengthWrap.style.display = 'none';
+          return;
+        }
+
+        if (profStrengthWrap) profStrengthWrap.style.display = 'block';
+        let score = 0;
+        if (hasMin) score += 1;
+        if (val.length >= 10) score += 1;
+        if (hasUpper && /[a-z]/.test(val)) score += 1;
+        if (hasNumber && hasSymbol) score += 1;
+
+        if (profStrengthFill && profStrengthText) {
+          if (score <= 1) {
+            profStrengthFill.style.width = '25%';
+            profStrengthFill.style.backgroundColor = '#ef4444';
+            profStrengthText.textContent = 'Weak password';
+            profStrengthText.style.color = '#ef4444';
+          } else if (score === 2) {
+            profStrengthFill.style.width = '50%';
+            profStrengthFill.style.backgroundColor = '#f59e0b';
+            profStrengthText.textContent = 'Fair password';
+            profStrengthText.style.color = '#f59e0b';
+          } else if (score === 3) {
+            profStrengthFill.style.width = '75%';
+            profStrengthFill.style.backgroundColor = '#3b82f6';
+            profStrengthText.textContent = 'Good password';
+            profStrengthText.style.color = '#3b82f6';
+          } else {
+            profStrengthFill.style.width = '100%';
+            profStrengthFill.style.backgroundColor = '#15803d';
+            profStrengthText.textContent = 'Strong password';
+            profStrengthText.style.color = '#15803d';
+          }
+        }
+      }
+
+      if (newPassInput) newPassInput.addEventListener('input', updateProfPasswordValidation);
+      if (confirmPassInput) confirmPassInput.addEventListener('input', updateProfPasswordValidation);
+
       // Handle Password Change Form Submit
       const changePasswordForm = document.getElementById('changePasswordForm');
       const savePasswordBtn = document.getElementById('savePasswordBtn');
@@ -2528,6 +2661,31 @@
           passwordAlert.className = 'profile-alert error';
           passwordAlert.textContent = 'Password must be at least 6 characters long.';
           passwordAlert.style.display = 'block';
+          document.getElementById('newPassword').focus();
+          return;
+        }
+
+        if (!/[A-Z]/.test(newPass)) {
+          passwordAlert.className = 'profile-alert error';
+          passwordAlert.textContent = 'Password must contain at least 1 uppercase capital letter (A-Z).';
+          passwordAlert.style.display = 'block';
+          document.getElementById('newPassword').focus();
+          return;
+        }
+
+        if (!/[0-9]/.test(newPass)) {
+          passwordAlert.className = 'profile-alert error';
+          passwordAlert.textContent = 'Password must contain at least 1 number (0-9).';
+          passwordAlert.style.display = 'block';
+          document.getElementById('newPassword').focus();
+          return;
+        }
+
+        if (!/[^A-Za-z0-9]/.test(newPass)) {
+          passwordAlert.className = 'profile-alert error';
+          passwordAlert.textContent = 'Password must contain at least 1 symbol or special character (e.g. !@#$%^&*).';
+          passwordAlert.style.display = 'block';
+          document.getElementById('newPassword').focus();
           return;
         }
 
@@ -2535,6 +2693,7 @@
           passwordAlert.className = 'profile-alert error';
           passwordAlert.textContent = 'Passwords do not match. Please re-enter.';
           passwordAlert.style.display = 'block';
+          document.getElementById('confirmNewPassword').focus();
           return;
         }
 
@@ -2551,6 +2710,7 @@
           passwordAlert.textContent = 'Password changed successfully!';
           passwordAlert.style.display = 'block';
           changePasswordForm.reset();
+          updateProfPasswordValidation();
 
           if (typeof logUserActivity === 'function') {
             await logUserActivity('password_changed', 'Changed account security password');

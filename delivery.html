@@ -264,6 +264,92 @@
       color: var(--agent-primary);
     }
 
+    /* Password Strength Indicator */
+    .password-strength-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+    .password-strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background-color: #e2e8f0;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .password-strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.25s ease, background-color 0.25s ease;
+    }
+    .password-strength-text {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Live Password Guidance Checklist */
+    .password-guidance-box {
+      margin-top: 10px;
+      padding: 11px 13px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .password-guidance-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .password-guidance-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    @media (min-width: 520px) {
+      .password-guidance-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 12px;
+      }
+    }
+    .password-guidance-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      color: #64748b;
+      transition: color 0.15s ease;
+      transform: none !important;
+    }
+    .password-guidance-item .req-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease;
+    }
+    .password-guidance-item .req-icon svg {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .password-guidance-item.valid {
+      color: #15803d;
+      font-weight: 600;
+    }
+    .password-guidance-item.valid .req-icon {
+      background: #15803d;
+    }
+    .password-guidance-item.valid .req-icon svg {
+      opacity: 1;
+    }
+
     .btn-submit-primary {
       width: 100%;
       padding: 12px 18px;
@@ -640,7 +726,7 @@
             <div>
               <label class="form-label" for="regPassword">Password *</label>
               <div class="password-field-wrapper">
-                <input type="password" id="regPassword" class="form-input" required minlength="6" placeholder="At least 6 characters">
+                <input type="password" id="regPassword" class="form-input" required minlength="6" placeholder="Create strong password">
                 <button type="button" class="eye-toggle-btn" onclick="window.togglePasswordVisibility('regPassword', this)" aria-label="Toggle password view" title="Show/Hide Password">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
@@ -653,6 +739,51 @@
                 <button type="button" class="eye-toggle-btn" onclick="window.togglePasswordVisibility('regPasswordRetype', this)" aria-label="Toggle password view" title="Show/Hide Password">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password Strength Indicator -->
+          <div class="password-strength-wrap" id="agentPassStrengthWrap">
+            <div class="password-strength-bar">
+              <div class="password-strength-fill" id="agentPassStrengthFill"></div>
+            </div>
+            <div class="password-strength-text" id="agentPassStrengthText">Password strength</div>
+          </div>
+
+          <!-- Password Live Requirements Guidance Checklist -->
+          <div class="password-guidance-box" id="agentPassGuidanceBox">
+            <div class="password-guidance-title">Password Security Requirements:</div>
+            <div class="password-guidance-grid">
+              <div class="password-guidance-item" id="agentReqMin">
+                <span class="req-icon">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>At least 6 characters</span>
+              </div>
+              <div class="password-guidance-item" id="agentReqUpper">
+                <span class="req-icon">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>At least 1 uppercase letter (A-Z)</span>
+              </div>
+              <div class="password-guidance-item" id="agentReqNumber">
+                <span class="req-icon">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>At least 1 number (0-9)</span>
+              </div>
+              <div class="password-guidance-item" id="agentReqSymbol">
+                <span class="req-icon">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>At least 1 symbol (!@#$%^&amp;*)</span>
+              </div>
+              <div class="password-guidance-item" id="agentReqMatch">
+                <span class="req-icon">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span>Passwords match</span>
               </div>
             </div>
           </div>
@@ -697,11 +828,92 @@
     document.addEventListener('DOMContentLoaded', () => {
       initStatesDropdown();
       checkActiveAgentSession();
+      setupAgentPasswordValidation();
 
       window.addEventListener('nkemmart_order_updated', () => {
         if (currentAgent) loadAgentOrders();
       });
     });
+
+    // Real-time Password Security Rules Validation
+    function setupAgentPasswordValidation() {
+      const passInput = document.getElementById('regPassword');
+      const retypeInput = document.getElementById('regPasswordRetype');
+      const strengthWrap = document.getElementById('agentPassStrengthWrap');
+      const strengthFill = document.getElementById('agentPassStrengthFill');
+      const strengthText = document.getElementById('agentPassStrengthText');
+
+      const reqMin = document.getElementById('agentReqMin');
+      const reqUpper = document.getElementById('agentReqUpper');
+      const reqNumber = document.getElementById('agentReqNumber');
+      const reqSymbol = document.getElementById('agentReqSymbol');
+      const reqMatch = document.getElementById('agentReqMatch');
+
+      function validateRules() {
+        const val = passInput ? passInput.value : '';
+        const retypeVal = retypeInput ? retypeInput.value : '';
+
+        const hasMin = val.length >= 6;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasNumber = /[0-9]/.test(val);
+        const hasSymbol = /[^A-Za-z0-9]/.test(val);
+        const hasMatch = val.length > 0 && val === retypeVal;
+
+        if (reqMin) reqMin.classList.toggle('valid', hasMin);
+        if (reqUpper) reqUpper.classList.toggle('valid', hasUpper);
+        if (reqNumber) reqNumber.classList.toggle('valid', hasNumber);
+        if (reqSymbol) reqSymbol.classList.toggle('valid', hasSymbol);
+        if (reqMatch) reqMatch.classList.toggle('valid', hasMatch);
+
+        if (!val) {
+          if (strengthWrap) strengthWrap.style.display = 'none';
+          return { hasMin, hasUpper, hasNumber, hasSymbol, hasMatch, isValid: false };
+        }
+
+        if (strengthWrap) strengthWrap.style.display = 'block';
+        let score = 0;
+        if (hasMin) score += 1;
+        if (val.length >= 10) score += 1;
+        if (hasUpper && /[a-z]/.test(val)) score += 1;
+        if (hasNumber && hasSymbol) score += 1;
+
+        if (strengthFill && strengthText) {
+          if (score <= 1) {
+            strengthFill.style.width = '25%';
+            strengthFill.style.backgroundColor = '#ef4444';
+            strengthText.textContent = 'Weak password';
+            strengthText.style.color = '#ef4444';
+          } else if (score === 2) {
+            strengthFill.style.width = '50%';
+            strengthFill.style.backgroundColor = '#f59e0b';
+            strengthText.textContent = 'Fair password';
+            strengthText.style.color = '#f59e0b';
+          } else if (score === 3) {
+            strengthFill.style.width = '75%';
+            strengthFill.style.backgroundColor = '#3b82f6';
+            strengthText.textContent = 'Good password';
+            strengthText.style.color = '#3b82f6';
+          } else {
+            strengthFill.style.width = '100%';
+            strengthFill.style.backgroundColor = '#15803d';
+            strengthText.textContent = 'Strong password';
+            strengthText.style.color = '#15803d';
+          }
+        }
+
+        return {
+          hasMin,
+          hasUpper,
+          hasNumber,
+          hasSymbol,
+          hasMatch,
+          isValid: (hasMin && hasUpper && hasNumber && hasSymbol && hasMatch)
+        };
+      }
+
+      if (passInput) passInput.addEventListener('input', validateRules);
+      if (retypeInput) retypeInput.addEventListener('input', validateRules);
+    }
 
     // Populate Nigeria States
     function initStatesDropdown() {
@@ -805,8 +1017,30 @@
       const password = document.getElementById('regPassword').value;
       const passwordRetype = document.getElementById('regPasswordRetype').value;
 
+      // Validate Password Security Requirements
+      if (password.length < 6) {
+        fb.innerHTML = '<div class="agent-notice-box warning">Password must be at least 6 characters long.</div>';
+        document.getElementById('regPassword').focus();
+        return;
+      }
+      if (!/[A-Z]/.test(password)) {
+        fb.innerHTML = '<div class="agent-notice-box warning">Password must contain at least 1 uppercase capital letter (A-Z).</div>';
+        document.getElementById('regPassword').focus();
+        return;
+      }
+      if (!/[0-9]/.test(password)) {
+        fb.innerHTML = '<div class="agent-notice-box warning">Password must contain at least 1 number (0-9).</div>';
+        document.getElementById('regPassword').focus();
+        return;
+      }
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        fb.innerHTML = '<div class="agent-notice-box warning">Password must contain at least 1 symbol or special character (e.g. !@#$%^&*).</div>';
+        document.getElementById('regPassword').focus();
+        return;
+      }
       if (password !== passwordRetype) {
         fb.innerHTML = '<div class="agent-notice-box warning">Passwords do not match. Please retype carefully.</div>';
+        document.getElementById('regPasswordRetype').focus();
         return;
       }
 
