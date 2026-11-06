@@ -1,13 +1,23 @@
 /**
  * RALPHMART SUPERCENTER - SUPABASE CLIENT & AUTH HELPER
- * Project: ralphmart.supercenter@gmail.com's Project
- * Region: eu-west-1
+ * Status: Disconnected from remote database (Awaiting correct project credentials)
  */
 
 const SUPABASE_CONFIG = {
-  url: 'https://xgdwxuraupeztihfugxb.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHd4dXJhdXBlenRpaGZ1Z3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDM1NDAsImV4cCI6MjEwOTI3OTU0MH0.0caOjkT0es74sh2qs9bx-y2jX8DIsM0MH1ZOflW4irk'
+  url: '',
+  anonKey: ''
 };
+
+// Clean up any stale tokens from disconnected Supabase project
+try {
+  if (typeof localStorage !== 'undefined') {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-xgdwxuraupeztihfugxb-') || key.includes('xgdwxuraupeztihfugxb')) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+} catch (e) {}
 
 // Paystack Live Payment Gateway Configuration
 window.RALPHMART_PAYSTACK = {
@@ -44,12 +54,18 @@ let _supabaseInstance = null;
 
 function getSupabase() {
   if (_supabaseInstance) return _supabaseInstance;
+  if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+    return null;
+  }
   if (typeof supabase !== 'undefined' && supabase.createClient) {
     _supabaseInstance = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
     return _supabaseInstance;
   }
-  console.warn('Supabase JS library not loaded. Make sure @supabase/supabase-js is included via script tag.');
   return null;
+}
+
+function isSupabaseConnected() {
+  return Boolean(SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && _supabaseInstance);
 }
 
 // Authentication Helpers
@@ -3681,6 +3697,7 @@ if (typeof window !== 'undefined') {
   window.adminApproveAgentQuote = adminApproveAgentQuote;
   window.acceptCustomerDeliveryQuote = acceptCustomerDeliveryQuote;
   window.updateAgentDeliveryStatus = updateAgentDeliveryStatus;
+  window.isSupabaseConnected = isSupabaseConnected;
 }
 
 // Auto update menu, badges, smart header, realtime sync, and back-to-top on DOM load

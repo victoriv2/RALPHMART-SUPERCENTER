@@ -2023,9 +2023,9 @@
       </div>
 
       <div class="admin-topbar-right">
-        <div class="admin-cloud-pill">
-          <span class="cloud-dot"></span>
-          <span>Supabase Connected</span>
+        <div class="admin-cloud-pill" id="adminCloudStatusPill" style="background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;">
+          <span class="cloud-dot" style="background: #94a3b8; box-shadow: none;"></span>
+          <span id="adminCloudStatusText">Supabase Disconnected</span>
         </div>
         <a href="index.html" class="admin-view-store-link" target="_blank">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -2768,24 +2768,21 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
           
           <div style="background: #ffffff; border: 1px solid var(--admin-border); border-radius: 12px; padding: 22px;">
-            <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 10px 0;">Supabase Cloud Database Status</h3>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-              <span class="cloud-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span>
-              <span style="font-size: 13.5px; font-weight: 700; color: #15803d;">Active &amp; Connected</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 15px; font-weight: 800; color: #091e3a; margin: 0 0 4px 0;">Supabase Cloud Database</h3>
+                <span style="font-size: 12px; color: #64748b;">Cloud database and authentication backend</span>
+              </div>
+              <span id="adminSupabaseStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; padding: 3px 8px; border-radius: 12px;">
+                <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #94a3b8;"></span>
+                DISCONNECTED
+              </span>
             </div>
             
-            <div style="font-size: 12.5px; color: #475569; line-height: 1.6;">
-              <div><strong>Project ID:</strong> xgdwxuraupeztihfugxb</div>
-              <div><strong>Project Name:</strong> NKEMMART Supercenter Database</div>
-              <div><strong>Region:</strong> AWS (eu-west-1)</div>
-              <div><strong>Tables Active:</strong> delivery_agents, orders, profiles, product_reviews, requests, user_activities</div>
-              <div><strong>RLS &amp; Security:</strong> Configured &amp; Verified</div>
-            </div>
-
-            <div style="margin-top: 20px;">
-              <button type="button" class="admin-btn btn-secondary" onclick="syncAllToSupabase()" style="font-size: 12.5px;">
-                <span>Re-Sync Product Catalog to Cloud</span>
-              </button>
+            <div style="font-size: 12.5px; color: #475569; line-height: 1.6; margin-top: 14px;">
+              <div><strong>Status:</strong> Disconnected from remote database</div>
+              <div><strong>Mode:</strong> Local first (orders, agents, reviews, and activities operate in secure browser storage)</div>
+              <div style="margin-top: 8px; color: #64748b;">When you are ready to connect to your correct Supabase project, provide your project URL and public anon key.</div>
             </div>
           </div>
 
